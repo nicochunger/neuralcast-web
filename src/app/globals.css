@@ -1,0 +1,513 @@
+:root {
+  color-scheme: dark;
+  --ink: #f2f2ec;
+  --muted: #b7bbb3;
+  --dim: #797f77;
+  --black: #080807;
+  --panel: #11120f;
+  --panel-strong: #191b16;
+  --line: rgba(242, 242, 236, 0.14);
+  --cyan: #29d9bb;
+  --red: #ff493d;
+  --lime: #d6fb4d;
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--black);
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  color: var(--ink);
+  background:
+    linear-gradient(110deg, rgba(41, 217, 187, 0.16), transparent 31%),
+    linear-gradient(250deg, rgba(255, 73, 61, 0.16), transparent 28%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 6px),
+    var(--black);
+  font-family: "Aptos", "Trebuchet MS", sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+img {
+  max-width: 100%;
+}
+
+.appShell {
+  width: min(1180px, calc(100% - 32px));
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: max(28px, env(safe-area-inset-top)) 0 calc(112px + env(safe-area-inset-bottom));
+}
+
+.appHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 8px 0 28px;
+}
+
+.appHeader h1 {
+  max-width: 760px;
+  margin: 0;
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: clamp(2.55rem, 6vw, 6.6rem);
+  font-weight: 700;
+  line-height: 0.92;
+}
+
+.sectionEyebrow {
+  margin: 0 0 10px;
+  color: var(--lime);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.stationGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.stationCard {
+  position: relative;
+  min-height: 560px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  isolation: isolate;
+}
+
+.stationCard::before {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: var(--station-bg);
+  background-position: center;
+  background-size: cover;
+  content: "";
+  filter: saturate(0.92) contrast(1.08);
+  transform: scale(1.02);
+}
+
+.stationCard::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(8, 8, 7, 0.12), rgba(8, 8, 7, 0.86) 70%),
+    linear-gradient(90deg, rgba(8, 8, 7, 0.74), rgba(8, 8, 7, 0.2));
+  content: "";
+}
+
+.stationImageWash {
+  position: absolute;
+  inset: 0;
+  border-top: 5px solid var(--station-accent);
+  opacity: 0.95;
+}
+
+.stationCardInner {
+  position: relative;
+  display: flex;
+  min-height: 560px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 22px;
+}
+
+.stationTopline,
+.stationActions,
+.appFooter,
+.scheduleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.stationTopline {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.stateChip {
+  min-width: 86px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 11px;
+  color: var(--ink);
+  text-align: center;
+}
+
+.stateChipLive {
+  border-color: color-mix(in srgb, var(--station-accent), white 10%);
+  background: color-mix(in srgb, var(--station-accent), transparent 75%);
+}
+
+.stateChipBusy {
+  border-color: var(--lime);
+}
+
+.stationIdentity {
+  display: grid;
+  grid-template-columns: 116px 1fr;
+  align-items: flex-end;
+  gap: 18px;
+  margin-top: auto;
+}
+
+.stationArtwork {
+  aspect-ratio: 1;
+  width: 116px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.32);
+}
+
+.stationIdentity h2,
+.schedulePanel h2 {
+  margin: 0;
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: clamp(2.2rem, 5vw, 4.6rem);
+  line-height: 0.95;
+}
+
+.stationIdentity p,
+.scheduleHeader p {
+  max-width: 34rem;
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.stationMeta {
+  display: grid;
+  gap: 7px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+
+.stationMeta span,
+.stationScheduleLine span,
+.scheduleSummaryItem span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.stationMeta strong {
+  min-height: 3.2rem;
+  font-size: clamp(1.18rem, 2.2vw, 1.62rem);
+  line-height: 1.18;
+}
+
+.stationMeta em {
+  color: var(--muted);
+  font-style: normal;
+}
+
+.primaryButton,
+.secondaryButton,
+.miniButton {
+  min-height: 48px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.primaryButton {
+  min-width: 138px;
+  padding: 0 26px;
+  background: var(--station-accent);
+  color: #080807;
+}
+
+.secondaryButton,
+.miniButton {
+  border: 1px solid var(--line);
+  padding: 0 18px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink);
+}
+
+.secondaryButtonActive {
+  border-color: var(--station-accent);
+}
+
+.primaryButton:hover,
+.secondaryButton:hover,
+.miniButton:hover {
+  transform: translateY(-1px);
+}
+
+.stationScheduleLine {
+  display: grid;
+  gap: 5px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.stationScheduleLine strong {
+  font-size: 1.05rem;
+}
+
+.playerError {
+  margin: 18px 0 0;
+  border-left: 4px solid var(--red);
+  padding: 10px 12px;
+  color: var(--ink);
+  background: rgba(255, 73, 61, 0.1);
+}
+
+.schedulePanel {
+  margin-top: 28px;
+  border-top: 5px solid var(--station-accent);
+  border-radius: 8px;
+  padding: 26px;
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--station-accent), transparent 88%), transparent 36%),
+    var(--panel-strong);
+  box-shadow: var(--shadow);
+}
+
+.scheduleHeader {
+  align-items: flex-start;
+}
+
+.scheduleHeader > span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.scheduleSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 26px;
+}
+
+.scheduleSummaryItem {
+  display: grid;
+  min-height: 132px;
+  align-content: flex-start;
+  gap: 10px;
+  border-left: 3px solid var(--station-accent);
+  padding: 4px 0 0 14px;
+}
+
+.scheduleSummaryItem strong {
+  font-size: 1.4rem;
+}
+
+.scheduleSummaryItem em {
+  color: var(--muted);
+  font-style: normal;
+}
+
+.scheduleList {
+  display: grid;
+  gap: 0;
+  max-height: 560px;
+  margin: 26px 0 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.scheduleRow,
+.scheduleEmpty {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 18px;
+  border-bottom: 1px solid var(--line);
+  padding: 16px 0;
+}
+
+.scheduleRow time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.scheduleRow div {
+  display: grid;
+  gap: 5px;
+}
+
+.scheduleRow strong {
+  font-size: 1.08rem;
+}
+
+.scheduleRow span,
+.scheduleEmpty {
+  color: var(--muted);
+}
+
+.open-rotation strong {
+  color: var(--lime);
+}
+
+.open-slot strong {
+  color: var(--muted);
+}
+
+.appFooter {
+  margin-top: 26px;
+  padding-bottom: 8px;
+  color: var(--dim);
+  font-size: 0.94rem;
+}
+
+.miniPlayer {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  left: max(16px, env(safe-area-inset-left));
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 16px;
+  max-width: 720px;
+  margin: 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(17, 18, 15, 0.94);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(18px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.miniPlayerVisible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.miniPlayer div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.miniPlayer span {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.miniPlayer strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  .appShell {
+    width: min(100% - 22px, 620px);
+    padding-top: max(18px, env(safe-area-inset-top));
+  }
+
+  .appHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .appHeader h1 {
+    font-size: clamp(2.4rem, 15vw, 4.4rem);
+  }
+
+  .stationGrid,
+  .scheduleSummaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stationCard,
+  .stationCardInner {
+    min-height: 500px;
+  }
+
+  .stationIdentity {
+    grid-template-columns: 86px 1fr;
+  }
+
+  .stationArtwork {
+    width: 86px;
+  }
+
+  .stationActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+  }
+
+  .schedulePanel {
+    padding: 20px;
+  }
+
+  .scheduleHeader {
+    display: grid;
+  }
+
+  .scheduleRow,
+  .scheduleEmpty {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .appFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
