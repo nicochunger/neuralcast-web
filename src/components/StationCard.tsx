@@ -1,4 +1,5 @@
 import { segmentTitle } from "@/lib/schedule";
+import type { CSSProperties } from "react";
 import type {
   PlaybackState,
   Station,
@@ -36,8 +37,9 @@ export function StationCard({
   const trackText = getTrackText(nowPlaying);
   const listenerText =
     nowPlaying.listeners === undefined
-      ? "Listeners pending"
-      : `${nowPlaying.listeners} ${nowPlaying.listeners === 1 ? "listener" : "listeners"}`;
+      ? "Listeners: --"
+      : `Listeners: ${nowPlaying.listeners}`;
+  const liveNowText = schedule.error ? "Unavailable" : segmentTitle(schedule.liveSegment);
 
   return (
     <article
@@ -46,53 +48,58 @@ export function StationCard({
         {
           "--station-bg": `url(${station.backgroundImage})`,
           "--station-accent": station.accentColor
-        } as React.CSSProperties
+        } as CSSProperties
       }
     >
-      <div className="stationImageWash" />
       <div className="stationCardInner">
-        <div className="stationTopline">
-          <span className={`stateChip ${isOnAir ? "stateChipLive" : ""} ${isBusy ? "stateChipBusy" : ""}`}>
-            {statusLabel}
-          </span>
-          <span>{listenerText}</span>
-        </div>
-
-        <div className="stationIdentity">
-          <img src={station.artworkImage} alt="" className="stationArtwork" loading="eager" />
-          <div>
+        <div className="stationCardHeader">
+          <div className="stationTitleBlock">
             <h2>{station.name}</h2>
-            <p>{station.id === "neuralcast" ? "Curated AI radio" : "Heavy rotation from the forge"}</p>
+            <p>{station.id === "neuralcast" ? "Curated AI radio" : "Forged for heavy rotation"}</p>
+          </div>
+
+          <div className="stationControlGroup">
+            {isActive && playbackState !== "idle" ? (
+              <span className={`stateChip ${isOnAir ? "stateChipLive" : ""} ${isBusy ? "stateChipBusy" : ""}`}>
+                {isOnAir ? <WaveformBars /> : null}
+                {statusLabel}
+              </span>
+            ) : null}
+            <button
+              className="playButton"
+              type="button"
+              onClick={() => (shouldStop ? onStop() : onPlay(station))}
+              aria-label={`${shouldStop ? "Stop" : "Play"} ${station.name}`}
+            >
+              <span className={shouldStop ? "stopGlyph" : "playGlyph"} aria-hidden="true" />
+              {shouldStop ? "Stop" : "Play"}
+            </button>
           </div>
         </div>
 
-        <div className="stationMeta">
-          <span>Now playing</span>
-          <strong>{trackText}</strong>
+        <div className="stationInfoSurface">
+          <div className="stationMetaTopline">
+            <span>Now playing</span>
+            <span>{listenerText}</span>
+          </div>
+
+          <strong className="trackTitle">{trackText}</strong>
           {nowPlaying.error && !nowPlaying.text ? <em>{nowPlaying.error}</em> : null}
-        </div>
 
-        <div className="stationActions">
-          <button
-            className="primaryButton"
-            type="button"
-            onClick={() => (shouldStop ? onStop() : onPlay(station))}
-            aria-label={`${shouldStop ? "Stop" : "Play"} ${station.name}`}
-          >
-            {shouldStop ? "Stop" : "Play"}
-          </button>
-          <button
-            className={`secondaryButton ${isScheduleSelected ? "secondaryButtonActive" : ""}`}
-            type="button"
-            onClick={() => onSelectSchedule(station)}
-          >
-            Schedule
-          </button>
-        </div>
+          <div className="stationScheduleLine">
+            <span>Live now</span>
+            <strong>{liveNowText}</strong>
+          </div>
 
-        <div className="stationScheduleLine">
-          <span>Live now</span>
-          <strong>{schedule.error ? "Unavailable" : segmentTitle(schedule.liveSegment)}</strong>
+          <div className="stationActions">
+            <button
+              className={`actionButton ${isScheduleSelected ? "actionButtonActive" : ""}`}
+              type="button"
+              onClick={() => onSelectSchedule(station)}
+            >
+              Schedule
+            </button>
+          </div>
         </div>
       </div>
     </article>
@@ -128,4 +135,15 @@ function getTrackText(nowPlaying: StationNowPlayingState): string {
   }
 
   return "Metadata unavailable.";
+}
+
+function WaveformBars() {
+  return (
+    <span className="waveformBars" aria-hidden="true">
+      <span />
+      <span />
+      <span />
+      <span />
+    </span>
+  );
 }

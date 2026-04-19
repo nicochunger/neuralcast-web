@@ -14,6 +14,7 @@ export function MiniPlayer({ station, playbackState, nowPlaying, onPlay, onStop 
 
   return (
     <aside className={`miniPlayer ${isPlaying ? "miniPlayerVisible" : ""}`} aria-live="polite">
+      <img src={station.artworkImage} alt="" className="miniArtwork" />
       <div>
         <span>{station.name}</span>
         <strong>{track}</strong>

@@ -290,17 +290,20 @@ export function AudioPlayer() {
       <audio ref={audioRef} preload="none" />
 
       <header className="appHeader">
-        <div>
-          <p className="sectionEyebrow">NeuralCast</p>
-          <h1>Two live stations. One tap.</h1>
+        <div className="brandLockup">
+          <img src="/icons/icon-192.png" alt="" className="brandIcon" />
+          <div>
+            <h1>NeuralCast</h1>
+            <p>Live AI radio from Estavayer, Switzerland.</p>
+          </div>
         </div>
         <div className="headerActions">
           {installPrompt ? (
-            <button className="secondaryButton" type="button" onClick={requestInstall}>
+            <button className="installButton" type="button" onClick={requestInstall}>
               Install
             </button>
           ) : null}
-          <span>Zurich time</span>
+          <span>Europe/Zurich</span>
         </div>
       </header>
 
