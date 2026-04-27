@@ -1,17 +1,20 @@
 :root {
-  color-scheme: dark;
-  --ink: #f7f3ec;
-  --muted: rgba(247, 243, 236, 0.72);
-  --dim: rgba(247, 243, 236, 0.52);
-  --black: #0b0b0a;
-  --surface: #151411;
-  --surface-raised: #201e1a;
-  --surface-soft: rgba(255, 255, 255, 0.08);
-  --line: rgba(255, 255, 255, 0.14);
-  --line-strong: rgba(255, 255, 255, 0.22);
-  --red: #ff493d;
-  --lime: #d6fb4d;
-  --shadow: 0 18px 48px rgba(0, 0, 0, 0.42);
+  color-scheme: light;
+  --ink: #17212f;
+  --muted: #5c6675;
+  --dim: #7c8797;
+  --paper: #f4f7fa;
+  --canvas: #eef3f7;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-soft: #f0f4f8;
+  --line: rgba(23, 33, 47, 0.12);
+  --line-strong: rgba(23, 33, 47, 0.22);
+  --red: #b94b43;
+  --lime: #2f7b68;
+  --focus: #2f6f9f;
+  --shadow: 0 22px 56px rgba(31, 45, 61, 0.13);
+  --shadow-soft: 0 12px 30px rgba(31, 45, 61, 0.09);
 }
 
 * {
@@ -20,7 +23,7 @@
 
 html {
   min-height: 100%;
-  background: var(--black);
+  background: var(--paper);
 }
 
 body {
@@ -28,10 +31,11 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 220px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018) 0, rgba(255, 255, 255, 0.018) 1px, transparent 1px, transparent 28px),
-    var(--black);
+    linear-gradient(180deg, #fbfcfd 0, rgba(251, 252, 253, 0) 280px),
+    linear-gradient(180deg, var(--paper) 0, var(--canvas) 100%);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 button,
@@ -67,8 +71,9 @@ img {
   min-height: 72px;
   margin: 0 -14px 14px;
   padding: 10px 14px;
-  background: color-mix(in srgb, var(--black), transparent 9%);
-  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--line);
+  background: rgba(244, 247, 250, 0.86);
+  backdrop-filter: blur(20px) saturate(1.2);
 }
 
 .brandLockup {
@@ -84,6 +89,8 @@ img {
   aspect-ratio: 1;
   border: 1px solid var(--line);
   border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 8px 20px rgba(31, 45, 61, 0.08);
   object-fit: cover;
 }
 
@@ -143,7 +150,7 @@ img {
   background-position: center;
   background-size: cover;
   content: "";
-  filter: saturate(0.98) contrast(1.04);
+  filter: saturate(0.78) contrast(0.94) brightness(1.08);
   transform: scale(1.01);
 }
 
@@ -152,13 +159,14 @@ img {
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.42) 44%, rgba(0, 0, 0, 0.82)),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.56), rgba(0, 0, 0, 0.08) 64%);
+    linear-gradient(180deg, rgba(8, 14, 23, 0.14) 0, rgba(8, 14, 23, 0.04) 36%, rgba(8, 14, 23, 0.34) 62%, rgba(8, 14, 23, 0.82) 100%),
+    linear-gradient(90deg, rgba(8, 14, 23, 0.5), rgba(8, 14, 23, 0.08) 62%);
   content: "";
 }
 
 .stationCardActive {
-  border-color: color-mix(in srgb, var(--station-accent), white 18%);
+  border-color: color-mix(in srgb, var(--station-accent), white 12%);
+  box-shadow: 0 22px 58px color-mix(in srgb, var(--station-accent), transparent 82%);
 }
 
 .stationCardInner {
@@ -188,7 +196,7 @@ img {
   font-size: 1.52rem;
   font-weight: 760;
   line-height: 1.05;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 14px rgba(9, 17, 28, 0.34);
 }
 
 .stationTitleBlock p {
@@ -196,10 +204,10 @@ img {
   max-width: 22rem;
   margin: 6px 0 0;
   overflow: hidden;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.88);
   font-size: 0.94rem;
   line-height: 1.32;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 8px rgba(9, 17, 28, 0.3);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
@@ -217,7 +225,7 @@ img {
 .stationScheduleLine span,
 .scheduleSummaryItem span,
 .scheduleHeader > span {
-  color: rgba(255, 255, 255, 0.74);
+  color: var(--muted);
   font-size: 0.78rem;
   font-weight: 720;
   letter-spacing: 0;
@@ -228,20 +236,22 @@ img {
   align-items: center;
   gap: 7px;
   min-height: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--line);
   border-radius: 999px;
   padding: 5px 9px;
-  background: rgba(0, 0, 0, 0.28);
-  color: white;
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  box-shadow: 0 8px 18px rgba(17, 28, 42, 0.1);
+  backdrop-filter: blur(12px);
 }
 
 .stateChipLive {
-  border-color: color-mix(in srgb, var(--station-accent), white 18%);
+  border-color: color-mix(in srgb, var(--station-accent), white 22%);
+  color: color-mix(in srgb, var(--station-accent), #1d2938 28%);
 }
 
 .stateChipBusy {
-  border-color: var(--lime);
+  border-color: color-mix(in srgb, var(--station-accent), white 22%);
 }
 
 .waveformBars {
@@ -298,9 +308,9 @@ img {
   min-width: 102px;
   justify-content: center;
   padding: 0 14px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #11100e;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28);
+  background: var(--ink);
+  color: white;
+  box-shadow: 0 10px 24px rgba(17, 28, 42, 0.18);
 }
 
 .playGlyph {
@@ -320,57 +330,114 @@ img {
 
 .stationInfoSurface {
   display: grid;
-  gap: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
-  padding: 13px;
-  background: rgba(0, 0, 0, 0.28);
-  backdrop-filter: blur(12px);
+  grid-template-columns: minmax(0, 1fr) minmax(148px, 0.34fr);
+  grid-template-areas:
+    "meta meta"
+    "track live"
+    "track actions";
+  gap: 9px 18px;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .stationMetaTopline {
+  grid-area: meta;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
 
+.stationMetaTopline span:last-child {
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: rgba(8, 14, 23, 0.28);
+  box-shadow: 0 8px 18px rgba(8, 14, 23, 0.16);
+  backdrop-filter: blur(10px);
+}
+
+.stationInfoSurface .stationMetaTopline span,
+.stationInfoSurface .stationScheduleLine span {
+  color: rgba(255, 255, 255, 0.74);
+  text-shadow: 0 1px 8px rgba(8, 14, 23, 0.34);
+}
+
 .trackTitle {
-  display: -webkit-box;
-  min-height: 2.9rem;
+  grid-area: track;
+  display: grid;
+  min-height: 4.1rem;
+  align-content: flex-start;
+  gap: 3px;
   overflow: hidden;
-  color: rgba(255, 255, 255, 0.96);
-  font-size: 1.12rem;
+  color: white;
+  text-shadow: 0 1px 10px rgba(8, 14, 23, 0.38);
+}
+
+.trackArtist,
+.trackSong,
+.trackAlbum {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trackArtist {
+  color: white;
+  font-size: 1.18rem;
+  font-weight: 820;
+  line-height: 1.15;
+}
+
+.trackSong {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 1.03rem;
   font-weight: 680;
-  line-height: 1.3;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  line-height: 1.2;
+}
+
+.trackAlbum {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.88rem;
+  font-weight: 620;
+  line-height: 1.2;
 }
 
 .stationInfoSurface em {
-  color: rgba(255, 255, 255, 0.74);
+  color: var(--muted);
   font-style: normal;
 }
 
 .stationScheduleLine {
+  grid-area: live;
   display: grid;
-  gap: 4px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  padding-top: 9px;
+  align-self: start;
+  gap: 3px;
+  border-top: 0;
+  padding-top: 0;
 }
 
 .stationScheduleLine strong {
   overflow: hidden;
-  color: rgba(255, 255, 255, 0.88);
+  color: white;
   font-size: 0.96rem;
   font-weight: 650;
+  text-shadow: 0 1px 10px rgba(8, 14, 23, 0.38);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .stationActions {
+  grid-area: actions;
   display: grid;
   grid-template-columns: 1fr;
+  align-self: end;
 }
 
 .actionButton,
@@ -383,13 +450,17 @@ img {
 }
 
 .actionButton {
+  border-color: rgba(255, 255, 255, 0.24);
   color: white;
-  background: rgba(0, 0, 0, 0.24);
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(12px);
 }
 
 .actionButtonActive {
-  border-color: color-mix(in srgb, var(--station-accent), white 14%);
-  background: color-mix(in srgb, var(--station-accent), transparent 78%);
+  border-color: color-mix(in srgb, var(--station-accent), white 28%);
+  background: color-mix(in srgb, var(--station-accent), transparent 76%);
+  color: white;
 }
 
 .playButton:hover,
@@ -403,7 +474,7 @@ img {
 .actionButton:focus-visible,
 .installButton:focus-visible,
 .miniButton:focus-visible {
-  outline: 2px solid var(--lime);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
 }
 
@@ -413,17 +484,18 @@ img {
   border-radius: 8px;
   padding: 10px 12px;
   color: var(--ink);
-  background: rgba(255, 73, 61, 0.12);
+  background: color-mix(in srgb, var(--red), white 88%);
 }
 
 .schedulePanel {
   margin-top: 18px;
   border: 1px solid var(--line);
-  border-top: 4px solid var(--station-accent);
   border-radius: 8px;
-  padding: 18px;
-  background: color-mix(in srgb, var(--surface-raised), transparent 5%);
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.28);
+  padding: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.94)),
+    var(--surface-raised);
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .scheduleHeader,
@@ -434,8 +506,14 @@ img {
   gap: 14px;
 }
 
+.scheduleHeader {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 16px;
+}
+
 .schedulePanel h2 {
   margin: 0;
+  color: var(--ink);
   font-size: 1.38rem;
   line-height: 1.1;
 }
@@ -449,6 +527,7 @@ img {
 .scheduleHeader > span {
   border: 1px solid var(--line);
   border-radius: 999px;
+  background: var(--surface-soft);
   padding: 7px 10px;
   white-space: nowrap;
 }
@@ -457,7 +536,8 @@ img {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
-  margin-top: 18px;
+  width: min(100%, 880px);
+  margin: 18px auto 0;
 }
 
 .scheduleSummaryItem {
@@ -465,11 +545,14 @@ img {
   min-height: 108px;
   align-content: flex-start;
   gap: 8px;
-  border-left: 3px solid var(--station-accent);
-  padding: 2px 0 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 13px;
+  background: rgba(247, 250, 252, 0.7);
 }
 
 .scheduleSummaryItem strong {
+  color: var(--ink);
   font-size: 1.1rem;
   line-height: 1.2;
 }
@@ -480,55 +563,204 @@ img {
   line-height: 1.35;
 }
 
-.scheduleList {
+.scheduleTimelineShell {
   display: grid;
-  gap: 0;
-  max-height: 430px;
-  margin: 18px 0 0;
-  padding: 0;
-  overflow: auto;
-  list-style: none;
-  border-top: 1px solid var(--line);
+  gap: 12px;
+  width: min(100%, 880px);
+  margin: 20px auto 0;
 }
 
-.scheduleRow,
-.scheduleEmpty {
-  display: grid;
-  grid-template-columns: 120px minmax(0, 1fr);
-  gap: 16px;
-  border-bottom: 1px solid var(--line);
-  padding: 13px 0;
-}
-
-.scheduleRow time {
+.scheduleTimelineToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   color: var(--muted);
-  font-size: 0.92rem;
+  font-size: 0.84rem;
+  font-weight: 760;
+}
+
+.scheduleTimelineToolbar span:first-child {
+  color: color-mix(in srgb, var(--station-accent), #17212f 24%);
+  text-transform: uppercase;
+}
+
+.scheduleTimelineViewport {
+  max-height: 680px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.96)),
+    var(--surface);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  scroll-behavior: smooth;
+}
+
+.scheduleTimeline {
+  --timeline-height: 1296px;
+  --hour-height: 54px;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  min-width: 0;
+  height: var(--timeline-height);
+}
+
+.scheduleTimeGutter,
+.scheduleTrack {
+  position: relative;
+  height: var(--timeline-height);
+}
+
+.scheduleTimeGutter {
+  border-right: 1px solid var(--line);
+  background: #f7fafc;
+}
+
+.scheduleTimeGutter span {
+  position: absolute;
+  right: 12px;
+  color: var(--dim);
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transform: translateY(-50%);
+}
+
+.scheduleTimeGutter span:first-child {
+  transform: translateY(0);
+}
+
+.scheduleTrack {
+  overflow: hidden;
+  background-image:
+    linear-gradient(to bottom, rgba(23, 33, 47, 0.1) 0 1px, transparent 1px),
+    linear-gradient(to bottom, transparent 0 26px, rgba(23, 33, 47, 0.045) 26px 27px, transparent 27px);
+  background-size: 100% var(--hour-height), 100% var(--hour-height);
+}
+
+.timelineBlock {
+  position: absolute;
+  right: 12px;
+  left: 12px;
+  display: grid;
+  align-content: start;
+  min-height: 0;
+  gap: 2px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--station-accent), white 42%);
+  border-radius: 8px;
+  padding: 9px 12px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--station-accent), white 88%), rgba(255, 255, 255, 0.96));
+  box-shadow: 0 10px 24px rgba(31, 45, 61, 0.1);
+}
+
+.timelineBlock time {
+  color: color-mix(in srgb, var(--station-accent), #17212f 26%);
+  font-size: 0.76rem;
+  font-weight: 780;
   font-variant-numeric: tabular-nums;
 }
 
-.scheduleRow div {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-
-.scheduleRow strong {
+.timelineBlock strong {
+  overflow: hidden;
+  color: var(--ink);
   font-size: 0.98rem;
-  line-height: 1.25;
+  line-height: 1.16;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.scheduleRow span,
-.scheduleEmpty {
+.timelineBlock span {
+  display: -webkit-box;
+  overflow: hidden;
   color: var(--muted);
-  line-height: 1.35;
+  font-size: 0.86rem;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
-.open-rotation strong {
-  color: var(--lime);
+.timelineBlockShort {
+  align-content: center;
+  gap: 3px;
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 
-.open-slot strong {
+.timelineBlockShort time,
+.timelineBlockShort .timelineDetail {
+  display: none;
+}
+
+.timelineBlockShort strong {
+  font-size: 0.88rem;
+}
+
+.timelineBlock.open-slot {
+  border-color: rgba(23, 33, 47, 0.1);
+  background: rgba(247, 250, 252, 0.76);
+  box-shadow: none;
+}
+
+.timelineBlock.open-slot strong,
+.timelineBlock.open-slot span,
+.timelineBlock.open-slot time {
   color: var(--dim);
+}
+
+.timelineBlock.open-rotation {
+  border-color: color-mix(in srgb, var(--station-accent), white 32%);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--station-accent), white 82%), rgba(240, 244, 248, 0.94));
+}
+
+.scheduleNowLine {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  height: 0;
+  border-top: 2px solid var(--red);
+  pointer-events: none;
+}
+
+.scheduleNowLine::before {
+  position: absolute;
+  top: -4px;
+  left: 8px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid white;
+  border-radius: 999px;
+  background: var(--red);
+  box-shadow: 0 4px 10px rgba(185, 75, 67, 0.34);
+  content: "";
+}
+
+.scheduleNowLine span {
+  position: absolute;
+  top: -13px;
+  right: 10px;
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: var(--red);
+  color: white;
+  font-size: 0.74rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 8px 18px rgba(185, 75, 67, 0.24);
+}
+
+.scheduleEmpty {
+  margin-top: 18px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  padding: 18px;
+  color: var(--muted);
+  background: var(--surface-soft);
+  line-height: 1.35;
 }
 
 .appFooter {
@@ -553,11 +785,12 @@ img {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 10px;
-  background: rgba(21, 20, 17, 0.94);
+  background: rgba(255, 255, 255, 0.94);
   box-shadow: var(--shadow);
   opacity: 0;
   pointer-events: none;
   transform: translateY(18px);
+  backdrop-filter: blur(18px) saturate(1.2);
   transition: opacity 180ms ease, transform 180ms ease;
 }
 
@@ -571,6 +804,7 @@ img {
   width: 44px;
   aspect-ratio: 1;
   border-radius: 8px;
+  border: 1px solid var(--line);
   object-fit: cover;
 }
 
@@ -632,15 +866,25 @@ img {
     max-width: 45%;
   }
 
+  .stationInfoSurface {
+    grid-template-columns: minmax(0, 1fr) minmax(136px, 0.36fr);
+    gap: 9px 14px;
+  }
+
   .scheduleHeader,
   .appFooter {
     display: grid;
   }
 
-  .scheduleRow,
-  .scheduleEmpty {
-    grid-template-columns: 1fr;
-    gap: 8px;
+  .scheduleTimelineViewport {
+    max-height: 620px;
+  }
+
+  .scheduleTimeline {
+    --timeline-height: 1152px;
+    --hour-height: 48px;
+    grid-template-columns: 58px minmax(0, 1fr);
+    min-width: 560px;
   }
 
   .miniPlayer {
@@ -649,6 +893,52 @@ img {
 
   .miniArtwork {
     width: 38px;
+  }
+}
+
+@media (max-width: 560px) {
+  .stationInfoSurface {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "meta"
+      "track"
+      "live"
+      "actions";
+  }
+
+  .trackTitle {
+    min-height: auto;
+  }
+
+  .scheduleTimelineToolbar {
+    align-items: flex-start;
+    display: grid;
+  }
+
+  .scheduleTimeline {
+    --timeline-height: 1056px;
+    --hour-height: 44px;
+    grid-template-columns: 52px minmax(0, 1fr);
+    min-width: 0;
+  }
+
+  .scheduleTimeGutter span {
+    right: 8px;
+    font-size: 0.72rem;
+  }
+
+  .timelineBlock {
+    right: 8px;
+    left: 8px;
+    padding: 7px 9px;
+  }
+
+  .timelineBlock strong {
+    font-size: 0.9rem;
+  }
+
+  .timelineBlock span {
+    font-size: 0.8rem;
   }
 }
 

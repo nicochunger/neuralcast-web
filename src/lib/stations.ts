@@ -10,7 +10,7 @@ export const STATIONS: readonly Station[] = [
     timeZone: "Europe/Zurich",
     backgroundImage: "/images/neuralcast-bg.webp",
     artworkImage: "/images/neuralcast-art.webp",
-    accentColor: "#29d9bb"
+    accentColor: "#1f8a78"
   },
   {
     id: "neuralforge",
@@ -19,7 +19,7 @@ export const STATIONS: readonly Station[] = [
     timeZone: "Europe/Zurich",
     backgroundImage: "/images/neuralforge-bg.webp",
     artworkImage: "/images/neuralforge-art.webp",
-    accentColor: "#ff493d",
+    accentColor: "#b55748",
     openRotationThreshold: 10
   }
 ];

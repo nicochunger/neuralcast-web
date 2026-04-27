@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "NeuralCast",
-    statusBarStyle: "black-translucent"
+    statusBarStyle: "default"
   },
   icons: {
     icon: [
@@ -25,7 +25,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#080807"
+  themeColor: "#f4f7fa"
 };
 
 export default function RootLayout({

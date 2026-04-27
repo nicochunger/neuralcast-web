@@ -34,7 +34,7 @@ export function StationCard({
   const isOnAir = isActive && playbackState === "playing";
   const shouldStop = isActive && (playbackState === "playing" || playbackState === "buffering");
   const statusLabel = getStatusLabel(isActive, playbackState);
-  const trackText = getTrackText(nowPlaying);
+  const track = getTrackDetails(nowPlaying);
   const listenerText =
     nowPlaying.listeners === undefined
       ? "Listeners: --"
@@ -83,7 +83,11 @@ export function StationCard({
             <span>{listenerText}</span>
           </div>
 
-          <strong className="trackTitle">{trackText}</strong>
+          <div className="trackTitle" aria-label={track.label}>
+            <strong className="trackArtist">{track.artist}</strong>
+            {track.song ? <span className="trackSong">{track.song}</span> : null}
+            {track.album ? <span className="trackAlbum">{track.album}</span> : null}
+          </div>
           {nowPlaying.error && !nowPlaying.text ? <em>{nowPlaying.error}</em> : null}
 
           <div className="stationScheduleLine">
@@ -125,16 +129,56 @@ function getStatusLabel(isActive: boolean, playbackState: PlaybackState): string
   }
 }
 
-function getTrackText(nowPlaying: StationNowPlayingState): string {
+interface TrackDetails {
+  artist: string;
+  song?: string;
+  album?: string;
+  label: string;
+}
+
+function getTrackDetails(nowPlaying: StationNowPlayingState): TrackDetails {
   if (nowPlaying.text) {
-    return nowPlaying.text;
+    const parts = nowPlaying.text.split(" - ").map((part) => part.trim()).filter(Boolean);
+
+    if (parts.length >= 3) {
+      const [artist, album, ...songParts] = parts;
+      const song = songParts.join(" - ");
+
+      return {
+        artist,
+        song,
+        album,
+        label: nowPlaying.text
+      };
+    }
+
+    if (parts.length === 2) {
+      const [artist, song] = parts;
+
+      return {
+        artist,
+        song,
+        label: nowPlaying.text
+      };
+    }
+
+    return {
+      artist: nowPlaying.text,
+      label: nowPlaying.text
+    };
   }
 
   if (nowPlaying.isLoading) {
-    return "Waiting for live metadata.";
+    return {
+      artist: "Waiting for live metadata.",
+      label: "Waiting for live metadata."
+    };
   }
 
-  return "Metadata unavailable.";
+  return {
+    artist: "Metadata unavailable.",
+    label: "Metadata unavailable."
+  };
 }
 
 function WaveformBars() {
