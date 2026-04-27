@@ -291,7 +291,7 @@ export function AudioPlayer() {
 
       <header className="appHeader">
         <div className="brandLockup">
-          <img src="/icons/icon-192.png" alt="" className="brandIcon" />
+          <img src="/neuralcast-logo.png" alt="" className="brandIcon" />
           <div>
             <h1>NeuralCast</h1>
             <p>Live AI radio from Estavayer, Switzerland.</p>
