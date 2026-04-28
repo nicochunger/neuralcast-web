@@ -557,6 +557,13 @@ img {
   line-height: 1.2;
 }
 
+.scheduleSummaryItem time {
+  color: color-mix(in srgb, var(--station-accent), #17212f 28%);
+  font-size: 0.82rem;
+  font-weight: 760;
+  font-variant-numeric: tabular-nums;
+}
+
 .scheduleSummaryItem em {
   color: var(--muted);
   font-style: normal;
@@ -684,18 +691,28 @@ img {
 
 .timelineBlockShort {
   align-content: center;
-  gap: 3px;
-  padding-top: 4px;
-  padding-bottom: 4px;
+  gap: 0;
+  padding-top: 6px;
+  padding-bottom: 6px;
 }
 
-.timelineBlockShort time,
 .timelineBlockShort .timelineDetail {
   display: none;
 }
 
+.timelineBlockShort time {
+  display: block;
+  overflow: hidden;
+  font-size: 0.72rem;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .timelineBlockShort strong {
-  font-size: 0.88rem;
+  color: var(--ink);
+  font-size: 0.94rem;
+  line-height: 1.1;
 }
 
 .timelineBlock.open-slot {
@@ -711,9 +728,21 @@ img {
 }
 
 .timelineBlock.open-rotation {
-  border-color: color-mix(in srgb, var(--station-accent), white 32%);
+  border-color: #7aa7e8;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--station-accent), white 82%), rgba(240, 244, 248, 0.94));
+    linear-gradient(135deg, #dbeafe, #eef6ff 58%, rgba(255, 255, 255, 0.96));
+}
+
+.timelineBlock.open-rotation time {
+  color: #2f5f9b;
+}
+
+.timelineBlock.open-rotation strong {
+  color: #173b78;
+}
+
+.timelineBlock.open-rotation span {
+  color: #45648f;
 }
 
 .scheduleNowLine {
@@ -728,7 +757,7 @@ img {
 
 .scheduleNowLine::before {
   position: absolute;
-  top: -4px;
+  top: 1px;
   left: 8px;
   width: 10px;
   height: 10px;
@@ -737,6 +766,7 @@ img {
   background: var(--red);
   box-shadow: 0 4px 10px rgba(185, 75, 67, 0.34);
   content: "";
+  transform: translateY(-50%);
 }
 
 .scheduleNowLine span {
@@ -842,10 +872,6 @@ img {
     margin-right: -10px;
     margin-left: -10px;
     min-height: 68px;
-  }
-
-  .headerActions > span {
-    display: none;
   }
 
   .stationGrid,

@@ -303,7 +303,6 @@ export function AudioPlayer() {
               Install
             </button>
           ) : null}
-          <span>Europe/Zurich</span>
         </div>
       </header>
 

@@ -60,18 +60,17 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
       }
       aria-labelledby="schedule-title"
     >
-      <div className="sectionEyebrow">Today in Zurich</div>
       <div className="scheduleHeader">
         <div>
           <h2 id="schedule-title">{station.name} schedule</h2>
-          <p>{schedule.error ? schedule.error : "Live blocks are derived from the public AzuraCast schedule."}</p>
+          <p>{schedule.error ? schedule.error : "See what is playing now and what is coming up through the day."}</p>
         </div>
         <span>{schedule.isLoading ? "Loading" : `${segments.length} blocks`}</span>
       </div>
 
       <div className="scheduleSummaryGrid">
-        <ScheduleSummaryItem label="Live now" segment={schedule.liveSegment} />
-        <ScheduleSummaryItem label="Up next" segment={schedule.upNextSegment} />
+        <ScheduleSummaryItem label="Live now" segment={schedule.liveSegment} timeZone={station.timeZone} />
+        <ScheduleSummaryItem label="Up next" segment={schedule.upNextSegment} timeZone={station.timeZone} />
       </div>
 
       {segments.length === 0 ? (
@@ -79,7 +78,7 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
       ) : (
         <div className="scheduleTimelineShell">
           <div className="scheduleTimelineToolbar">
-            <span>24 hour view</span>
+            <span>24 hour view · Zurich time (CET/CEST)</span>
             <span>{nowMinutes === undefined ? scheduleDate : `Now ${formatClock(now, station.timeZone)}`}</span>
           </div>
 
@@ -119,7 +118,7 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
                   <article
                     key={`${block.segment.startTime}-${block.segment.endTime}`}
                     className={`timelineBlock ${block.segment.kind} ${
-                      block.durationMinutes < 45 ? "timelineBlockShort" : ""
+                      block.durationMinutes < 75 ? "timelineBlockShort" : ""
                     }`}
                     style={
                       {
@@ -143,10 +142,19 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
   );
 }
 
-function ScheduleSummaryItem({ label, segment }: { label: string; segment?: ScheduleSegment }) {
+function ScheduleSummaryItem({
+  label,
+  segment,
+  timeZone
+}: {
+  label: string;
+  segment?: ScheduleSegment;
+  timeZone: string;
+}) {
   return (
     <div className="scheduleSummaryItem">
       <span>{label}</span>
+      {segment ? <time>{formatRange(segment, timeZone)}</time> : null}
       <strong>{segmentTitle(segment)}</strong>
       <em>{segmentDetail(segment)}</em>
     </div>
