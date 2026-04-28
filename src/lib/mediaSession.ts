@@ -24,7 +24,7 @@ export function updateMediaSession(
     album: "NeuralCast",
     artwork: [
       { src: station.artworkImage, sizes: "1024x1024", type: "image/webp" },
-      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" }
+      { src: "/icons/neuralcast-icon-512.png", sizes: "512x512", type: "image/png" }
     ]
   });
   navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";

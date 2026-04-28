@@ -1,5 +1,12 @@
-const CACHE_NAME = "neuralcast-shell-v1";
-const SHELL_ASSETS = ["/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
+const CACHE_NAME = "neuralcast-shell-v2";
+const SHELL_ASSETS = [
+  "/",
+  "/manifest.webmanifest",
+  "/neuralcast-logo.png",
+  "/icons/neuralcast-icon-192.png",
+  "/icons/neuralcast-icon-512.png",
+  "/icons/neuralcast-apple-touch-icon.png"
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
