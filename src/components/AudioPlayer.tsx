@@ -21,6 +21,11 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
+type ResolvedTheme = "light" | "dark";
+type ThemePreference = "system" | ResolvedTheme;
+
+const THEME_STORAGE_KEY = "neuralcast:theme";
+
 export function AudioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const manualStopRef = useRef(false);
@@ -29,6 +34,8 @@ export function AudioPlayer() {
   const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
   const [playbackError, setPlaybackError] = useState<string | undefined>();
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [themePreference, setThemePreference] = useState<ThemePreference>("system");
+  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("light");
   const [nowPlaying, setNowPlaying] = useState<Record<StationId, StationNowPlayingState>>(
     createInitialNowPlayingState
   );
@@ -169,6 +176,29 @@ export function AudioPlayer() {
   }, []);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+    const initialPreference: ThemePreference = storedTheme === "light" || storedTheme === "dark" ? storedTheme : "system";
+
+    const updateResolvedTheme = (preference: ThemePreference) => {
+      setResolvedTheme(preference === "system" ? (mediaQuery.matches ? "dark" : "light") : preference);
+    };
+
+    setThemePreference(initialPreference);
+    applyThemePreference(initialPreference);
+    updateResolvedTheme(initialPreference);
+
+    const handleSystemThemeChange = () => {
+      if (!document.documentElement.dataset.theme) {
+        updateResolvedTheme("system");
+      }
+    };
+
+    mediaQuery.addEventListener("change", handleSystemThemeChange);
+    return () => mediaQuery.removeEventListener("change", handleSystemThemeChange);
+  }, []);
+
+  useEffect(() => {
     const audio = audioRef.current;
 
     if (!audio) {
@@ -285,6 +315,14 @@ export function AudioPlayer() {
     setInstallPrompt(null);
   };
 
+  const toggleTheme = () => {
+    const nextTheme: ResolvedTheme = resolvedTheme === "dark" ? "light" : "dark";
+    window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+    setThemePreference(nextTheme);
+    setResolvedTheme(nextTheme);
+    applyThemePreference(nextTheme);
+  };
+
   return (
     <main className="appShell">
       <audio ref={audioRef} preload="none" />
@@ -303,6 +341,20 @@ export function AudioPlayer() {
               Install
             </button>
           ) : null}
+          <button
+            className={`themeButton themeButton${resolvedTheme === "dark" ? "Dark" : "Light"}`}
+            type="button"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} theme`}
+            title={`Theme: ${themePreference === "system" ? `system (${resolvedTheme})` : resolvedTheme}. Switch to ${
+              resolvedTheme === "dark" ? "light" : "dark"
+            } theme`}
+          >
+            <span className="themeIcon" aria-hidden="true">
+              <span className="themeSun" />
+              <span className="themeMoon" />
+            </span>
+          </button>
         </div>
       </header>
 
@@ -341,6 +393,15 @@ export function AudioPlayer() {
       />
     </main>
   );
+}
+
+function applyThemePreference(preference: ThemePreference) {
+  if (preference === "system") {
+    document.documentElement.removeAttribute("data-theme");
+    return;
+  }
+
+  document.documentElement.dataset.theme = preference;
 }
 
 function createInitialNowPlayingState(): Record<StationId, StationNowPlayingState> {

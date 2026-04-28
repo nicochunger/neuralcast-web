@@ -2,6 +2,15 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
+const themeBootScript = `
+try {
+  var theme = window.localStorage.getItem("neuralcast:theme");
+  if (theme === "light" || theme === "dark") {
+    document.documentElement.dataset.theme = theme;
+  }
+} catch (_) {}
+`;
+
 export const metadata: Metadata = {
   title: "NeuralCast",
   description: "Live AI and curated radio from NeuralCast and NeuralForge.",
@@ -36,6 +45,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         {children}
         <Analytics />
       </body>

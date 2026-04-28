@@ -15,6 +15,162 @@
   --focus: #2f6f9f;
   --shadow: 0 22px 56px rgba(31, 45, 61, 0.13);
   --shadow-soft: 0 12px 30px rgba(31, 45, 61, 0.09);
+  --body-background:
+    linear-gradient(180deg, #fbfcfd 0, rgba(251, 252, 253, 0) 280px),
+    linear-gradient(180deg, var(--paper) 0, var(--canvas) 100%);
+  --header-bg: rgba(244, 247, 250, 0.86);
+  --icon-shadow: 0 8px 20px rgba(31, 45, 61, 0.08);
+  --state-chip-bg: rgba(255, 255, 255, 0.9);
+  --state-chip-shadow: 0 8px 18px rgba(17, 28, 42, 0.1);
+  --button-shadow: 0 10px 24px rgba(17, 28, 42, 0.18);
+  --panel-bg:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.94)),
+    var(--surface-raised);
+  --panel-inset: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --summary-bg: rgba(247, 250, 252, 0.7);
+  --timeline-bg:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.96)),
+    var(--surface);
+  --timeline-gutter-bg: #f7fafc;
+  --timeline-hour-line: rgba(23, 33, 47, 0.1);
+  --timeline-half-line: rgba(23, 33, 47, 0.045);
+  --timeline-block-border: color-mix(in srgb, var(--station-accent), white 30%);
+  --timeline-block-bg:
+    linear-gradient(135deg, color-mix(in srgb, var(--station-accent), white 82%), #ffffff 58%);
+  --timeline-block-shadow: 0 12px 28px rgba(31, 45, 61, 0.12);
+  --scheduled-block-bg: linear-gradient(135deg, #fff1ed 0%, #fffaf8 64%, #ffffff 100%);
+  --scheduled-block-border: #e2aca4;
+  --scheduled-block-time: #934a43;
+  --timeline-time: color-mix(in srgb, var(--station-accent), #17212f 26%);
+  --timeline-toolbar: color-mix(in srgb, var(--station-accent), #17212f 24%);
+  --open-slot-bg: rgba(247, 250, 252, 0.76);
+  --open-slot-border: rgba(23, 33, 47, 0.1);
+  --open-rotation-bg: linear-gradient(135deg, #dbeafe, #eef6ff 58%, rgba(255, 255, 255, 0.96));
+  --open-rotation-border: #7aa7e8;
+  --open-rotation-time: #2f5f9b;
+  --open-rotation-ink: #173b78;
+  --open-rotation-muted: #45648f;
+  --error-bg: color-mix(in srgb, var(--red), white 88%);
+  --mini-bg: rgba(255, 255, 255, 0.94);
+  --theme-icon-cutout: var(--surface-soft);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --ink: #f3f6fb;
+    --muted: #a7b0bd;
+    --dim: #828d9d;
+    --paper: #101317;
+    --canvas: #171b20;
+    --surface: #191e24;
+    --surface-raised: #20262d;
+    --surface-soft: #283039;
+    --line: rgba(226, 232, 240, 0.13);
+    --line-strong: rgba(226, 232, 240, 0.24);
+    --red: #e05d55;
+    --lime: #6eb6a2;
+    --focus: #7cc4ff;
+    --shadow: 0 24px 64px rgba(0, 0, 0, 0.42);
+    --shadow-soft: 0 14px 36px rgba(0, 0, 0, 0.3);
+    --body-background:
+      linear-gradient(180deg, #171b20 0, rgba(23, 27, 32, 0) 280px),
+      radial-gradient(circle at 14% 0, rgba(110, 182, 162, 0.11), transparent 34%),
+      linear-gradient(180deg, var(--paper) 0, var(--canvas) 100%);
+    --header-bg: rgba(16, 19, 23, 0.88);
+    --icon-shadow: 0 10px 24px rgba(0, 0, 0, 0.34);
+    --state-chip-bg: rgba(32, 38, 45, 0.86);
+    --state-chip-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+    --button-shadow: 0 12px 26px rgba(0, 0, 0, 0.34);
+    --panel-bg:
+      linear-gradient(180deg, rgba(32, 38, 45, 0.98), rgba(25, 30, 36, 0.96)),
+      var(--surface-raised);
+    --panel-inset: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --summary-bg: rgba(16, 19, 23, 0.32);
+    --timeline-bg:
+      linear-gradient(180deg, rgba(25, 30, 36, 0.92), rgba(18, 22, 27, 0.96)),
+      var(--surface);
+    --timeline-gutter-bg: #161b21;
+    --timeline-hour-line: rgba(226, 232, 240, 0.12);
+    --timeline-half-line: rgba(226, 232, 240, 0.055);
+    --timeline-block-border: color-mix(in srgb, var(--station-accent), #ffffff 26%);
+    --timeline-block-bg:
+      linear-gradient(135deg, color-mix(in srgb, var(--station-accent), #20262d 76%), #20262d 58%);
+    --timeline-block-shadow: 0 12px 26px rgba(0, 0, 0, 0.24);
+    --scheduled-block-bg: linear-gradient(135deg, #332421 0%, #26292d 68%, #20262d 100%);
+    --scheduled-block-border: #8b5952;
+    --scheduled-block-time: #f0afa7;
+    --timeline-time: color-mix(in srgb, var(--station-accent), #f3f6fb 44%);
+    --timeline-toolbar: color-mix(in srgb, var(--station-accent), #f3f6fb 34%);
+    --open-slot-bg: rgba(28, 34, 41, 0.58);
+    --open-slot-border: rgba(226, 232, 240, 0.12);
+    --open-rotation-bg: linear-gradient(135deg, rgba(32, 76, 126, 0.78), rgba(22, 47, 78, 0.68) 62%, rgba(27, 33, 40, 0.94));
+    --open-rotation-border: #5b95df;
+    --open-rotation-time: #a8cfff;
+    --open-rotation-ink: #dcecff;
+    --open-rotation-muted: #a9bdd6;
+    --error-bg: rgba(224, 93, 85, 0.16);
+    --mini-bg: rgba(32, 38, 45, 0.92);
+    --theme-icon-cutout: var(--surface-soft);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #f3f6fb;
+  --muted: #a7b0bd;
+  --dim: #828d9d;
+  --paper: #101317;
+  --canvas: #171b20;
+  --surface: #191e24;
+  --surface-raised: #20262d;
+  --surface-soft: #283039;
+  --line: rgba(226, 232, 240, 0.13);
+  --line-strong: rgba(226, 232, 240, 0.24);
+  --red: #e05d55;
+  --lime: #6eb6a2;
+  --focus: #7cc4ff;
+  --shadow: 0 24px 64px rgba(0, 0, 0, 0.42);
+  --shadow-soft: 0 14px 36px rgba(0, 0, 0, 0.3);
+  --body-background:
+    linear-gradient(180deg, #171b20 0, rgba(23, 27, 32, 0) 280px),
+    radial-gradient(circle at 14% 0, rgba(110, 182, 162, 0.11), transparent 34%),
+    linear-gradient(180deg, var(--paper) 0, var(--canvas) 100%);
+  --header-bg: rgba(16, 19, 23, 0.88);
+  --icon-shadow: 0 10px 24px rgba(0, 0, 0, 0.34);
+  --state-chip-bg: rgba(32, 38, 45, 0.86);
+  --state-chip-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+  --button-shadow: 0 12px 26px rgba(0, 0, 0, 0.34);
+  --panel-bg:
+    linear-gradient(180deg, rgba(32, 38, 45, 0.98), rgba(25, 30, 36, 0.96)),
+    var(--surface-raised);
+  --panel-inset: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --summary-bg: rgba(16, 19, 23, 0.32);
+  --timeline-bg:
+    linear-gradient(180deg, rgba(25, 30, 36, 0.92), rgba(18, 22, 27, 0.96)),
+    var(--surface);
+  --timeline-gutter-bg: #161b21;
+  --timeline-hour-line: rgba(226, 232, 240, 0.12);
+  --timeline-half-line: rgba(226, 232, 240, 0.055);
+  --timeline-block-border: color-mix(in srgb, var(--station-accent), #ffffff 26%);
+  --timeline-block-bg:
+    linear-gradient(135deg, color-mix(in srgb, var(--station-accent), #20262d 76%), #20262d 58%);
+  --timeline-block-shadow: 0 12px 26px rgba(0, 0, 0, 0.24);
+  --scheduled-block-bg: linear-gradient(135deg, #332421 0%, #26292d 68%, #20262d 100%);
+  --scheduled-block-border: #8b5952;
+  --scheduled-block-time: #f0afa7;
+  --timeline-time: color-mix(in srgb, var(--station-accent), #f3f6fb 44%);
+  --timeline-toolbar: color-mix(in srgb, var(--station-accent), #f3f6fb 34%);
+  --open-slot-bg: rgba(28, 34, 41, 0.58);
+  --open-slot-border: rgba(226, 232, 240, 0.12);
+  --open-rotation-bg: linear-gradient(135deg, rgba(32, 76, 126, 0.78), rgba(22, 47, 78, 0.68) 62%, rgba(27, 33, 40, 0.94));
+  --open-rotation-border: #5b95df;
+  --open-rotation-time: #a8cfff;
+  --open-rotation-ink: #dcecff;
+  --open-rotation-muted: #a9bdd6;
+  --error-bg: rgba(224, 93, 85, 0.16);
+  --mini-bg: rgba(32, 38, 45, 0.92);
+  --theme-icon-cutout: var(--surface-soft);
 }
 
 * {
@@ -30,9 +186,7 @@ body {
   min-height: 100%;
   margin: 0;
   color: var(--ink);
-  background:
-    linear-gradient(180deg, #fbfcfd 0, rgba(251, 252, 253, 0) 280px),
-    linear-gradient(180deg, var(--paper) 0, var(--canvas) 100%);
+  background: var(--body-background);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -72,7 +226,7 @@ img {
   margin: 0 -14px 14px;
   padding: 10px 14px;
   border-bottom: 1px solid var(--line);
-  background: rgba(244, 247, 250, 0.86);
+  background: var(--header-bg);
   backdrop-filter: blur(20px) saturate(1.2);
 }
 
@@ -90,7 +244,7 @@ img {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
-  box-shadow: 0 8px 20px rgba(31, 45, 61, 0.08);
+  box-shadow: var(--icon-shadow);
   object-fit: cover;
 }
 
@@ -239,9 +393,9 @@ img {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 5px 9px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--state-chip-bg);
   color: var(--ink);
-  box-shadow: 0 8px 18px rgba(17, 28, 42, 0.1);
+  box-shadow: var(--state-chip-shadow);
   backdrop-filter: blur(12px);
 }
 
@@ -294,7 +448,8 @@ img {
 .playButton,
 .actionButton,
 .installButton,
-.miniButton {
+.miniButton,
+.themeButton {
   min-height: 42px;
   border-radius: 8px;
   cursor: pointer;
@@ -309,8 +464,8 @@ img {
   justify-content: center;
   padding: 0 14px;
   background: var(--ink);
-  color: white;
-  box-shadow: 0 10px 24px rgba(17, 28, 42, 0.18);
+  color: var(--paper);
+  box-shadow: var(--button-shadow);
 }
 
 .playGlyph {
@@ -442,11 +597,81 @@ img {
 
 .actionButton,
 .installButton,
-.miniButton {
+.miniButton,
+.themeButton {
   border: 1px solid var(--line);
   padding: 0 14px;
   background: var(--surface-soft);
   color: var(--ink);
+}
+
+.themeButton {
+  display: grid;
+  width: 42px;
+  aspect-ratio: 1;
+  place-items: center;
+  padding: 0;
+}
+
+.themeIcon {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.themeSun,
+.themeMoon {
+  position: absolute;
+  display: block;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.themeSun {
+  inset: 4px;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+}
+
+.themeSun::before {
+  position: absolute;
+  inset: -7px;
+  border: 2px dotted currentColor;
+  border-radius: inherit;
+  content: "";
+  opacity: 0.72;
+}
+
+.themeMoon {
+  top: 2px;
+  left: 5px;
+  width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0;
+  transform: translateX(-3px) scale(0.78);
+}
+
+.themeMoon::after {
+  position: absolute;
+  top: -2px;
+  right: -5px;
+  width: 16px;
+  height: 16px;
+  border-radius: inherit;
+  background: var(--theme-icon-cutout);
+  content: "";
+}
+
+.themeButtonDark .themeSun {
+  opacity: 0;
+  transform: rotate(40deg) scale(0.66);
+}
+
+.themeButtonDark .themeMoon {
+  opacity: 1;
+  transform: translateX(0) scale(1);
 }
 
 .actionButton {
@@ -466,14 +691,16 @@ img {
 .playButton:hover,
 .actionButton:hover,
 .installButton:hover,
-.miniButton:hover {
+.miniButton:hover,
+.themeButton:hover {
   transform: translateY(-1px);
 }
 
 .playButton:focus-visible,
 .actionButton:focus-visible,
 .installButton:focus-visible,
-.miniButton:focus-visible {
+.miniButton:focus-visible,
+.themeButton:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 3px;
 }
@@ -484,7 +711,7 @@ img {
   border-radius: 8px;
   padding: 10px 12px;
   color: var(--ink);
-  background: color-mix(in srgb, var(--red), white 88%);
+  background: var(--error-bg);
 }
 
 .schedulePanel {
@@ -492,10 +719,8 @@ img {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 20px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.94)),
-    var(--surface-raised);
-  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  background: var(--panel-bg);
+  box-shadow: var(--shadow-soft), var(--panel-inset);
 }
 
 .scheduleHeader,
@@ -548,7 +773,7 @@ img {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 13px;
-  background: rgba(247, 250, 252, 0.7);
+  background: var(--summary-bg);
 }
 
 .scheduleSummaryItem strong {
@@ -588,7 +813,7 @@ img {
 }
 
 .scheduleTimelineToolbar span:first-child {
-  color: color-mix(in srgb, var(--station-accent), #17212f 24%);
+  color: var(--timeline-toolbar);
   text-transform: uppercase;
 }
 
@@ -597,10 +822,8 @@ img {
   overflow: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.96)),
-    var(--surface);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  background: var(--timeline-bg);
+  box-shadow: var(--panel-inset);
   scroll-behavior: smooth;
 }
 
@@ -621,7 +844,7 @@ img {
 
 .scheduleTimeGutter {
   border-right: 1px solid var(--line);
-  background: #f7fafc;
+  background: var(--timeline-gutter-bg);
 }
 
 .scheduleTimeGutter span {
@@ -641,8 +864,8 @@ img {
 .scheduleTrack {
   overflow: hidden;
   background-image:
-    linear-gradient(to bottom, rgba(23, 33, 47, 0.1) 0 1px, transparent 1px),
-    linear-gradient(to bottom, transparent 0 26px, rgba(23, 33, 47, 0.045) 26px 27px, transparent 27px);
+    linear-gradient(to bottom, var(--timeline-hour-line) 0 1px, transparent 1px),
+    linear-gradient(to bottom, transparent 0 26px, var(--timeline-half-line) 26px 27px, transparent 27px);
   background-size: 100% var(--hour-height), 100% var(--hour-height);
 }
 
@@ -650,24 +873,33 @@ img {
   position: absolute;
   right: 12px;
   left: 12px;
+  z-index: 1;
   display: grid;
   align-content: start;
   min-height: 0;
   gap: 2px;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--station-accent), white 42%);
+  border: 1px solid var(--timeline-block-border);
   border-radius: 8px;
   padding: 9px 12px;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--station-accent), white 88%), rgba(255, 255, 255, 0.96));
-  box-shadow: 0 10px 24px rgba(31, 45, 61, 0.1);
+  background: var(--timeline-block-bg);
+  box-shadow: var(--timeline-block-shadow);
+}
+
+.timelineBlock.scheduled {
+  border-color: var(--scheduled-block-border);
+  background: var(--scheduled-block-bg);
 }
 
 .timelineBlock time {
-  color: color-mix(in srgb, var(--station-accent), #17212f 26%);
+  color: var(--timeline-time);
   font-size: 0.76rem;
   font-weight: 780;
   font-variant-numeric: tabular-nums;
+}
+
+.timelineBlock.scheduled time {
+  color: var(--scheduled-block-time);
 }
 
 .timelineBlock strong {
@@ -716,8 +948,8 @@ img {
 }
 
 .timelineBlock.open-slot {
-  border-color: rgba(23, 33, 47, 0.1);
-  background: rgba(247, 250, 252, 0.76);
+  border-color: var(--open-slot-border);
+  background: var(--open-slot-bg);
   box-shadow: none;
 }
 
@@ -728,21 +960,20 @@ img {
 }
 
 .timelineBlock.open-rotation {
-  border-color: #7aa7e8;
-  background:
-    linear-gradient(135deg, #dbeafe, #eef6ff 58%, rgba(255, 255, 255, 0.96));
+  border-color: var(--open-rotation-border);
+  background: var(--open-rotation-bg);
 }
 
 .timelineBlock.open-rotation time {
-  color: #2f5f9b;
+  color: var(--open-rotation-time);
 }
 
 .timelineBlock.open-rotation strong {
-  color: #173b78;
+  color: var(--open-rotation-ink);
 }
 
 .timelineBlock.open-rotation span {
-  color: #45648f;
+  color: var(--open-rotation-muted);
 }
 
 .scheduleNowLine {
@@ -815,7 +1046,7 @@ img {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--mini-bg);
   box-shadow: var(--shadow);
   opacity: 0;
   pointer-events: none;
