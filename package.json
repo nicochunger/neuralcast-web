@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
+    "bcryptjs": "^3.0.3",
     "next": "^15.0.0",
+    "next-auth": "^4.24.14",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
