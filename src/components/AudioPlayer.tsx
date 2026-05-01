@@ -6,6 +6,7 @@ import { clearMediaSessionPlaybackState, registerMediaSessionHandlers, updateMed
 import { DEFAULT_STATION_ID, STATIONS, isStationId } from "@/lib/stations";
 import { MiniPlayer } from "@/components/MiniPlayer";
 import { SchedulePreview } from "@/components/SchedulePreview";
+import { SiteHeader } from "@/components/SiteHeader";
 import { StationCard } from "@/components/StationCard";
 import type {
   PlaybackState,
@@ -22,13 +23,8 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
-type ResolvedTheme = "light" | "dark";
-type ThemePreference = "system" | ResolvedTheme;
-
-const THEME_STORAGE_KEY = "neuralcast:theme";
-
 export function AudioPlayer() {
-  const { locale, setLocale, t } = useI18n();
+  const { t } = useI18n();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const manualStopRef = useRef(false);
   const [activeStationId, setActiveStationId] = useState<StationId>(DEFAULT_STATION_ID);
@@ -36,8 +32,6 @@ export function AudioPlayer() {
   const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
   const [playbackError, setPlaybackError] = useState<string | undefined>();
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [themePreference, setThemePreference] = useState<ThemePreference>("system");
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("light");
   const [nowPlaying, setNowPlaying] = useState<Record<StationId, StationNowPlayingState>>(
     createInitialNowPlayingState
   );
@@ -178,29 +172,6 @@ export function AudioPlayer() {
   }, []);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-    const initialPreference: ThemePreference = storedTheme === "light" || storedTheme === "dark" ? storedTheme : "system";
-
-    const updateResolvedTheme = (preference: ThemePreference) => {
-      setResolvedTheme(preference === "system" ? (mediaQuery.matches ? "dark" : "light") : preference);
-    };
-
-    setThemePreference(initialPreference);
-    applyThemePreference(initialPreference);
-    updateResolvedTheme(initialPreference);
-
-    const handleSystemThemeChange = () => {
-      if (!document.documentElement.dataset.theme) {
-        updateResolvedTheme("system");
-      }
-    };
-
-    mediaQuery.addEventListener("change", handleSystemThemeChange);
-    return () => mediaQuery.removeEventListener("change", handleSystemThemeChange);
-  }, []);
-
-  useEffect(() => {
     const audio = audioRef.current;
 
     if (!audio) {
@@ -317,74 +288,19 @@ export function AudioPlayer() {
     setInstallPrompt(null);
   };
 
-  const toggleTheme = () => {
-    const nextTheme: ResolvedTheme = resolvedTheme === "dark" ? "light" : "dark";
-    window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
-    setThemePreference(nextTheme);
-    setResolvedTheme(nextTheme);
-    applyThemePreference(nextTheme);
-  };
-
   return (
     <main className="appShell">
       <audio ref={audioRef} preload="none" />
 
-      <header className="appHeader">
-        <div className="brandLockup">
-          <img src="/neuralcast-logo.png" alt="" className="brandIcon" />
-          <div>
-            <h1>NeuralCast</h1>
-            <p>{t("app.tagline")}</p>
-          </div>
-        </div>
-        <div className="headerActions">
-          <div className="languageToggle" role="group" aria-label={t("common.language")}>
-            <button
-              className={`languageButton ${locale === "en" ? "languageButtonActive" : ""}`}
-              type="button"
-              onClick={() => setLocale("en")}
-              aria-pressed={locale === "en"}
-              title="English"
-            >
-              <FlagIcon country="us" />
-              <span>EN</span>
-            </button>
-            <button
-              className={`languageButton ${locale === "es" ? "languageButtonActive" : ""}`}
-              type="button"
-              onClick={() => setLocale("es")}
-              aria-pressed={locale === "es"}
-              title="Español"
-            >
-              <FlagIcon country="ar" />
-              <span>ES</span>
-            </button>
-          </div>
-          {installPrompt ? (
+      <SiteHeader
+        extraActions={
+          installPrompt ? (
             <button className="installButton" type="button" onClick={requestInstall}>
               {t("common.install")}
             </button>
-          ) : null}
-          <button
-            className={`themeButton themeButton${resolvedTheme === "dark" ? "Dark" : "Light"}`}
-            type="button"
-            onClick={toggleTheme}
-            aria-label={resolvedTheme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")}
-            title={t("theme.title", {
-              theme:
-                themePreference === "system"
-                  ? `${t("theme.system")} (${t(`theme.${resolvedTheme}`)})`
-                  : t(`theme.${resolvedTheme}`),
-              action: resolvedTheme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")
-            })}
-          >
-            <span className="themeIcon" aria-hidden="true">
-              <span className="themeSun" />
-              <span className="themeMoon" />
-            </span>
-          </button>
-        </div>
-      </header>
+          ) : null
+        }
+      />
 
       <section className="stationGrid" aria-label={t("stations.ariaLabel")}>
         {STATIONS.map((station) => (
@@ -421,47 +337,6 @@ export function AudioPlayer() {
       />
     </main>
   );
-}
-
-function FlagIcon({ country }: { country: "us" | "ar" }) {
-  if (country === "ar") {
-    return (
-      <svg className="languageFlag" viewBox="0 0 28 20" role="img" aria-label="Argentina flag">
-        <rect width="28" height="20" fill="#75aadb" />
-        <rect y="6.67" width="28" height="6.66" fill="#ffffff" />
-        <circle cx="14" cy="10" r="2.1" fill="#f6b40e" />
-        <circle cx="14" cy="10" r="1.1" fill="#d98f00" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg className="languageFlag" viewBox="0 0 28 20" role="img" aria-label="United States flag">
-      <rect width="28" height="20" fill="#b22234" />
-      {Array.from({ length: 6 }, (_, index) => (
-        <rect key={index} y={1.54 + index * 3.08} width="28" height="1.54" fill="#ffffff" />
-      ))}
-      <rect width="11.8" height="10.77" fill="#3c3b6e" />
-      {Array.from({ length: 12 }, (_, index) => (
-        <circle
-          key={index}
-          cx={2 + (index % 4) * 2.5}
-          cy={2 + Math.floor(index / 4) * 2.5}
-          r="0.38"
-          fill="#ffffff"
-        />
-      ))}
-    </svg>
-  );
-}
-
-function applyThemePreference(preference: ThemePreference) {
-  if (preference === "system") {
-    document.documentElement.removeAttribute("data-theme");
-    return;
-  }
-
-  document.documentElement.dataset.theme = preference;
 }
 
 function createInitialNowPlayingState(): Record<StationId, StationNowPlayingState> {

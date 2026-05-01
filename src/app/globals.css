@@ -270,17 +270,32 @@ img {
   white-space: nowrap;
 }
 
-.languageToggle {
+.headerContextLink {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--surface-soft);
+  min-height: 34px;
+  padding: 0 2px;
+  border-bottom: 1px solid transparent;
+  color: var(--muted);
+  font-weight: 740;
+  text-decoration: none;
 }
 
-.languageButton {
+.headerContextLink:hover {
+  color: var(--ink);
+}
+
+.headerContextLink:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.languageMenu {
+  position: relative;
+}
+
+.languageMenuTrigger,
+.languageMenuItem {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -294,10 +309,47 @@ img {
   font-weight: 760;
 }
 
-.languageButtonActive {
+.languageMenuTrigger {
+  min-width: 72px;
+  justify-content: space-between;
+  background: var(--surface-soft);
+}
+
+.languageMenuList {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  display: grid;
+  gap: 6px;
+  min-width: 148px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.languageMenuItem {
+  justify-content: flex-start;
+  background: transparent;
+}
+
+.languageMenuItemActive {
   border-color: color-mix(in srgb, var(--focus), white 28%);
   background: var(--surface);
   box-shadow: var(--shadow-soft);
+}
+
+.languageMenuChevron {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1;
+  transition: transform 160ms ease;
+}
+
+.languageMenuChevronOpen {
+  transform: rotate(180deg);
 }
 
 .languageFlag {
@@ -754,6 +806,257 @@ img {
   background: var(--error-bg);
 }
 
+.aboutShell {
+  padding-bottom: max(42px, env(safe-area-inset-bottom));
+}
+
+.aboutHero,
+.aboutBand {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow);
+}
+
+.aboutHero {
+  min-height: 430px;
+  margin-bottom: 18px;
+  padding: 38px;
+  background:
+    linear-gradient(105deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.84) 42%, rgba(255, 255, 255, 0.16) 100%),
+    url("/images/neuralcast-art.webp") center/cover no-repeat;
+}
+
+.aboutHero::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg, rgba(31, 138, 120, 0.2), rgba(181, 87, 72, 0.16) 52%, transparent 76%);
+  content: "";
+  pointer-events: none;
+}
+
+.aboutHeroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 40rem;
+}
+
+.aboutHero h2,
+.aboutSectionHeading h3,
+.aboutNarrativeBlock h3 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.aboutHero h2 {
+  max-width: 12ch;
+  font-size: clamp(2.6rem, 5vw, 4.35rem);
+  line-height: 0.98;
+}
+
+.aboutLead,
+.aboutNarrativeBlock p,
+.aboutCard p,
+.aboutStep p,
+.aboutClosingText {
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.62;
+}
+
+.aboutLead {
+  max-width: 39rem;
+  margin: 18px 0 0;
+  font-size: 1.1rem;
+}
+
+.aboutHeroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.aboutPrimaryLink,
+.aboutSecondaryLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-weight: 780;
+  text-decoration: none;
+}
+
+.aboutPrimaryLink {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: var(--button-shadow);
+}
+
+.aboutSecondaryLink {
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--ink);
+}
+
+.aboutBand {
+  margin-bottom: 18px;
+  padding: 28px 30px 32px;
+}
+
+.aboutSectionHeading {
+  max-width: 44rem;
+  margin-bottom: 24px;
+}
+
+.aboutSectionHeading h3,
+.aboutNarrativeBlock h3 {
+  font-size: 2rem;
+  line-height: 1.02;
+}
+
+.aboutStoryText {
+  max-width: 46rem;
+}
+
+.aboutStoryText p,
+.aboutHostNote {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.62;
+}
+
+.aboutPrinciples,
+.aboutSteps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.aboutCompactGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.aboutCard,
+.aboutStep {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 220px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(247, 250, 252, 0.94));
+  box-shadow: var(--shadow-soft);
+}
+
+.aboutCard span,
+.aboutStep span,
+.aboutStat span {
+  color: var(--timeline-toolbar);
+  font-size: 0.78rem;
+  font-weight: 780;
+  text-transform: uppercase;
+}
+
+.aboutCard strong,
+.aboutStep strong,
+.aboutStat strong {
+  font-size: 1.18rem;
+  line-height: 1.18;
+}
+
+.aboutNarrativeBand {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.92)),
+    url("/images/neuralforge-art.webp") center/cover no-repeat;
+}
+
+.aboutNarrative {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.8fr);
+  gap: 22px;
+}
+
+.aboutNarrativeBlock p {
+  margin: 16px 0 0;
+  max-width: 46rem;
+}
+
+.aboutClosingBand {
+  margin-bottom: 0;
+}
+
+:root[data-theme="dark"] .aboutHero {
+  background:
+    linear-gradient(105deg, rgba(16, 19, 23, 0.92) 0%, rgba(16, 19, 23, 0.82) 42%, rgba(16, 19, 23, 0.22) 100%),
+    url("/images/neuralcast-art.webp") center/cover no-repeat;
+}
+
+:root[data-theme="dark"] .aboutHero::after {
+  background:
+    linear-gradient(120deg, rgba(110, 182, 162, 0.14), rgba(224, 93, 85, 0.14) 54%, rgba(16, 19, 23, 0.04) 76%);
+}
+
+:root[data-theme="dark"] .aboutCard,
+:root[data-theme="dark"] .aboutStep {
+  border-color: rgba(226, 232, 240, 0.12);
+  background: linear-gradient(180deg, rgba(32, 38, 45, 0.88), rgba(25, 30, 36, 0.96));
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+}
+
+:root[data-theme="dark"] .aboutNarrativeBand {
+  background:
+    linear-gradient(180deg, rgba(25, 30, 36, 0.95), rgba(18, 22, 27, 0.92)),
+    url("/images/neuralforge-art.webp") center/cover no-repeat;
+}
+
+:root[data-theme="dark"] .aboutSecondaryLink {
+  border-color: rgba(226, 232, 240, 0.16);
+  background: rgba(32, 38, 45, 0.72);
+  color: var(--ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .aboutHero {
+    background:
+      linear-gradient(105deg, rgba(16, 19, 23, 0.92) 0%, rgba(16, 19, 23, 0.82) 42%, rgba(16, 19, 23, 0.22) 100%),
+      url("/images/neuralcast-art.webp") center/cover no-repeat;
+  }
+
+  :root:not([data-theme]) .aboutHero::after {
+    background:
+      linear-gradient(120deg, rgba(110, 182, 162, 0.14), rgba(224, 93, 85, 0.14) 54%, rgba(16, 19, 23, 0.04) 76%);
+  }
+
+  :root:not([data-theme]) .aboutCard,
+  :root:not([data-theme]) .aboutStep {
+    border-color: rgba(226, 232, 240, 0.12);
+    background: linear-gradient(180deg, rgba(32, 38, 45, 0.88), rgba(25, 30, 36, 0.96));
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+  }
+
+  :root:not([data-theme]) .aboutNarrativeBand {
+    background:
+      linear-gradient(180deg, rgba(25, 30, 36, 0.95), rgba(18, 22, 27, 0.92)),
+      url("/images/neuralforge-art.webp") center/cover no-repeat;
+  }
+
+  :root:not([data-theme]) .aboutSecondaryLink {
+    border-color: rgba(226, 232, 240, 0.16);
+    background: rgba(32, 38, 45, 0.72);
+    color: var(--ink);
+  }
+}
+
 .schedulePanel {
   margin-top: 18px;
   border: 1px solid var(--line);
@@ -1173,6 +1476,10 @@ img {
     display: grid;
   }
 
+  .headerActions {
+    flex-wrap: wrap;
+  }
+
   .scheduleTimelineViewport {
     max-height: 620px;
   }
@@ -1190,6 +1497,25 @@ img {
 
   .miniArtwork {
     width: 38px;
+  }
+
+  .aboutHero {
+    min-height: 360px;
+    padding: 26px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.84) 56%, rgba(255, 255, 255, 0.3) 100%),
+      url("/images/neuralcast-art.webp") center/cover no-repeat;
+  }
+
+  .aboutBand {
+    padding: 24px 22px 26px;
+  }
+
+  .aboutPrinciples,
+  .aboutSteps,
+  .aboutCompactGrid,
+  .aboutNarrative {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1236,6 +1562,29 @@ img {
 
   .timelineBlock span {
     font-size: 0.8rem;
+  }
+
+  .appHeader {
+    align-items: flex-start;
+  }
+
+  .headerActions {
+    justify-content: flex-end;
+  }
+
+  .aboutHero h2 {
+    max-width: 11ch;
+    font-size: 2.4rem;
+  }
+
+  .aboutLead,
+  .aboutNarrativeBlock p,
+  .aboutCard p,
+  .aboutStep p,
+  .aboutStoryText p,
+  .aboutHostNote,
+  .aboutClosingText {
+    font-size: 0.98rem;
   }
 }
 
