@@ -265,6 +265,7 @@ img {
   display: flex;
   align-items: center;
   gap: 10px;
+  row-gap: 8px;
   color: var(--muted);
   font-size: 0.9rem;
   white-space: nowrap;
@@ -310,7 +311,7 @@ img {
 }
 
 .languageMenuTrigger {
-  min-width: 72px;
+  min-width: 68px;
   justify-content: space-between;
   background: var(--surface-soft);
 }
@@ -1480,6 +1481,11 @@ img {
     flex-wrap: wrap;
   }
 
+  .languageMenuList {
+    right: 0;
+    left: auto;
+  }
+
   .scheduleTimelineViewport {
     max-height: 620px;
   }
@@ -1569,7 +1575,30 @@ img {
   }
 
   .headerActions {
+    width: 100%;
     justify-content: flex-end;
+  }
+
+  .headerActions > nav {
+    margin-right: auto;
+  }
+
+  .languageMenuTrigger {
+    min-width: 58px;
+    padding: 0 8px;
+  }
+
+  .languageMenuTrigger span:not(.languageMenuChevron) {
+    font-size: 0.82rem;
+  }
+
+  .languageMenuList {
+    min-width: 134px;
+  }
+
+  .installButton {
+    min-height: 38px;
+    padding: 0 12px;
   }
 
   .aboutHero h2 {
