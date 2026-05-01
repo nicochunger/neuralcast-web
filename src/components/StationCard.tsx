@@ -1,4 +1,6 @@
-import { segmentTitle } from "@/lib/schedule";
+"use client";
+
+import { getSegmentTitle, getStationDescription, useI18n } from "@/lib/i18n";
 import type { CSSProperties } from "react";
 import type {
   PlaybackState,
@@ -30,16 +32,17 @@ export function StationCard({
   onStop,
   onSelectSchedule
 }: StationCardProps) {
+  const { locale, t } = useI18n();
   const isBusy = isActive && playbackState === "buffering";
   const isOnAir = isActive && playbackState === "playing";
   const shouldStop = isActive && (playbackState === "playing" || playbackState === "buffering");
-  const statusLabel = getStatusLabel(isActive, playbackState);
-  const track = getTrackDetails(nowPlaying);
+  const statusLabel = getStatusLabel(isActive, playbackState, t);
+  const track = getTrackDetails(nowPlaying, t);
   const listenerText =
     nowPlaying.listeners === undefined
-      ? "Listeners: --"
-      : `Listeners: ${nowPlaying.listeners}`;
-  const liveNowText = schedule.error ? "Unavailable" : segmentTitle(schedule.liveSegment);
+      ? t("common.listenersUnknown")
+      : t("common.listeners", { count: nowPlaying.listeners });
+  const liveNowText = schedule.error ? t("common.unavailable") : getSegmentTitle(schedule.liveSegment, locale);
 
   return (
     <article
@@ -55,7 +58,7 @@ export function StationCard({
         <div className="stationCardHeader">
           <div className="stationTitleBlock">
             <h2>{station.name}</h2>
-            <p>{station.id === "neuralcast" ? "Curated AI radio" : "Forged for heavy rotation"}</p>
+            <p>{getStationDescription(station.id, t)}</p>
           </div>
 
           <div className="stationControlGroup">
@@ -69,17 +72,17 @@ export function StationCard({
               className="playButton"
               type="button"
               onClick={() => (shouldStop ? onStop() : onPlay(station))}
-              aria-label={`${shouldStop ? "Stop" : "Play"} ${station.name}`}
+              aria-label={`${shouldStop ? t("common.stop") : t("common.play")} ${station.name}`}
             >
               <span className={shouldStop ? "stopGlyph" : "playGlyph"} aria-hidden="true" />
-              {shouldStop ? "Stop" : "Play"}
+              {shouldStop ? t("common.stop") : t("common.play")}
             </button>
           </div>
         </div>
 
         <div className="stationInfoSurface">
           <div className="stationMetaTopline">
-            <span>Now playing</span>
+            <span>{t("station.nowPlaying")}</span>
             <span>{listenerText}</span>
           </div>
 
@@ -91,7 +94,7 @@ export function StationCard({
           {nowPlaying.error && !nowPlaying.text ? <em>{nowPlaying.error}</em> : null}
 
           <div className="stationScheduleLine">
-            <span>Live now</span>
+            <span>{t("station.liveNow")}</span>
             <strong>{liveNowText}</strong>
           </div>
 
@@ -101,7 +104,7 @@ export function StationCard({
               type="button"
               onClick={() => onSelectSchedule(station)}
             >
-              Schedule
+              {t("station.schedule")}
             </button>
           </div>
         </div>
@@ -110,22 +113,26 @@ export function StationCard({
   );
 }
 
-function getStatusLabel(isActive: boolean, playbackState: PlaybackState): string {
+function getStatusLabel(
+  isActive: boolean,
+  playbackState: PlaybackState,
+  t: ReturnType<typeof useI18n>["t"]
+): string {
   if (!isActive) {
-    return "Ready";
+    return t("status.ready");
   }
 
   switch (playbackState) {
     case "buffering":
-      return "Buffering";
+      return t("status.buffering");
     case "playing":
-      return "On air";
+      return t("status.onAir");
     case "paused":
-      return "Paused";
+      return t("status.paused");
     case "error":
-      return "Stream error";
+      return t("status.streamError");
     default:
-      return "Ready";
+      return t("status.ready");
   }
 }
 
@@ -136,7 +143,10 @@ interface TrackDetails {
   label: string;
 }
 
-function getTrackDetails(nowPlaying: StationNowPlayingState): TrackDetails {
+function getTrackDetails(
+  nowPlaying: StationNowPlayingState,
+  t: ReturnType<typeof useI18n>["t"]
+): TrackDetails {
   if (nowPlaying.text) {
     const parts = nowPlaying.text.split(" - ").map((part) => part.trim()).filter(Boolean);
 
@@ -170,14 +180,14 @@ function getTrackDetails(nowPlaying: StationNowPlayingState): TrackDetails {
 
   if (nowPlaying.isLoading) {
     return {
-      artist: "Waiting for live metadata.",
-      label: "Waiting for live metadata."
+      artist: t("track.waiting"),
+      label: t("track.waiting")
     };
   }
 
   return {
-    artist: "Metadata unavailable.",
-    label: "Metadata unavailable."
+    artist: t("track.unavailable"),
+    label: t("track.unavailable")
   };
 }
 

@@ -1,3 +1,6 @@
+"use client";
+
+import { useI18n } from "@/lib/i18n";
 import type { PlaybackState, Station, StationNowPlayingState } from "@/types/radio";
 
 interface MiniPlayerProps {
@@ -9,8 +12,9 @@ interface MiniPlayerProps {
 }
 
 export function MiniPlayer({ station, playbackState, nowPlaying, onPlay, onStop }: MiniPlayerProps) {
+  const { t } = useI18n();
   const isPlaying = playbackState === "playing" || playbackState === "buffering";
-  const track = nowPlaying.text ?? "Live stream";
+  const track = nowPlaying.text ?? t("common.liveStream");
 
   return (
     <aside className={`miniPlayer ${isPlaying ? "miniPlayerVisible" : ""}`} aria-live="polite">
@@ -20,7 +24,7 @@ export function MiniPlayer({ station, playbackState, nowPlaying, onPlay, onStop 
         <strong>{track}</strong>
       </div>
       <button className="miniButton" type="button" onClick={() => (isPlaying ? onStop() : onPlay(station))}>
-        {isPlaying ? "Stop" : "Play"}
+        {isPlaying ? t("common.stop") : t("common.play")}
       </button>
     </aside>
   );

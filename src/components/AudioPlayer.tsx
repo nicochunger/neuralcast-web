@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useI18n } from "@/lib/i18n";
 import { clearMediaSessionPlaybackState, registerMediaSessionHandlers, updateMediaSession } from "@/lib/mediaSession";
 import { DEFAULT_STATION_ID, STATIONS, isStationId } from "@/lib/stations";
 import { MiniPlayer } from "@/components/MiniPlayer";
@@ -27,6 +28,7 @@ type ThemePreference = "system" | ResolvedTheme;
 const THEME_STORAGE_KEY = "neuralcast:theme";
 
 export function AudioPlayer() {
+  const { locale, setLocale, t } = useI18n();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const manualStopRef = useRef(false);
   const [activeStationId, setActiveStationId] = useState<StationId>(DEFAULT_STATION_ID);
@@ -59,7 +61,7 @@ export function AudioPlayer() {
           const response = await fetch(`/api/nowplaying/${stationId}`, { cache: "no-store" });
 
           if (!response.ok) {
-            throw new Error("Metadata unavailable.");
+            throw new Error(t("common.unavailable"));
           }
 
           const payload = (await response.json()) as StationNowPlaying;
@@ -76,7 +78,7 @@ export function AudioPlayer() {
             [stationId]: {
               ...current[stationId],
               isLoading: false,
-              error: "Metadata unavailable."
+              error: t("common.unavailable")
             }
           }));
         }
@@ -93,7 +95,7 @@ export function AudioPlayer() {
           const response = await fetch(`/api/schedule/${stationId}`, { cache: "no-store" });
 
           if (!response.ok) {
-            throw new Error("Schedule unavailable.");
+            throw new Error(t("schedule.error"));
           }
 
           const payload = (await response.json()) as StationScheduleDay;
@@ -110,7 +112,7 @@ export function AudioPlayer() {
             [stationId]: {
               ...current[stationId],
               isLoading: false,
-              error: "Schedule unavailable."
+              error: t("schedule.error")
             }
           }));
         }
@@ -158,7 +160,7 @@ export function AudioPlayer() {
         await audio.play();
       } catch {
         setPlaybackState("error");
-        setPlaybackError("Playback was blocked or the stream could not be reached. Tap Play again after checking the network.");
+        setPlaybackError(t("player.playbackBlocked"));
       }
 
       void refreshNowPlaying([station.id]);
@@ -224,7 +226,7 @@ export function AudioPlayer() {
     const handleError = () => {
       if (!manualStopRef.current) {
         setPlaybackState("error");
-        setPlaybackError("The stream could not be loaded.");
+        setPlaybackError(t("player.streamLoadError"));
       }
     };
 
@@ -243,7 +245,7 @@ export function AudioPlayer() {
       audio.removeEventListener("pause", handlePause);
       audio.removeEventListener("error", handleError);
     };
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void refreshNowPlaying();
@@ -332,23 +334,53 @@ export function AudioPlayer() {
           <img src="/neuralcast-logo.png" alt="" className="brandIcon" />
           <div>
             <h1>NeuralCast</h1>
-            <p>Live AI radio from Estavayer, Switzerland.</p>
+            <p>{t("app.tagline")}</p>
           </div>
         </div>
         <div className="headerActions">
+          <div className="languageToggle" role="group" aria-label={t("common.language")}>
+            <button
+              className={`languageButton ${locale === "en" ? "languageButtonActive" : ""}`}
+              type="button"
+              onClick={() => setLocale("en")}
+              aria-pressed={locale === "en"}
+              title="English"
+            >
+              <span className="languageFlag" aria-hidden="true">
+                🇺🇸
+              </span>
+              <span>EN</span>
+            </button>
+            <button
+              className={`languageButton ${locale === "es" ? "languageButtonActive" : ""}`}
+              type="button"
+              onClick={() => setLocale("es")}
+              aria-pressed={locale === "es"}
+              title="Español"
+            >
+              <span className="languageFlag" aria-hidden="true">
+                🇦🇷
+              </span>
+              <span>ES</span>
+            </button>
+          </div>
           {installPrompt ? (
             <button className="installButton" type="button" onClick={requestInstall}>
-              Install
+              {t("common.install")}
             </button>
           ) : null}
           <button
             className={`themeButton themeButton${resolvedTheme === "dark" ? "Dark" : "Light"}`}
             type="button"
             onClick={toggleTheme}
-            aria-label={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} theme`}
-            title={`Theme: ${themePreference === "system" ? `system (${resolvedTheme})` : resolvedTheme}. Switch to ${
-              resolvedTheme === "dark" ? "light" : "dark"
-            } theme`}
+            aria-label={resolvedTheme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")}
+            title={t("theme.title", {
+              theme:
+                themePreference === "system"
+                  ? `${t("theme.system")} (${t(`theme.${resolvedTheme}`)})`
+                  : t(`theme.${resolvedTheme}`),
+              action: resolvedTheme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")
+            })}
           >
             <span className="themeIcon" aria-hidden="true">
               <span className="themeSun" />
@@ -358,7 +390,7 @@ export function AudioPlayer() {
         </div>
       </header>
 
-      <section className="stationGrid" aria-label="Stations">
+      <section className="stationGrid" aria-label={t("stations.ariaLabel")}>
         {STATIONS.map((station) => (
           <StationCard
             key={station.id}
@@ -380,8 +412,8 @@ export function AudioPlayer() {
       <SchedulePreview station={scheduleStation} schedule={schedules[scheduleStation.id]} />
 
       <footer className="appFooter">
-        <span>Live streams require a network connection.</span>
-        <span>Add to Home Screen on iOS from the Share menu.</span>
+        <span>{t("footer.connection")}</span>
+        <span>{t("footer.iosInstall")}</span>
       </footer>
 
       <MiniPlayer

@@ -270,6 +270,41 @@ img {
   white-space: nowrap;
 }
 
+.languageToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-soft);
+}
+
+.languageButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 760;
+}
+
+.languageButtonActive {
+  border-color: color-mix(in srgb, var(--focus), white 28%);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.languageFlag {
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .sectionEyebrow {
   margin: 0 0 8px;
   color: var(--lime);

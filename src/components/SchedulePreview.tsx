@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { getSegmentDetail, getSegmentTitle, useI18n } from "@/lib/i18n";
 import { addDaysToDateString, getZonedDateString, zonedDateTimeToUtcMillis } from "@/lib/dateTime";
-import { segmentDetail, segmentTitle } from "@/lib/schedule";
 import type { ScheduleSegment, Station, StationScheduleState } from "@/types/radio";
 
 interface SchedulePreviewProps {
@@ -14,6 +14,7 @@ const MINUTES_PER_DAY = 24 * 60;
 const HOUR_MARKS = Array.from({ length: 24 }, (_, hour) => hour);
 
 export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
+  const { locale, t } = useI18n();
   const segments = schedule.segments ?? [];
   const [now, setNow] = useState(() => new Date());
   const timelineRef = useRef<HTMLDivElement | null>(null);
@@ -62,28 +63,28 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
     >
       <div className="scheduleHeader">
         <div>
-          <h2 id="schedule-title">{station.name} schedule</h2>
-          <p>{schedule.error ? schedule.error : "See what is playing now and what is coming up through the day."}</p>
+          <h2 id="schedule-title">{t("schedule.title", { station: station.name })}</h2>
+          <p>{schedule.error ? schedule.error : t("schedule.description")}</p>
         </div>
-        <span>{schedule.isLoading ? "Loading" : `${segments.length} blocks`}</span>
+        <span>{schedule.isLoading ? t("common.loading") : t("schedule.blocks", { count: segments.length })}</span>
       </div>
 
       <div className="scheduleSummaryGrid">
-        <ScheduleSummaryItem label="Live now" segment={schedule.liveSegment} timeZone={station.timeZone} />
-        <ScheduleSummaryItem label="Up next" segment={schedule.upNextSegment} timeZone={station.timeZone} />
+        <ScheduleSummaryItem label={t("schedule.summary.liveNow")} segment={schedule.liveSegment} timeZone={station.timeZone} />
+        <ScheduleSummaryItem label={t("schedule.summary.upNext")} segment={schedule.upNextSegment} timeZone={station.timeZone} />
       </div>
 
       {segments.length === 0 ? (
-        <div className="scheduleEmpty">{schedule.isLoading ? "Loading schedule." : "Schedule unavailable."}</div>
+        <div className="scheduleEmpty">{schedule.isLoading ? `${t("common.loading")}...` : t("schedule.empty")}</div>
       ) : (
         <div className="scheduleTimelineShell">
           <div className="scheduleTimelineToolbar">
-            <span>24 hour view · Zurich time (CET/CEST)</span>
-            <span>{nowMinutes === undefined ? scheduleDate : `Now ${formatClock(now, station.timeZone)}`}</span>
+            <span>{t("schedule.toolbar")}</span>
+            <span>{nowMinutes === undefined ? scheduleDate : t("schedule.now", { time: formatClock(now, station.timeZone, locale) })}</span>
           </div>
 
           <div className="scheduleTimelineViewport" ref={timelineRef}>
-            <div className="scheduleTimeline" aria-label={`${station.name} 24 hour schedule for ${scheduleDate}`}>
+            <div className="scheduleTimeline" aria-label={t("schedule.ariaLabel", { station: station.name, date: scheduleDate })}>
               <div className="scheduleTimeGutter" aria-hidden="true">
                 {HOUR_MARKS.map((hour) => (
                   <span
@@ -108,9 +109,9 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
                         top: `${nowPercent}%`
                       } as CSSProperties
                     }
-                    aria-label={`Current time ${formatClock(now, station.timeZone)}`}
+                    aria-label={`${t("schedule.now", { time: formatClock(now, station.timeZone, locale) })}`}
                   >
-                    <span>{formatClock(now, station.timeZone)}</span>
+                    <span>{formatClock(now, station.timeZone, locale)}</span>
                   </div>
                 )}
 
@@ -128,9 +129,9 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
                     }
                     role="listitem"
                   >
-                    <time>{formatRange(block.segment, station.timeZone)}</time>
-                    <strong>{segmentTitle(block.segment)}</strong>
-                    <span className="timelineDetail">{segmentDetail(block.segment)}</span>
+                    <time>{formatRange(block.segment, station.timeZone, locale)}</time>
+                    <strong>{getSegmentTitle(block.segment, locale)}</strong>
+                    <span className="timelineDetail">{getSegmentDetail(block.segment, locale)}</span>
                   </article>
                 ))}
               </div>
@@ -151,18 +152,19 @@ function ScheduleSummaryItem({
   segment?: ScheduleSegment;
   timeZone: string;
 }) {
+  const { locale, t } = useI18n();
   return (
     <div className="scheduleSummaryItem">
       <span>{label}</span>
-      {segment ? <time>{formatRange(segment, timeZone)}</time> : null}
-      <strong>{segmentTitle(segment)}</strong>
-      <em>{segmentDetail(segment)}</em>
+      {segment ? <time>{formatRange(segment, timeZone, locale)}</time> : null}
+      <strong>{getSegmentTitle(segment, locale)}</strong>
+      <em>{getSegmentDetail(segment, locale)}</em>
     </div>
   );
 }
 
-function formatRange(segment: ScheduleSegment, timeZone: string): string {
-  const formatter = new Intl.DateTimeFormat("en-US", {
+function formatRange(segment: ScheduleSegment, timeZone: string, locale: string): string {
+  const formatter = new Intl.DateTimeFormat(locale, {
     timeZone,
     hour: "2-digit",
     minute: "2-digit",
@@ -220,8 +222,8 @@ function getMinuteOfDay(date: Date, timeZone: string): number {
   return clamp(parts.hour * 60 + parts.minute + parts.second / 60, 0, MINUTES_PER_DAY);
 }
 
-function formatClock(date: Date, timeZone: string): string {
-  return new Intl.DateTimeFormat("en-US", {
+function formatClock(date: Date, timeZone: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
     timeZone,
     hour: "2-digit",
     minute: "2-digit",
