@@ -346,9 +346,7 @@ export function AudioPlayer() {
               aria-pressed={locale === "en"}
               title="English"
             >
-              <span className="languageFlag" aria-hidden="true">
-                🇺🇸
-              </span>
+              <FlagIcon country="us" />
               <span>EN</span>
             </button>
             <button
@@ -358,9 +356,7 @@ export function AudioPlayer() {
               aria-pressed={locale === "es"}
               title="Español"
             >
-              <span className="languageFlag" aria-hidden="true">
-                🇦🇷
-              </span>
+              <FlagIcon country="ar" />
               <span>ES</span>
             </button>
           </div>
@@ -424,6 +420,38 @@ export function AudioPlayer() {
         onStop={stopPlayback}
       />
     </main>
+  );
+}
+
+function FlagIcon({ country }: { country: "us" | "ar" }) {
+  if (country === "ar") {
+    return (
+      <svg className="languageFlag" viewBox="0 0 28 20" role="img" aria-label="Argentina flag">
+        <rect width="28" height="20" fill="#75aadb" />
+        <rect y="6.67" width="28" height="6.66" fill="#ffffff" />
+        <circle cx="14" cy="10" r="2.1" fill="#f6b40e" />
+        <circle cx="14" cy="10" r="1.1" fill="#d98f00" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg className="languageFlag" viewBox="0 0 28 20" role="img" aria-label="United States flag">
+      <rect width="28" height="20" fill="#b22234" />
+      {Array.from({ length: 6 }, (_, index) => (
+        <rect key={index} y={1.54 + index * 3.08} width="28" height="1.54" fill="#ffffff" />
+      ))}
+      <rect width="11.8" height="10.77" fill="#3c3b6e" />
+      {Array.from({ length: 12 }, (_, index) => (
+        <circle
+          key={index}
+          cx={2 + (index % 4) * 2.5}
+          cy={2 + Math.floor(index / 4) * 2.5}
+          r="0.38"
+          fill="#ffffff"
+        />
+      ))}
+    </svg>
   );
 }
 

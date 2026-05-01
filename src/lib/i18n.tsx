@@ -1,13 +1,12 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  LOCALE_COOKIE_KEY,
+  LOCALE_STORAGE_KEY,
+  type Locale,
+} from "@/lib/locale";
 import type { ScheduleSegment, StationId } from "@/types/radio";
-
-const LOCALE_STORAGE_KEY = "neuralcast:locale";
-
-export const SUPPORTED_LOCALES = ["en", "es"] as const;
-
-export type Locale = (typeof SUPPORTED_LOCALES)[number];
 
 type TranslationKey =
   | "app.tagline"
@@ -159,11 +158,18 @@ interface I18nContextValue {
 
 const I18nContext = createContext<I18nContextValue | undefined>(undefined);
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>(getInitialLocale);
+export function LanguageProvider({
+  children,
+  initialLocale
+}: {
+  children: ReactNode;
+  initialLocale: Locale;
+}) {
+  const [locale, setLocale] = useState<Locale>(initialLocale);
 
   useEffect(() => {
     window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
+    document.cookie = `${LOCALE_COOKIE_KEY}=${locale}; path=/; max-age=31536000; samesite=lax`;
     document.documentElement.lang = locale;
   }, [locale]);
 
@@ -236,25 +242,6 @@ export function getSegmentDetail(
 
 export function getStationDescription(stationId: StationId, t: I18nContextValue["t"]): string {
   return t(`station.description.${stationId}`);
-}
-
-function getInitialLocale(): Locale {
-  if (typeof window === "undefined") {
-    return "en";
-  }
-
-  const storedLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY);
-
-  if (isLocale(storedLocale)) {
-    return storedLocale;
-  }
-
-  const browserLocale = window.navigator.language.toLowerCase();
-  return browserLocale.startsWith("es") ? "es" : "en";
-}
-
-function isLocale(value: string | null): value is Locale {
-  return value !== null && SUPPORTED_LOCALES.includes(value as Locale);
 }
 
 function interpolate(template: string, params?: TranslationParams): string {

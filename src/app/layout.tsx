@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { cookies, headers } from "next/headers";
 import { LanguageProvider } from "@/lib/i18n";
+import { LOCALE_COOKIE_KEY, resolvePreferredLocale } from "@/lib/locale";
 import "./globals.css";
 
 const themeBootScript = `
@@ -40,16 +42,24 @@ export const viewport: Viewport = {
   themeColor: "#f4f7fa"
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const requestHeaders = await headers();
+  const initialLocale = resolvePreferredLocale({
+    storedLocale: cookieStore.get(LOCALE_COOKIE_KEY)?.value,
+    browserLanguage: requestHeaders.get("accept-language"),
+    countryCode: requestHeaders.get("x-vercel-ip-country")
+  });
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={initialLocale} suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider initialLocale={initialLocale}>{children}</LanguageProvider>
         <Analytics />
       </body>
     </html>

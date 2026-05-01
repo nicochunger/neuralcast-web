@@ -301,8 +301,13 @@ img {
 }
 
 .languageFlag {
-  font-size: 1rem;
-  line-height: 1;
+  display: block;
+  width: 24px;
+  height: 17px;
+  overflow: hidden;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px var(--line-strong);
+  flex: 0 0 auto;
 }
 
 .sectionEyebrow {
