@@ -8,7 +8,7 @@ Standalone Next.js website and PWA for the public NeuralCast radio experience.
 - Poll same-origin API routes for now-playing metadata and listener counts.
 - Show a compact daily schedule derived from the public AzuraCast schedule API.
 - Register a production service worker and expose a PWA manifest with install icons.
-- Avoid private admin controls and credentialed endpoints.
+- Provide a private admin sign-in flow for future control-room actions.
 
 ## Development
 
@@ -18,6 +18,24 @@ npm run dev
 ```
 
 Open `http://localhost:3000`.
+
+### Admin Authentication
+
+The app now includes a private admin login at `/login` and a protected admin area at `/admin`.
+
+Create a local `.env.local` file from `.env.example` and set:
+
+- `NEXTAUTH_SECRET`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD_HASH`
+
+To generate a bcrypt password hash:
+
+```bash
+node -e 'const bcrypt=require("bcryptjs"); bcrypt.hash(process.argv[1], 12).then(console.log)' "your-password"
+```
+
+On Vercel, add the same three environment variables in the project settings before deploying.
 
 ## Build
 

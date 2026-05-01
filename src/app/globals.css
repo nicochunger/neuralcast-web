@@ -282,11 +282,29 @@ img {
   text-decoration: none;
 }
 
+.headerContextButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 760;
+}
+
 .headerContextLink:hover {
   color: var(--ink);
 }
 
-.headerContextLink:focus-visible {
+.headerContextButton:hover {
+  transform: translateY(-1px);
+}
+
+.headerContextLink:focus-visible,
+.headerContextButton:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 4px;
 }
@@ -805,6 +823,165 @@ img {
   padding: 10px 12px;
   color: var(--ink);
   background: var(--error-bg);
+}
+
+.authShell,
+.adminShell {
+  padding-bottom: max(42px, env(safe-area-inset-bottom));
+}
+
+.authCard,
+.adminPanel,
+.adminHero {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow-soft), var(--panel-inset);
+}
+
+.authCard {
+  width: min(100%, 520px);
+  margin: 52px auto 0;
+  padding: 30px;
+}
+
+.authCard h2,
+.adminHero h2,
+.adminPanel h3 {
+  margin: 0;
+}
+
+.authLead,
+.adminLead,
+.adminPanel p,
+.authNotice p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.authLead,
+.adminLead {
+  margin: 14px 0 0;
+}
+
+.authForm {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.authField {
+  display: grid;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.authField input {
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 14px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.authField input:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.authError {
+  margin: 0;
+  border-left: 4px solid var(--red);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--error-bg);
+  color: var(--ink);
+}
+
+.authSubmitButton,
+.adminBackLink,
+.adminGhostButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 8px;
+  font-weight: 780;
+}
+
+.authSubmitButton {
+  border: 0;
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+  box-shadow: var(--button-shadow);
+}
+
+.authSubmitButton:disabled,
+.adminGhostButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.authNotice {
+  display: grid;
+  gap: 10px;
+  margin-top: 22px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--summary-bg);
+}
+
+.authNotice p {
+  margin: 0;
+}
+
+.adminHero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 26px 28px;
+}
+
+.adminBackLink {
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.adminGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.adminPanel {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-height: 220px;
+  padding: 22px;
+}
+
+.adminPanel p {
+  margin: 0;
+}
+
+.adminGhostButton {
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-soft);
+  color: var(--ink);
 }
 
 .aboutShell {
@@ -1326,36 +1503,50 @@ img {
   left: 0;
   z-index: 3;
   height: 0;
-  border-top: 2px solid var(--red);
   pointer-events: none;
 }
 
 .scheduleNowLine::before {
   position: absolute;
-  top: 1px;
+  top: 0;
   left: 8px;
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border: 2px solid white;
   border-radius: 999px;
   background: var(--red);
   box-shadow: 0 4px 10px rgba(185, 75, 67, 0.34);
+  content: "";
+  transform: translate(-50%, -50%);
+}
+
+.scheduleNowLine::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: var(--red);
   content: "";
   transform: translateY(-50%);
 }
 
 .scheduleNowLine span {
   position: absolute;
-  top: -13px;
+  top: 0;
   right: 10px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
   border-radius: 999px;
-  padding: 3px 8px;
+  padding: 0 10px;
   background: var(--red);
   color: white;
   font-size: 0.74rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   box-shadow: 0 8px 18px rgba(185, 75, 67, 0.24);
+  transform: translateY(-50%);
 }
 
 .scheduleEmpty {
@@ -1517,6 +1708,14 @@ img {
     padding: 24px 22px 26px;
   }
 
+  .adminGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .adminHero {
+    display: grid;
+  }
+
   .aboutPrinciples,
   .aboutSteps,
   .aboutCompactGrid,
@@ -1583,6 +1782,10 @@ img {
     margin-right: auto;
   }
 
+  .headerContextButton {
+    padding: 0 8px;
+  }
+
   .languageMenuTrigger {
     min-width: 58px;
     padding: 0 8px;
@@ -1604,6 +1807,12 @@ img {
   .aboutHero h2 {
     max-width: 11ch;
     font-size: 2.4rem;
+  }
+
+  .authCard,
+  .adminHero,
+  .adminPanel {
+    padding: 22px 18px;
   }
 
   .aboutLead,
