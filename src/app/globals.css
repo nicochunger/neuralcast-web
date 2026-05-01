@@ -1326,36 +1326,50 @@ img {
   left: 0;
   z-index: 3;
   height: 0;
-  border-top: 2px solid var(--red);
   pointer-events: none;
 }
 
 .scheduleNowLine::before {
   position: absolute;
-  top: 1px;
+  top: 0;
   left: 8px;
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border: 2px solid white;
   border-radius: 999px;
   background: var(--red);
   box-shadow: 0 4px 10px rgba(185, 75, 67, 0.34);
+  content: "";
+  transform: translate(-50%, -50%);
+}
+
+.scheduleNowLine::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: var(--red);
   content: "";
   transform: translateY(-50%);
 }
 
 .scheduleNowLine span {
   position: absolute;
-  top: -13px;
+  top: 0;
   right: 10px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
   border-radius: 999px;
-  padding: 3px 8px;
+  padding: 0 10px;
   background: var(--red);
   color: white;
   font-size: 0.74rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   box-shadow: 0 8px 18px rgba(185, 75, 67, 0.24);
+  transform: translateY(-50%);
 }
 
 .scheduleEmpty {
