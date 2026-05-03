@@ -976,6 +976,19 @@ img {
   white-space: nowrap;
 }
 
+.adminToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.adminSignedInText {
+  margin: 0;
+  color: var(--muted);
+}
+
 .adminGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1000,6 +1013,172 @@ img {
   border: 1px solid var(--line-strong);
   background: var(--surface-soft);
   color: var(--ink);
+}
+
+.adminConsoleStack {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.adminPanelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.adminSection,
+.adminSubsection {
+  display: grid;
+  gap: 12px;
+}
+
+.adminSection h4,
+.adminSubsection h5 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.adminSubsection p,
+.adminSection p,
+.adminPanelHeader p {
+  margin: 0;
+}
+
+.adminChipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.adminChip,
+.adminTextButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 720;
+}
+
+.adminChipActive {
+  border-color: color-mix(in srgb, var(--focus), white 26%);
+  background: color-mix(in srgb, var(--focus), white 84%);
+  color: color-mix(in srgb, var(--focus), #17212f 26%);
+}
+
+.adminChip:disabled,
+.adminTextButton:disabled,
+.adminPrimaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.adminField {
+  display: grid;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.adminField input,
+.adminField select {
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 14px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.adminField input:focus-visible,
+.adminField select:focus-visible,
+.adminChip:focus-visible,
+.adminTextButton:focus-visible,
+.adminPrimaryButton:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.adminFieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.adminPrimaryButton {
+  width: 100%;
+}
+
+.adminStatusNotice {
+  margin: 0;
+  border-left: 4px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.adminStatusNoticeSuccess {
+  border-left-color: var(--lime);
+  background: color-mix(in srgb, var(--lime), white 88%);
+}
+
+.adminStatusNoticeError {
+  border-left-color: var(--red);
+  background: var(--error-bg);
+}
+
+.adminMessageSuccess {
+  border-left-color: var(--lime);
+  background: color-mix(in srgb, var(--lime), white 88%);
+}
+
+.adminJobBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  font-size: 0.84rem;
+  font-weight: 780;
+}
+
+.adminJobBadgeAccepted,
+.adminJobBadgeRunning {
+  border-color: color-mix(in srgb, var(--focus), white 24%);
+  color: color-mix(in srgb, var(--focus), #17212f 26%);
+}
+
+.adminJobBadgeSucceeded {
+  border-color: color-mix(in srgb, var(--lime), white 22%);
+  color: color-mix(in srgb, var(--lime), #17212f 24%);
+}
+
+.adminJobBadgeFailed {
+  border-color: color-mix(in srgb, var(--red), white 24%);
+  color: color-mix(in srgb, var(--red), #17212f 24%);
+}
+
+.adminLogTail {
+  overflow: auto;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
 }
 
 .aboutShell {
@@ -1731,6 +1910,12 @@ img {
   }
 
   .adminHero {
+    display: grid;
+  }
+
+  .adminToolbar,
+  .adminPanelHeader,
+  .adminFieldGrid {
     display: grid;
   }
 

@@ -29,6 +29,8 @@ Create a local `.env.local` file from `.env.example` and set:
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD_HASH`
 - `AZURACAST_ADMIN_API_KEY`
+- `HOST_ADMIN_BASE_URL`
+- `HOST_ADMIN_TOKEN`
 
 To generate a bcrypt password hash:
 
@@ -39,6 +41,7 @@ node -e 'const bcrypt=require("bcryptjs"); bcrypt.hash(process.argv[1], 12).then
 On Vercel, add the same four environment variables in the project settings before deploying.
 
 `AZURACAST_ADMIN_API_KEY` is used server-side for protected control-room actions like skipping the current track, and is never exposed to the browser.
+`HOST_ADMIN_BASE_URL` and `HOST_ADMIN_TOKEN` are used server-side for the host orchestrator console, including force-archetype and schedule-generator jobs.
 
 ## Build
 
