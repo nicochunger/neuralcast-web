@@ -19,6 +19,9 @@ interface StationCardProps {
   onPlay: (station: Station) => void;
   onStop: () => void;
   onSelectSchedule: (station: Station) => void;
+  showAdminSkip: boolean;
+  isSkippingTrack: boolean;
+  onSkipTrack: (station: Station) => void;
 }
 
 export function StationCard({
@@ -30,7 +33,10 @@ export function StationCard({
   isScheduleSelected,
   onPlay,
   onStop,
-  onSelectSchedule
+  onSelectSchedule,
+  showAdminSkip,
+  isSkippingTrack,
+  onSkipTrack
 }: StationCardProps) {
   const { locale, t } = useI18n();
   const isBusy = isActive && playbackState === "buffering";
@@ -106,6 +112,16 @@ export function StationCard({
             >
               {t("station.schedule")}
             </button>
+            {showAdminSkip ? (
+              <button
+                className="adminActionButton"
+                type="button"
+                onClick={() => onSkipTrack(station)}
+                disabled={isSkippingTrack}
+              >
+                {isSkippingTrack ? "Skipping..." : "Skip song"}
+              </button>
+            ) : null}
           </div>
         </div>
       </div>

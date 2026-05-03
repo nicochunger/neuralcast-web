@@ -28,6 +28,7 @@ Create a local `.env.local` file from `.env.example` and set:
 - `NEXTAUTH_SECRET`
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD_HASH`
+- `AZURACAST_ADMIN_API_KEY`
 
 To generate a bcrypt password hash:
 
@@ -35,7 +36,9 @@ To generate a bcrypt password hash:
 node -e 'const bcrypt=require("bcryptjs"); bcrypt.hash(process.argv[1], 12).then(console.log)' "your-password"
 ```
 
-On Vercel, add the same three environment variables in the project settings before deploying.
+On Vercel, add the same four environment variables in the project settings before deploying.
+
+`AZURACAST_ADMIN_API_KEY` is used server-side for protected control-room actions like skipping the current track, and is never exposed to the browser.
 
 ## Build
 

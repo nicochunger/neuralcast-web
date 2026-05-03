@@ -23,7 +23,11 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
-export function AudioPlayer() {
+interface AudioPlayerProps {
+  isAdmin: boolean;
+}
+
+export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   const { t } = useI18n();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const manualStopRef = useRef(false);
@@ -31,7 +35,9 @@ export function AudioPlayer() {
   const [scheduleStationId, setScheduleStationId] = useState<StationId>(DEFAULT_STATION_ID);
   const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
   const [playbackError, setPlaybackError] = useState<string | undefined>();
+  const [adminMessage, setAdminMessage] = useState<string | undefined>();
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [skippingStationId, setSkippingStationId] = useState<StationId | null>(null);
   const [nowPlaying, setNowPlaying] = useState<Record<StationId, StationNowPlayingState>>(
     createInitialNowPlayingState
   );
@@ -291,6 +297,39 @@ export function AudioPlayer() {
     setInstallPrompt(null);
   };
 
+  const skipTrack = useCallback(
+    async (station: Station) => {
+      if (!isAdmin || skippingStationId) {
+        return;
+      }
+
+      setAdminMessage(undefined);
+      setSkippingStationId(station.id);
+
+      try {
+        const response = await fetch(`/api/admin/skip/${station.id}`, {
+          method: "POST",
+          cache: "no-store"
+        });
+        const payload = (await response.json()) as { message?: string; error?: string };
+
+        if (!response.ok) {
+          throw new Error(payload.error || "Unable to skip the current track.");
+        }
+
+        setAdminMessage(payload.message || `Skipped current track on ${station.name}.`);
+        window.setTimeout(() => {
+          void refreshNowPlaying([station.id]);
+        }, 1200);
+      } catch (error) {
+        setAdminMessage(error instanceof Error ? error.message : "Unable to skip the current track.");
+      } finally {
+        setSkippingStationId(null);
+      }
+    },
+    [isAdmin, refreshNowPlaying, skippingStationId]
+  );
+
   return (
     <main className="appShell">
       <audio ref={audioRef} preload="none" />
@@ -318,11 +357,15 @@ export function AudioPlayer() {
             onPlay={playStation}
             onStop={stopPlayback}
             onSelectSchedule={(selectedStation) => setScheduleStationId(selectedStation.id)}
+            showAdminSkip={isAdmin}
+            isSkippingTrack={skippingStationId === station.id}
+            onSkipTrack={skipTrack}
           />
         ))}
       </section>
 
       {playbackError ? <p className="playerError">{playbackError}</p> : null}
+      {adminMessage ? <p className="playerError">{adminMessage}</p> : null}
 
       <SchedulePreview station={scheduleStation} schedule={schedules[scheduleStation.id]} />
 
