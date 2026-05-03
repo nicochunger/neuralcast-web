@@ -10,15 +10,35 @@ interface LoginPageProps {
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
-  const session = await getAuthSession();
+  const isConfigured = isAdminAuthConfigured();
   const { callbackUrl } = await searchParams;
   const destination = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/admin";
+
+  if (!isConfigured) {
+    return (
+      <main className="appShell authShell">
+        <SiteHeader />
+
+        <section className="authCard">
+          <p className="sectionEyebrow">Admin access</p>
+          <h2>Sign in to manage NeuralCast</h2>
+          <p className="authLead">
+            This private area will be used for live controls like skipping songs and triggering host snippets.
+          </p>
+          <div className="authNotice">
+            <p>Admin login is not configured yet.</p>
+            <p>Add `NEXTAUTH_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD_HASH` in Vercel and your local env file.</p>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  const session = await getAuthSession();
 
   if (session?.user?.isAdmin) {
     redirect(destination);
   }
-
-  const isConfigured = isAdminAuthConfigured();
 
   return (
     <main className="appShell authShell">
@@ -30,14 +50,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <p className="authLead">
           This private area will be used for live controls like skipping songs and triggering host snippets.
         </p>
-        {isConfigured ? (
-          <LoginForm callbackUrl={destination} />
-        ) : (
-          <div className="authNotice">
-            <p>Admin login is not configured yet.</p>
-            <p>Add `NEXTAUTH_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD_HASH` in Vercel and your local env file.</p>
-          </div>
-        )}
+        <LoginForm callbackUrl={destination} />
       </section>
     </main>
   );

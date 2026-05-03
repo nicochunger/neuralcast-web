@@ -85,5 +85,9 @@ export const authOptions: NextAuthOptions = {
 };
 
 export function getAuthSession() {
+  if (!isAdminAuthConfigured()) {
+    return Promise.resolve(null);
+  }
+
   return getServerSession(authOptions);
 }

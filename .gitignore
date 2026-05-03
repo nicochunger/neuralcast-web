@@ -5,6 +5,7 @@ dist/
 coverage/
 .vercel/
 .codex
+.env.local
 *.log
 *.tsbuildinfo
 .DS_Store
