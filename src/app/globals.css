@@ -1433,12 +1433,46 @@ img {
 }
 
 .schedulePanel {
-  margin-top: 18px;
+  margin-top: 0;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 20px;
   background: var(--panel-bg);
   box-shadow: var(--shadow-soft), var(--panel-inset);
+}
+
+.scheduleModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(12, 16, 22, 0.52);
+  backdrop-filter: blur(3px);
+}
+
+.scheduleModal {
+  position: relative;
+  width: min(100%, 980px);
+  max-height: calc(100dvh - 36px);
+  overflow: auto;
+}
+
+.scheduleModalClose {
+  position: sticky;
+  top: 10px;
+  z-index: 2;
+  float: right;
+  width: 34px;
+  height: 34px;
+  margin: 10px 10px -44px 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-weight: 760;
+  cursor: pointer;
 }
 
 .scheduleHeader,
@@ -1696,8 +1730,8 @@ img {
 
 .scheduleNowLine {
   position: absolute;
-  right: 0;
-  left: 0;
+  right: 10px;
+  left: 8px;
   z-index: 3;
   height: 0;
   pointer-events: none;
@@ -1715,17 +1749,19 @@ img {
   box-shadow: 0 4px 10px rgba(185, 75, 67, 0.34);
   content: "";
   transform: translate(-50%, -50%);
+  z-index: 2;
 }
 
 .scheduleNowLine::after {
   position: absolute;
   top: 0;
-  right: 0;
   left: 0;
+  right: 64px;
   height: 2px;
   background: var(--red);
   content: "";
   transform: translateY(-50%);
+  z-index: 0;
 }
 
 .scheduleNowLine span {
@@ -1744,6 +1780,7 @@ img {
   font-variant-numeric: tabular-nums;
   box-shadow: 0 8px 18px rgba(185, 75, 67, 0.24);
   transform: translateY(-50%);
+  z-index: 2;
 }
 
 .scheduleEmpty {

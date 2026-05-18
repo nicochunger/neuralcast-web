@@ -33,6 +33,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   const manualStopRef = useRef(false);
   const [activeStationId, setActiveStationId] = useState<StationId>(DEFAULT_STATION_ID);
   const [scheduleStationId, setScheduleStationId] = useState<StationId>(DEFAULT_STATION_ID);
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
   const [playbackError, setPlaybackError] = useState<string | undefined>();
   const [adminMessage, setAdminMessage] = useState<string | undefined>();
@@ -176,6 +177,21 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       setScheduleStationId(lastStation);
     }
   }, []);
+
+  useEffect(() => {
+    if (!isScheduleOpen) {
+      return;
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsScheduleOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isScheduleOpen]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -356,7 +372,10 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
             isScheduleSelected={station.id === scheduleStationId}
             onPlay={playStation}
             onStop={stopPlayback}
-            onSelectSchedule={(selectedStation) => setScheduleStationId(selectedStation.id)}
+            onSelectSchedule={(selectedStation) => {
+              setScheduleStationId(selectedStation.id);
+              setIsScheduleOpen(true);
+            }}
             showAdminSkip={isAdmin}
             isSkippingTrack={skippingStationId === station.id}
             onSkipTrack={skipTrack}
@@ -367,7 +386,29 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       {playbackError ? <p className="playerError">{playbackError}</p> : null}
       {adminMessage ? <p className="playerError">{adminMessage}</p> : null}
 
-      <SchedulePreview station={scheduleStation} schedule={schedules[scheduleStation.id]} />
+      {isScheduleOpen ? (
+        <div
+          className="scheduleModalBackdrop"
+          role="presentation"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setIsScheduleOpen(false);
+            }
+          }}
+        >
+          <div className="scheduleModal" role="dialog" aria-modal="true" aria-labelledby="schedule-title">
+            <button
+              className="scheduleModalClose"
+              type="button"
+              onClick={() => setIsScheduleOpen(false)}
+              aria-label="Close schedule"
+            >
+              ✕
+            </button>
+            <SchedulePreview station={scheduleStation} schedule={schedules[scheduleStation.id]} />
+          </div>
+        </div>
+      ) : null}
 
       <footer className="appFooter">
         <span>{t("footer.connection")}</span>
