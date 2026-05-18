@@ -95,6 +95,7 @@ export function StationCard({
           <div className="trackTitle" aria-label={track.label}>
             <strong className="trackArtist">{track.artist}</strong>
             {track.song ? <span className="trackSong">{track.song}</span> : null}
+            {track.album ? <span className="trackAlbum">{track.album}</span> : null}
           </div>
           {nowPlaying.error && !nowPlaying.text ? <em>{nowPlaying.error}</em> : null}
 
@@ -154,6 +155,7 @@ function getStatusLabel(
 interface TrackDetails {
   artist: string;
   song?: string;
+  album?: string;
   label: string;
 }
 
@@ -165,12 +167,13 @@ function getTrackDetails(
     const parts = nowPlaying.text.split(" - ").map((part) => part.trim()).filter(Boolean);
 
     if (parts.length >= 3) {
-      const [artist, ...songParts] = parts;
+      const [artist, album, ...songParts] = parts;
       const song = songParts.join(" - ");
 
       return {
         artist,
         song,
+        album,
         label: nowPlaying.text
       };
     }
