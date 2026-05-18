@@ -60,8 +60,10 @@ export default async function RootLayout({
     <html lang={initialLocale} suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
-        <LanguageProvider initialLocale={initialLocale}>{children}</LanguageProvider>
-        <PersistentMiniPlayerOverlay />
+        <LanguageProvider initialLocale={initialLocale}>
+          {children}
+          <PersistentMiniPlayerOverlay />
+        </LanguageProvider>
         <Analytics />
       </body>
     </html>
