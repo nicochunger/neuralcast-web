@@ -1972,6 +1972,17 @@ img {
 }
 
 @media (max-width: 560px) {
+  .appHeader {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .brandLockup {
+    width: 100%;
+  }
+
   .stationInfoSurface {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -2014,10 +2025,6 @@ img {
 
   .timelineBlock span {
     font-size: 0.8rem;
-  }
-
-  .appHeader {
-    align-items: flex-start;
   }
 
   .headerActions {
