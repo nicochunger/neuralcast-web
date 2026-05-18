@@ -69,11 +69,6 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
         <span>{schedule.isLoading ? t("common.loading") : t("schedule.blocks", { count: segments.length })}</span>
       </div>
 
-      <div className="scheduleSummaryGrid">
-        <ScheduleSummaryItem label={t("schedule.summary.liveNow")} segment={schedule.liveSegment} timeZone={station.timeZone} />
-        <ScheduleSummaryItem label={t("schedule.summary.upNext")} segment={schedule.upNextSegment} timeZone={station.timeZone} />
-      </div>
-
       {segments.length === 0 ? (
         <div className="scheduleEmpty">{schedule.isLoading ? `${t("common.loading")}...` : t("schedule.empty")}</div>
       ) : (
@@ -140,26 +135,6 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
         </div>
       )}
     </section>
-  );
-}
-
-function ScheduleSummaryItem({
-  label,
-  segment,
-  timeZone
-}: {
-  label: string;
-  segment?: ScheduleSegment;
-  timeZone: string;
-}) {
-  const { locale, t } = useI18n();
-  return (
-    <div className="scheduleSummaryItem">
-      <span>{label}</span>
-      {segment ? <time>{formatRange(segment, timeZone, locale)}</time> : null}
-      <strong>{getSegmentTitle(segment, locale)}</strong>
-      <em>{getSegmentDetail(segment, locale)}</em>
-    </div>
   );
 }
 
