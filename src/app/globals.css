@@ -271,6 +271,12 @@ img {
   white-space: nowrap;
 }
 
+.headerUtilityRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .headerContextLink {
   display: inline-flex;
   align-items: center;
@@ -720,7 +726,8 @@ img {
 
 .themeButton {
   display: grid;
-  width: 42px;
+  width: 34px;
+  min-height: 34px;
   aspect-ratio: 1;
   place-items: center;
   padding: 0;
@@ -729,8 +736,8 @@ img {
 .themeIcon {
   position: relative;
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 17px;
+  height: 17px;
 }
 
 .themeSun,
@@ -1965,6 +1972,17 @@ img {
 }
 
 @media (max-width: 560px) {
+  .appHeader {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .brandLockup {
+    width: 100%;
+  }
+
   .stationInfoSurface {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -2009,17 +2027,20 @@ img {
     font-size: 0.8rem;
   }
 
-  .appHeader {
-    align-items: flex-start;
-  }
-
   .headerActions {
     width: 100%;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    row-gap: 10px;
   }
 
   .headerActions > nav {
-    margin-right: auto;
+    margin-right: 0;
+  }
+
+  .headerUtilityRow {
+    justify-content: flex-end;
+    flex-wrap: wrap;
   }
 
   .headerContextButton {
@@ -2042,6 +2063,11 @@ img {
   .installButton {
     min-height: 38px;
     padding: 0 12px;
+  }
+
+  .themeButton {
+    width: 38px;
+    min-height: 38px;
   }
 
   .aboutHero h2 {

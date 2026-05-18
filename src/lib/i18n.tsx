@@ -27,6 +27,7 @@ type TranslationKey =
   | "footer.iosInstall"
   | "player.playbackBlocked"
   | "player.streamLoadError"
+  | "player.installFallbackAndroid"
   | "schedule.title"
   | "schedule.description"
   | "schedule.error"
@@ -117,6 +118,8 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "player.playbackBlocked":
       "Playback was blocked or the stream could not be reached. Tap Play again after checking the network.",
     "player.streamLoadError": "The stream could not be loaded.",
+    "player.installFallbackAndroid":
+      "To install on Android, open your browser menu and tap Install app or Add to Home screen.",
     "schedule.title": "{station} schedule",
     "schedule.description": "See what is playing now and what is coming up through the day.",
     "schedule.error": "Schedule unavailable.",
@@ -214,6 +217,8 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "player.playbackBlocked":
       "La reproducción se bloqueó o no se pudo acceder a la transmisión. Pulsa Reproducir de nuevo después de comprobar la red.",
     "player.streamLoadError": "No se pudo cargar la transmisión.",
+    "player.installFallbackAndroid":
+      "Para instalar en Android, abre el menú del navegador y toca Instalar aplicación o Añadir a la pantalla de inicio.",
     "schedule.title": "Programación de {station}",
     "schedule.description": "Mira lo que suena ahora y lo que viene después durante el día.",
     "schedule.error": "Programación no disponible.",
