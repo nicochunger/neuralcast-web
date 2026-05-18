@@ -3,6 +3,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { clearMediaSessionPlaybackState, registerMediaSessionHandlers, updateMediaSession } from "@/lib/mediaSession";
+import {
+  getPersistentAudioElement,
+  getPersistentPlayerState,
+  setPersistentPlayerState
+} from "@/lib/persistentPlayer";
 import { DEFAULT_STATION_ID, STATIONS, isStationId } from "@/lib/stations";
 import { MiniPlayer } from "@/components/MiniPlayer";
 import { SchedulePreview } from "@/components/SchedulePreview";
@@ -134,7 +139,11 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     setPlaybackState("idle");
     setPlaybackError(undefined);
     clearMediaSessionPlaybackState();
-  }, []);
+    setPersistentPlayerState({
+      activeStationId,
+      playbackState: "idle"
+    });
+  }, [activeStationId]);
 
   const playStation = useCallback(
     async (station: Station) => {
@@ -179,6 +188,27 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   }, []);
 
   useEffect(() => {
+    const persistedState = getPersistentPlayerState();
+    const audio = getPersistentAudioElement();
+
+    if (!persistedState) {
+      return;
+    }
+
+    setActiveStationId(persistedState.activeStationId);
+    setScheduleStationId(persistedState.activeStationId);
+
+    if (!audio.paused && audio.src) {
+      setPlaybackState("playing");
+      setPlaybackError(undefined);
+    } else {
+      setPlaybackState(persistedState.playbackState);
+    }
+
+    void refreshNowPlaying([persistedState.activeStationId]);
+  }, [refreshNowPlaying]);
+
+  useEffect(() => {
     if (!isScheduleOpen) {
       return;
     }
@@ -194,6 +224,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   }, [isScheduleOpen]);
 
   useEffect(() => {
+    audioRef.current = getPersistentAudioElement();
     const audio = audioRef.current;
 
     if (!audio) {
@@ -239,6 +270,14 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       audio.removeEventListener("error", handleError);
     };
   }, [t]);
+
+  useEffect(() => {
+    setPersistentPlayerState({
+      activeStationId,
+      playbackState,
+      trackText: nowPlaying[activeStationId]?.text
+    });
+  }, [activeStationId, nowPlaying, playbackState]);
 
   useEffect(() => {
     void refreshNowPlaying();
@@ -348,8 +387,6 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
 
   return (
     <main className="appShell">
-      <audio ref={audioRef} preload="none" />
-
       <SiteHeader
         extraActions={
           installPrompt ? (

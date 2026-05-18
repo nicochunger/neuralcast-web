@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { cookies, headers } from "next/headers";
 import { LanguageProvider } from "@/lib/i18n";
 import { LOCALE_COOKIE_KEY, resolvePreferredLocale } from "@/lib/locale";
+import { PersistentMiniPlayerOverlay } from "@/components/PersistentMiniPlayerOverlay";
 import "./globals.css";
 
 const themeBootScript = `
@@ -59,7 +60,10 @@ export default async function RootLayout({
     <html lang={initialLocale} suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
-        <LanguageProvider initialLocale={initialLocale}>{children}</LanguageProvider>
+        <LanguageProvider initialLocale={initialLocale}>
+          {children}
+          <PersistentMiniPlayerOverlay />
+        </LanguageProvider>
         <Analytics />
       </body>
     </html>
