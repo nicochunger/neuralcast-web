@@ -352,7 +352,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
 
   const requestInstall = async () => {
     if (!installPrompt) {
-      window.alert("To install on Android, open your browser menu and tap Install app or Add to Home screen.");
+      window.alert(t("player.installFallbackAndroid"));
       return;
     }
 
