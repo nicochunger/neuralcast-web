@@ -3,7 +3,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { clearMediaSessionPlaybackState, registerMediaSessionHandlers, updateMediaSession } from "@/lib/mediaSession";
-import { getPersistentAudioElement, setPersistentPlayerState } from "@/lib/persistentPlayer";
+import {
+  getPersistentAudioElement,
+  getPersistentPlayerState,
+  setPersistentPlayerState
+} from "@/lib/persistentPlayer";
 import { DEFAULT_STATION_ID, STATIONS, isStationId } from "@/lib/stations";
 import { MiniPlayer } from "@/components/MiniPlayer";
 import { SchedulePreview } from "@/components/SchedulePreview";
@@ -182,6 +186,27 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       setScheduleStationId(lastStation);
     }
   }, []);
+
+  useEffect(() => {
+    const persistedState = getPersistentPlayerState();
+    const audio = getPersistentAudioElement();
+
+    if (!persistedState) {
+      return;
+    }
+
+    setActiveStationId(persistedState.activeStationId);
+    setScheduleStationId(persistedState.activeStationId);
+
+    if (!audio.paused && audio.src) {
+      setPlaybackState("playing");
+      setPlaybackError(undefined);
+    } else {
+      setPlaybackState(persistedState.playbackState);
+    }
+
+    void refreshNowPlaying([persistedState.activeStationId]);
+  }, [refreshNowPlaying]);
 
   useEffect(() => {
     if (!isScheduleOpen) {
