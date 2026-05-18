@@ -92,61 +92,63 @@ export function SiteHeader({ extraActions }: { extraActions?: ReactNode }) {
             {pathname === "/about" ? t("nav.backToRadio") : t("nav.about")}
           </Link>
         </nav>
-        <div className="languageMenu" ref={languageMenuRef}>
+        <div className="headerUtilityRow">
+          <div className="languageMenu" ref={languageMenuRef}>
+            <button
+              className="languageMenuTrigger"
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={languageMenuOpen}
+              aria-label={t("common.language")}
+              onClick={() => setLanguageMenuOpen((open) => !open)}
+            >
+              <FlagIcon country={activeLanguage.country} />
+              <span>{activeLanguage.shortLabel}</span>
+              <span className={`languageMenuChevron ${languageMenuOpen ? "languageMenuChevronOpen" : ""}`} aria-hidden="true">
+                ▾
+              </span>
+            </button>
+            {languageMenuOpen ? (
+              <div className="languageMenuList" role="menu" aria-label={t("common.language")}>
+                {languageOptions.map((option) => (
+                  <button
+                    key={option.locale}
+                    className={`languageMenuItem ${option.locale === locale ? "languageMenuItemActive" : ""}`}
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={option.locale === locale}
+                    onClick={() => {
+                      setLocale(option.locale);
+                      setLanguageMenuOpen(false);
+                    }}
+                  >
+                    <FlagIcon country={option.country} />
+                    <span>{option.label}</span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          {extraActions}
           <button
-            className="languageMenuTrigger"
+            className={`themeButton themeButton${resolvedTheme === "dark" ? "Dark" : "Light"}`}
             type="button"
-            aria-haspopup="menu"
-            aria-expanded={languageMenuOpen}
-            aria-label={t("common.language")}
-            onClick={() => setLanguageMenuOpen((open) => !open)}
+            onClick={toggleTheme}
+            aria-label={resolvedTheme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")}
+            title={t("theme.title", {
+              theme:
+                themePreference === "system"
+                  ? `${t("theme.system")} (${t(`theme.${resolvedTheme}`)})`
+                  : t(`theme.${resolvedTheme}`),
+              action: resolvedTheme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")
+            })}
           >
-            <FlagIcon country={activeLanguage.country} />
-            <span>{activeLanguage.shortLabel}</span>
-            <span className={`languageMenuChevron ${languageMenuOpen ? "languageMenuChevronOpen" : ""}`} aria-hidden="true">
-              ▾
+            <span className="themeIcon" aria-hidden="true">
+              <span className="themeSun" />
+              <span className="themeMoon" />
             </span>
           </button>
-          {languageMenuOpen ? (
-            <div className="languageMenuList" role="menu" aria-label={t("common.language")}>
-              {languageOptions.map((option) => (
-                <button
-                  key={option.locale}
-                  className={`languageMenuItem ${option.locale === locale ? "languageMenuItemActive" : ""}`}
-                  type="button"
-                  role="menuitemradio"
-                  aria-checked={option.locale === locale}
-                  onClick={() => {
-                    setLocale(option.locale);
-                    setLanguageMenuOpen(false);
-                  }}
-                >
-                  <FlagIcon country={option.country} />
-                  <span>{option.label}</span>
-                </button>
-              ))}
-            </div>
-          ) : null}
         </div>
-        {extraActions}
-        <button
-          className={`themeButton themeButton${resolvedTheme === "dark" ? "Dark" : "Light"}`}
-          type="button"
-          onClick={toggleTheme}
-          aria-label={resolvedTheme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")}
-          title={t("theme.title", {
-            theme:
-              themePreference === "system"
-                ? `${t("theme.system")} (${t(`theme.${resolvedTheme}`)})`
-                : t(`theme.${resolvedTheme}`),
-            action: resolvedTheme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")
-          })}
-        >
-          <span className="themeIcon" aria-hidden="true">
-            <span className="themeSun" />
-            <span className="themeMoon" />
-          </span>
-        </button>
       </div>
     </header>
   );

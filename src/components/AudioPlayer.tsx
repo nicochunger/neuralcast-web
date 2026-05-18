@@ -43,6 +43,8 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   const [playbackError, setPlaybackError] = useState<string | undefined>();
   const [adminMessage, setAdminMessage] = useState<string | undefined>();
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isAndroid, setIsAndroid] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
   const [skippingStationId, setSkippingStationId] = useState<StationId | null>(null);
   const [nowPlaying, setNowPlaying] = useState<Record<StationId, StationNowPlayingState>>(
     createInitialNowPlayingState
@@ -319,6 +321,12 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   }, []);
 
   useEffect(() => {
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+    setIsStandalone(standalone);
+    setIsAndroid(/android/i.test(window.navigator.userAgent));
+  }, []);
+
+  useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
       event.preventDefault();
       setInstallPrompt(event as BeforeInstallPromptEvent);
@@ -344,6 +352,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
 
   const requestInstall = async () => {
     if (!installPrompt) {
+      window.alert("To install on Android, open your browser menu and tap Install app or Add to Home screen.");
       return;
     }
 
@@ -389,7 +398,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     <main className="appShell">
       <SiteHeader
         extraActions={
-          installPrompt ? (
+          (installPrompt || (isAndroid && !isStandalone)) ? (
             <button className="installButton" type="button" onClick={requestInstall}>
               {t("common.install")}
             </button>
