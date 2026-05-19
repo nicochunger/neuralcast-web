@@ -724,6 +724,10 @@ img {
   color: var(--ink);
 }
 
+.installButton {
+  min-height: 34px;
+}
+
 .themeButton {
   display: grid;
   width: 34px;
