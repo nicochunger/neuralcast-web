@@ -66,7 +66,6 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
           <h2 id="schedule-title">{t("schedule.title", { station: station.name })}</h2>
           <p>{schedule.error ? schedule.error : t("schedule.description")}</p>
         </div>
-        <span>{schedule.isLoading ? t("common.loading") : t("schedule.blocks", { count: segments.length })}</span>
       </div>
 
       {segments.length === 0 ? (
