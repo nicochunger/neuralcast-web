@@ -234,7 +234,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "station.liveNow": "En directo",
     "station.schedule": "Programación",
     "station.description.neuralcast": "Selección mixta de radio con IA",
-    "station.description.neuralforge": "Variante intensa con un presentador de IA",
+    "station.description.neuralforge": "Variante pesada con un locutor de IA",
     "track.waiting": "Esperando los metadatos en directo.",
     "track.unavailable": "Metadatos no disponibles.",
     "status.ready": "Listo",
