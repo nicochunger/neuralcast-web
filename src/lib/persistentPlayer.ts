@@ -8,35 +8,69 @@ export interface PersistentPlayerState {
 
 type Listener = (state: PersistentPlayerState) => void;
 
-let audioElement: HTMLAudioElement | null = null;
-let state: PersistentPlayerState | null = null;
-const listeners = new Set<Listener>();
+interface PersistentPlayerGlobal {
+  audioElement: HTMLAudioElement | null;
+  state: PersistentPlayerState | null;
+  listeners: Set<Listener>;
+}
 
-export function getPersistentAudioElement(): HTMLAudioElement {
-  if (!audioElement) {
-    audioElement = new Audio();
-    audioElement.preload = "none";
+declare global {
+  interface Window {
+    __neuralcastPersistentPlayer__?: PersistentPlayerGlobal;
+  }
+}
+
+const fallbackStore: PersistentPlayerGlobal = {
+  audioElement: null,
+  state: null,
+  listeners: new Set<Listener>()
+};
+
+function getStore(): PersistentPlayerGlobal {
+  if (typeof window === "undefined") {
+    return fallbackStore;
   }
 
-  return audioElement;
+  if (!window.__neuralcastPersistentPlayer__) {
+    window.__neuralcastPersistentPlayer__ = {
+      audioElement: null,
+      state: null,
+      listeners: new Set<Listener>()
+    };
+  }
+
+  return window.__neuralcastPersistentPlayer__;
+}
+
+export function getPersistentAudioElement(): HTMLAudioElement {
+  const store = getStore();
+
+  if (!store.audioElement) {
+    store.audioElement = new Audio();
+    store.audioElement.preload = "none";
+  }
+
+  return store.audioElement;
 }
 
 export function setPersistentPlayerState(nextState: PersistentPlayerState) {
-  state = nextState;
-  listeners.forEach((listener) => listener(nextState));
+  const store = getStore();
+  store.state = nextState;
+  store.listeners.forEach((listener) => listener(nextState));
 }
 
 export function getPersistentPlayerState() {
-  return state;
+  return getStore().state;
 }
 
 export function subscribePersistentPlayer(listener: Listener) {
-  listeners.add(listener);
-  if (state) {
-    listener(state);
+  const store = getStore();
+  store.listeners.add(listener);
+  if (store.state) {
+    listener(store.state);
   }
 
   return () => {
-    listeners.delete(listener);
+    store.listeners.delete(listener);
   };
 }
