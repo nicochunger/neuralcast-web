@@ -56,13 +56,15 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
       className="schedulePanel"
       style={
         {
-          "--station-accent": station.accentColor
+          "--station-accent": station.accentColor,
+          "--station-bg": `url(${station.backgroundImage})`
         } as CSSProperties
       }
       aria-labelledby="schedule-title"
     >
       <div className="scheduleHeader">
         <div>
+          <span className="scheduleKicker">{station.name}</span>
           <h2 id="schedule-title">{t("schedule.title", { station: station.name })}</h2>
           <p>{schedule.error ? schedule.error : t("schedule.description")}</p>
         </div>
