@@ -12,9 +12,12 @@ import { DEFAULT_STATION_ID, STATIONS, isStationId } from "@/lib/stations";
 import { MiniPlayer } from "@/components/MiniPlayer";
 import { SchedulePreview } from "@/components/SchedulePreview";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SongRequestModal } from "@/components/SongRequestModal";
 import { StationCard } from "@/components/StationCard";
 import type {
   PlaybackState,
+  RequestableSong,
+  SongRequestState,
   Station,
   StationId,
   StationNowPlaying,
@@ -46,6 +49,11 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   const [isAndroid, setIsAndroid] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [skippingStationId, setSkippingStationId] = useState<StationId | null>(null);
+  const [songRequestState, setSongRequestState] = useState<SongRequestState>({
+    stationName: "",
+    isLoading: false,
+    songs: []
+  });
   const [nowPlaying, setNowPlaying] = useState<Record<StationId, StationNowPlayingState>>(
     createInitialNowPlayingState
   );
@@ -58,6 +66,10 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   const scheduleStation = useMemo(
     () => STATIONS.find((station) => station.id === scheduleStationId) ?? STATIONS[0],
     [scheduleStationId]
+  );
+  const songRequestStation = useMemo(
+    () => STATIONS.find((station) => station.id === songRequestState.stationId),
+    [songRequestState.stationId]
   );
 
   const refreshNowPlaying = useCallback(async (stationIds: StationId[] = STATIONS.map((station) => station.id)) => {
@@ -226,6 +238,21 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   }, [isScheduleOpen]);
 
   useEffect(() => {
+    if (!songRequestState.stationId) {
+      return;
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeSongRequests();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [songRequestState.stationId]);
+
+  useEffect(() => {
     audioRef.current = getPersistentAudioElement();
     const audio = audioRef.current;
 
@@ -312,10 +339,18 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   }, [activeStationId, refreshNowPlaying, refreshSchedules]);
 
   useEffect(() => {
-    if (
-      "serviceWorker" in navigator &&
-      (process.env.NODE_ENV === "production" || window.location.hostname === "localhost")
-    ) {
+    if (!("serviceWorker" in navigator)) {
+      return;
+    }
+
+    if (process.env.NODE_ENV !== "production") {
+      navigator.serviceWorker.getRegistrations()
+        .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+        .catch(() => undefined);
+      return;
+    }
+
+    if (process.env.NODE_ENV === "production") {
       navigator.serviceWorker.register("/sw.js").catch(() => undefined);
     }
   }, []);
@@ -394,6 +429,98 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     [isAdmin, refreshNowPlaying, skippingStationId]
   );
 
+  const openSongRequests = useCallback(
+    async (station: Station) => {
+      setSongRequestState({
+        stationId: station.id,
+        stationName: station.name,
+        isLoading: true,
+        songs: []
+      });
+
+      try {
+        const response = await fetch(`/api/requests/${station.id}`, { cache: "no-store" });
+        const payload = (await response.json()) as { songs?: RequestableSong[]; error?: string };
+
+        if (!response.ok) {
+          throw new Error(payload.error || t("request.loadError"));
+        }
+
+        setSongRequestState((current) =>
+          current.stationId === station.id
+            ? {
+                ...current,
+                isLoading: false,
+                songs: payload.songs ?? []
+              }
+            : current
+        );
+      } catch (error) {
+        setSongRequestState((current) =>
+          current.stationId === station.id
+            ? {
+                ...current,
+                isLoading: false,
+                songs: [],
+                error: error instanceof Error ? error.message : t("request.loadError")
+              }
+            : current
+        );
+      }
+    },
+    [t]
+  );
+
+  const submitSongRequest = useCallback(
+    async (song: RequestableSong) => {
+      const stationId = songRequestState.stationId;
+
+      if (!stationId || songRequestState.submittingRequestId) {
+        return;
+      }
+
+      setSongRequestState((current) => ({
+        ...current,
+        submittingRequestId: song.requestId,
+        error: undefined
+      }));
+
+      try {
+        const response = await fetch(`/api/requests/${stationId}`, {
+          method: "POST",
+          cache: "no-store",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ requestUrl: song.requestUrl })
+        });
+        const payload = (await response.json()) as { message?: string; error?: string };
+
+        if (!response.ok) {
+          throw new Error(payload.error || t("request.submitError"));
+        }
+
+        setAdminMessage(payload.message || t("request.success"));
+        closeSongRequests();
+      } catch (error) {
+        setSongRequestState((current) => ({
+          ...current,
+          submittingRequestId: undefined,
+          error: error instanceof Error ? error.message : t("request.submitError")
+        }));
+      }
+    },
+    [songRequestState.stationId, songRequestState.submittingRequestId, t]
+  );
+
+  const closeSongRequests = () => {
+    setSongRequestState({
+      stationName: "",
+      isLoading: false,
+      songs: []
+    });
+  };
+
   return (
     <main className="appShell">
       <SiteHeader
@@ -422,6 +549,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
               setScheduleStationId(selectedStation.id);
               setIsScheduleOpen(true);
             }}
+            onRequestSong={openSongRequests}
             showAdminSkip={isAdmin}
             isSkippingTrack={skippingStationId === station.id}
             onSkipTrack={skipTrack}
@@ -454,6 +582,15 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
             <SchedulePreview station={scheduleStation} schedule={schedules[scheduleStation.id]} />
           </div>
         </div>
+      ) : null}
+
+      {songRequestStation ? (
+        <SongRequestModal
+          station={songRequestStation}
+          requestState={songRequestState}
+          onRequestSong={submitSongRequest}
+          onDismiss={closeSongRequests}
+        />
       ) : null}
 
       <footer className="appFooter">

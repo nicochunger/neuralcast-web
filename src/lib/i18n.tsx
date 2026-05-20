@@ -42,8 +42,22 @@ type TranslationKey =
   | "station.nowPlaying"
   | "station.liveNow"
   | "station.schedule"
+  | "station.requestSong"
   | "station.description.neuralcast"
   | "station.description.neuralforge"
+  | "request.title"
+  | "request.description"
+  | "request.close"
+  | "request.searchLabel"
+  | "request.searchPlaceholder"
+  | "request.loading"
+  | "request.empty"
+  | "request.noMatches"
+  | "request.submit"
+  | "request.submitting"
+  | "request.success"
+  | "request.loadError"
+  | "request.submitError"
   | "track.waiting"
   | "track.unavailable"
   | "status.ready"
@@ -134,8 +148,22 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "station.nowPlaying": "Now playing",
     "station.liveNow": "Live now",
     "station.schedule": "Schedule",
+    "station.requestSong": "Request song",
     "station.description.neuralcast": "Mixed AI radio selection",
     "station.description.neuralforge": "Heavy variant with an AI host",
+    "request.title": "Request a song",
+    "request.description": "Choose a track from the station library. AzuraCast will place it in the request queue when available.",
+    "request.close": "Close song requests",
+    "request.searchLabel": "Search the catalog",
+    "request.searchPlaceholder": "Artist, title, album, or genre",
+    "request.loading": "Loading available songs...",
+    "request.empty": "No songs are currently available for request.",
+    "request.noMatches": "No songs matched your search.",
+    "request.submit": "Request",
+    "request.submitting": "Sending...",
+    "request.success": "Your request has been submitted.",
+    "request.loadError": "Unable to load requestable songs.",
+    "request.submitError": "Unable to submit song request.",
     "track.waiting": "Waiting for live metadata.",
     "track.unavailable": "Metadata unavailable.",
     "status.ready": "Ready",
@@ -233,8 +261,22 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "station.nowPlaying": "Sonando ahora",
     "station.liveNow": "En directo",
     "station.schedule": "Programación",
+    "station.requestSong": "Pedir canción",
     "station.description.neuralcast": "Selección mixta de radio con IA",
     "station.description.neuralforge": "Variante pesada con un locutor de IA",
+    "request.title": "Pedir una canción",
+    "request.description": "Elegí una canción de la biblioteca de la emisora. AzuraCast la pondrá en la cola de pedidos cuando esté disponible.",
+    "request.close": "Cerrar pedidos de canciones",
+    "request.searchLabel": "Buscar en el catálogo",
+    "request.searchPlaceholder": "Artista, canción, álbum o género",
+    "request.loading": "Cargando canciones disponibles...",
+    "request.empty": "No hay canciones disponibles para pedir en este momento.",
+    "request.noMatches": "No hay canciones que coincidan con tu búsqueda.",
+    "request.submit": "Pedir",
+    "request.submitting": "Enviando...",
+    "request.success": "Tu pedido fue enviado.",
+    "request.loadError": "No se pudieron cargar las canciones disponibles.",
+    "request.submitError": "No se pudo enviar el pedido.",
     "track.waiting": "Esperando los metadatos en directo.",
     "track.unavailable": "Metadatos no disponibles.",
     "status.ready": "Listo",

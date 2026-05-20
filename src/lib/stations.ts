@@ -5,6 +5,7 @@ export const AZURACAST_BASE_URL = "https://neuralcast.duckdns.org";
 export const STATIONS: readonly Station[] = [
   {
     id: "neuralcast",
+    azuracastStationId: 1,
     name: "NeuralCast",
     streamUrl: `${AZURACAST_BASE_URL}/listen/neuralcast/radio.mp3`,
     timeZone: "Europe/Zurich",
@@ -14,6 +15,7 @@ export const STATIONS: readonly Station[] = [
   },
   {
     id: "neuralforge",
+    azuracastStationId: 2,
     name: "NeuralForge",
     streamUrl: `${AZURACAST_BASE_URL}/listen/neuralforge/radio.mp3`,
     timeZone: "Europe/Zurich",

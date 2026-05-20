@@ -6,6 +6,7 @@ export type ScheduleSegmentKind = "scheduled" | "open-slot" | "open-rotation";
 
 export interface Station {
   id: StationId;
+  azuracastStationId: number;
   name: string;
   streamUrl: string;
   timeZone: string;
@@ -21,6 +22,9 @@ export interface StationNowPlaying {
   text?: string;
   artist?: string;
   title?: string;
+  album?: string;
+  genre?: string;
+  art?: string;
   listeners?: number;
   fetchedAt: string;
 }
@@ -51,5 +55,26 @@ export interface StationScheduleDay {
 export interface StationScheduleState extends Partial<StationScheduleDay> {
   stationId: StationId;
   isLoading: boolean;
+  error?: string;
+}
+
+export interface RequestableSong {
+  requestId: string;
+  requestUrl: string;
+  text?: string;
+  artist?: string;
+  title?: string;
+  album?: string;
+  genre?: string;
+  art?: string;
+  displayText: string;
+}
+
+export interface SongRequestState {
+  stationId?: StationId;
+  stationName: string;
+  isLoading: boolean;
+  songs: RequestableSong[];
+  submittingRequestId?: string;
   error?: string;
 }

@@ -19,6 +19,7 @@ interface StationCardProps {
   onPlay: (station: Station) => void;
   onStop: () => void;
   onSelectSchedule: (station: Station) => void;
+  onRequestSong: (station: Station) => void;
   showAdminSkip: boolean;
   isSkippingTrack: boolean;
   onSkipTrack: (station: Station) => void;
@@ -34,6 +35,7 @@ export function StationCard({
   onPlay,
   onStop,
   onSelectSchedule,
+  onRequestSong,
   showAdminSkip,
   isSkippingTrack,
   onSkipTrack
@@ -92,10 +94,19 @@ export function StationCard({
             <span>{listenerText}</span>
           </div>
 
-          <div className="trackTitle" aria-label={track.label}>
-            <strong className="trackArtist">{track.artist}</strong>
-            {track.song ? <span className="trackSong">{track.song}</span> : null}
-            {track.album ? <span className="trackAlbum">{track.album}</span> : null}
+          <div className="trackNowPlaying">
+            <div className={`trackArtwork ${nowPlaying.art ? "trackArtworkLoaded" : ""}`} aria-hidden="true">
+              {nowPlaying.art ? <img src={nowPlaying.art} alt="" loading="lazy" /> : <span>{getArtworkInitial(track)}</span>}
+            </div>
+            <div className="trackTitle" aria-label={track.label}>
+              <strong className="trackArtist">{track.artist}</strong>
+              {track.song ? (
+                <span className="trackSong">{track.song}</span>
+              ) : null}
+              {track.album ? (
+                <span className="trackAlbum">{track.album}</span>
+              ) : null}
+            </div>
           </div>
           {nowPlaying.error && !nowPlaying.text ? <em>{nowPlaying.error}</em> : null}
 
@@ -111,6 +122,9 @@ export function StationCard({
               onClick={() => onSelectSchedule(station)}
             >
               {t("station.schedule")}
+            </button>
+            <button className="actionButton requestActionButton" type="button" onClick={() => onRequestSong(station)}>
+              {t("station.requestSong")}
             </button>
             {showAdminSkip ? (
               <button
@@ -164,6 +178,15 @@ function getTrackDetails(
   t: ReturnType<typeof useI18n>["t"]
 ): TrackDetails {
   if (nowPlaying.text) {
+    if (nowPlaying.artist || nowPlaying.title) {
+      return {
+        artist: nowPlaying.artist ?? nowPlaying.text,
+        song: nowPlaying.title,
+        album: nowPlaying.album,
+        label: nowPlaying.text
+      };
+    }
+
     const parts = nowPlaying.text.split(" - ").map((part) => part.trim()).filter(Boolean);
 
     if (parts.length >= 3) {
@@ -205,6 +228,10 @@ function getTrackDetails(
     artist: t("track.unavailable"),
     label: t("track.unavailable")
   };
+}
+
+function getArtworkInitial(track: TrackDetails): string {
+  return (track.artist || track.song || "?").trim().charAt(0).toUpperCase() || "?";
 }
 
 function WaveformBars() {

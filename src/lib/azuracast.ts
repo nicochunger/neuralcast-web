@@ -28,6 +28,7 @@ function normalizeNowPlaying(station: Station, payload: unknown): StationNowPlay
 
   const artist = readString(song.artist);
   const title = readString(song.title);
+  const album = readString(song.album);
   const text = readString(song.text) ?? formatTrack(artist, title);
   const stationName = readString(stationPayload.name) ?? station.name;
   const listenerCount = parseListenerCount(listeners);
@@ -38,6 +39,9 @@ function normalizeNowPlaying(station: Station, payload: unknown): StationNowPlay
     text,
     artist,
     title,
+    album,
+    genre: readString(song.genre),
+    art: readString(song.art),
     listeners: listenerCount,
     fetchedAt: new Date().toISOString()
   };
