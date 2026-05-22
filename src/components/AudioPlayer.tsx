@@ -9,7 +9,7 @@ import { SchedulePreview } from "@/components/SchedulePreview";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SongRequestModal } from "@/components/SongRequestModal";
 import { StationCard } from "@/components/StationCard";
-import { skipTrackAction, submitSongRequestAction } from "@/lib/actions";
+import { submitSongRequestAction } from "@/lib/actions";
 import type {
   RequestableSong,
   SongRequestState,
@@ -151,13 +151,17 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       setSkippingStationId(station.id);
 
       try {
-        const result = await skipTrackAction(station.id);
+        const response = await fetch(`/api/admin/skip/${station.id}`, {
+          method: "POST",
+          cache: "no-store"
+        });
+        const payload = await readJsonResponse(response);
 
-        if (!result.success) {
-          throw new Error(result.error || "Unable to skip the current track.");
+        if (!response.ok) {
+          throw new Error(payload.error || "Unable to skip the current track.");
         }
 
-        setAdminMessage(result.message || `Skipped current track on ${station.name}.`);
+        setAdminMessage(payload.message || `Skipped current track on ${station.name}.`);
         window.setTimeout(() => {
           void refreshNowPlaying([station.id]);
         }, 1200);
@@ -340,4 +344,26 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       />
     </main>
   );
+}
+
+async function readJsonResponse(response: Response): Promise<{ message?: string; error?: string }> {
+  const body = await response.text();
+
+  try {
+    const parsed = JSON.parse(body) as unknown;
+    if (parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return parsed as { message?: string; error?: string };
+    }
+  } catch {
+    // Fall through to the generic HTML/plaintext handling below.
+  }
+
+  if (body.includes("<!DOCTYPE") || body.includes("<html")) {
+    return {
+      error: "Unexpected HTML response while skipping the current track."
+    };
+  }
+
+  const text = body.trim();
+  return text ? { error: text } : { error: "Unable to skip the current track." };
 }
