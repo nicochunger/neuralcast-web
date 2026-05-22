@@ -2306,6 +2306,18 @@ img {
   font-size: 0.9rem;
 }
 
+.footerAdminLink {
+  color: color-mix(in srgb, var(--dim), var(--text) 18%);
+  text-decoration: none;
+}
+
+.footerAdminLink:hover,
+.footerAdminLink:focus-visible {
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .miniPlayer {
   position: fixed;
   right: max(14px, env(safe-area-inset-right));

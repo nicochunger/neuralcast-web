@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
@@ -332,7 +333,12 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
 
       <footer className="appFooter">
         <span>{t("footer.connection")}</span>
-        <span>{t("footer.iosInstall")}</span>
+        <span>
+          {t("footer.iosInstall")}{" "}
+          <Link className="footerAdminLink" href="/admin">
+            {t("footer.admin")}
+          </Link>
+        </span>
       </footer>
 
       <MiniPlayer

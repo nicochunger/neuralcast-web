@@ -25,6 +25,7 @@ type TranslationKey =
   | "nav.backToRadio"
   | "footer.connection"
   | "footer.iosInstall"
+  | "footer.admin"
   | "player.playbackBlocked"
   | "player.streamLoadError"
   | "player.installFallbackAndroid"
@@ -129,6 +130,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "nav.backToRadio": "Back to radio",
     "footer.connection": "Live streams require a network connection.",
     "footer.iosInstall": "Add to Home Screen on iOS from the Share menu.",
+    "footer.admin": "Admin",
     "player.playbackBlocked":
       "Playback was blocked or the stream could not be reached. Tap Play again after checking the network.",
     "player.streamLoadError": "The stream could not be loaded.",
@@ -242,6 +244,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "nav.backToRadio": "Volver a la radio",
     "footer.connection": "Las transmisiones en directo requieren conexión de red.",
     "footer.iosInstall": "En iOS, usa el menú Compartir para añadirla a la pantalla de inicio.",
+    "footer.admin": "Admin",
     "player.playbackBlocked":
       "La reproducción se bloqueó o no se pudo acceder a la transmisión. Pulsa Reproducir de nuevo después de comprobar la red.",
     "player.streamLoadError": "No se pudo cargar la transmisión.",
