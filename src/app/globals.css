@@ -453,7 +453,7 @@ img {
 .stationCardHeader {
   display: flex;
   align-items: flex-start;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 14px;
 }
 
@@ -487,17 +487,9 @@ img {
 
 .stationControlGroup {
   display: grid;
-  justify-items: start;
-  gap: 7px;
-  max-width: min(100%, 620px);
-  margin-top: 14px;
-}
-
-.stationPlaybackRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  justify-items: end;
   gap: 8px;
+  max-width: min(100%, 220px);
 }
 
 .stateChip,
@@ -530,6 +522,8 @@ img {
   display: inline-flex;
   align-items: center;
   min-height: 32px;
+  width: fit-content;
+  margin-top: 12px;
   border: 1px solid rgba(255, 255, 255, 0.26);
   border-radius: 999px;
   padding: 5px 9px;
@@ -2530,7 +2524,7 @@ img {
   }
 
   .stationControlGroup {
-    max-width: min(100%, 620px);
+    max-width: 45%;
   }
 
   .stationInfoSurface {
@@ -2662,6 +2656,7 @@ img {
 
   .stationControlGroup {
     max-width: none;
+    justify-items: start;
   }
 
   .stationInfoSurface {

@@ -67,27 +67,25 @@ export function StationCard({
           <div className="stationTitleBlock">
             <h2>{station.name}</h2>
             <p>{getStationDescription(station.id, t)}</p>
+            <span className="listenerChip">{listenerText}</span>
+          </div>
 
-            <div className="stationControlGroup">
-              <div className="stationPlaybackRow">
-                <button
-                  className="playButton"
-                  type="button"
-                  onClick={() => (shouldStop ? onStop() : onPlay(station))}
-                  aria-label={`${shouldStop ? t("common.stop") : t("common.play")} ${station.name}`}
-                >
-                  <span className={shouldStop ? "stopGlyph" : "playGlyph"} aria-hidden="true" />
-                  {shouldStop ? t("common.stop") : t("common.play")}
-                </button>
-                {isActive && playbackState !== "idle" ? (
-                  <span className={`stateChip ${isOnAir ? "stateChipLive" : ""} ${isBusy ? "stateChipBusy" : ""}`}>
-                    {isOnAir ? <WaveformBars /> : null}
-                    {statusLabel}
-                  </span>
-                ) : null}
-              </div>
-              <span className="listenerChip">{listenerText}</span>
-            </div>
+          <div className="stationControlGroup">
+            <button
+              className="playButton"
+              type="button"
+              onClick={() => (shouldStop ? onStop() : onPlay(station))}
+              aria-label={`${shouldStop ? t("common.stop") : t("common.play")} ${station.name}`}
+            >
+              <span className={shouldStop ? "stopGlyph" : "playGlyph"} aria-hidden="true" />
+              {shouldStop ? t("common.stop") : t("common.play")}
+            </button>
+            {isActive && playbackState !== "idle" ? (
+              <span className={`stateChip ${isOnAir ? "stateChipLive" : ""} ${isBusy ? "stateChipBusy" : ""}`}>
+                {isOnAir ? <WaveformBars /> : null}
+                {statusLabel}
+              </span>
+            ) : null}
           </div>
         </div>
 
