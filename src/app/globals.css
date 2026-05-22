@@ -2306,12 +2306,17 @@ img {
   font-size: 0.9rem;
 }
 
+.appFooterUtility {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
 .footerAdminLink {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   min-height: 30px;
-  margin-left: 2px;
   border: 1px solid color-mix(in srgb, var(--border), var(--text) 16%);
   border-radius: 999px;
   padding: 5px 10px;

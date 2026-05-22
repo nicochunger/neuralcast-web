@@ -333,8 +333,8 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
 
       <footer className="appFooter">
         <span>{t("footer.connection")}</span>
-        <span>
-          {t("footer.iosInstall")}{" "}
+        <span className="appFooterUtility">
+          <span>{t("footer.iosInstall")}</span>
           <Link className="footerAdminLink" href="/admin">
             <span className="footerAdminIcon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
