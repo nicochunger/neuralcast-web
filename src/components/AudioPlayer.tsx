@@ -1,29 +1,20 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/lib/i18n";
-import { clearMediaSessionPlaybackState, registerMediaSessionHandlers, updateMediaSession } from "@/lib/mediaSession";
-import {
-  getPersistentAudioElement,
-  getPersistentPlayerState,
-  setPersistentPlayerState
-} from "@/lib/persistentPlayer";
-import { DEFAULT_STATION_ID, STATIONS, isStationId } from "@/lib/stations";
+import { useAudioPlayer } from "@/context/AudioPlayerContext";
+import { DEFAULT_STATION_ID, STATIONS } from "@/lib/stations";
 import { MiniPlayer } from "@/components/MiniPlayer";
 import { SchedulePreview } from "@/components/SchedulePreview";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SongRequestModal } from "@/components/SongRequestModal";
 import { StationCard } from "@/components/StationCard";
+import { skipTrackAction, submitSongRequestAction } from "@/lib/actions";
 import type {
-  PlaybackState,
   RequestableSong,
   SongRequestState,
   Station,
-  StationId,
-  StationNowPlaying,
-  StationNowPlayingState,
-  StationScheduleDay,
-  StationScheduleState
+  StationId
 } from "@/types/radio";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -37,13 +28,20 @@ interface AudioPlayerProps {
 
 export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   const { t } = useI18n();
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const manualStopRef = useRef(false);
-  const [activeStationId, setActiveStationId] = useState<StationId>(DEFAULT_STATION_ID);
+  const {
+    activeStationId,
+    activeStation,
+    playbackState,
+    playbackError,
+    nowPlaying,
+    schedules,
+    playStation,
+    stopPlayback,
+    refreshNowPlaying
+  } = useAudioPlayer();
+
   const [scheduleStationId, setScheduleStationId] = useState<StationId>(DEFAULT_STATION_ID);
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
-  const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
-  const [playbackError, setPlaybackError] = useState<string | undefined>();
   const [adminMessage, setAdminMessage] = useState<string | undefined>();
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isAndroid, setIsAndroid] = useState(false);
@@ -54,15 +52,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     isLoading: false,
     songs: []
   });
-  const [nowPlaying, setNowPlaying] = useState<Record<StationId, StationNowPlayingState>>(
-    createInitialNowPlayingState
-  );
-  const [schedules, setSchedules] = useState<Record<StationId, StationScheduleState>>(createInitialScheduleState);
 
-  const activeStation = useMemo(
-    () => STATIONS.find((station) => station.id === activeStationId) ?? STATIONS[0],
-    [activeStationId]
-  );
   const scheduleStation = useMemo(
     () => STATIONS.find((station) => station.id === scheduleStationId) ?? STATIONS[0],
     [scheduleStationId]
@@ -72,155 +62,10 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     [songRequestState.stationId]
   );
 
-  const refreshNowPlaying = useCallback(async (stationIds: StationId[] = STATIONS.map((station) => station.id)) => {
-    setNowPlaying((current) => markNowPlayingLoading(current, stationIds));
-
-    await Promise.all(
-      stationIds.map(async (stationId) => {
-        try {
-          const response = await fetch(`/api/nowplaying/${stationId}`, { cache: "no-store" });
-
-          if (!response.ok) {
-            throw new Error(t("common.unavailable"));
-          }
-
-          const payload = (await response.json()) as StationNowPlaying;
-          setNowPlaying((current) => ({
-            ...current,
-            [stationId]: {
-              ...payload,
-              isLoading: false
-            }
-          }));
-        } catch {
-          setNowPlaying((current) => ({
-            ...current,
-            [stationId]: {
-              ...current[stationId],
-              isLoading: false,
-              error: t("common.unavailable")
-            }
-          }));
-        }
-      })
-    );
-  }, []);
-
-  const refreshSchedules = useCallback(async (stationIds: StationId[] = STATIONS.map((station) => station.id)) => {
-    setSchedules((current) => markScheduleLoading(current, stationIds));
-
-    await Promise.all(
-      stationIds.map(async (stationId) => {
-        try {
-          const response = await fetch(`/api/schedule/${stationId}`, { cache: "no-store" });
-
-          if (!response.ok) {
-            throw new Error(t("schedule.error"));
-          }
-
-          const payload = (await response.json()) as StationScheduleDay;
-          setSchedules((current) => ({
-            ...current,
-            [stationId]: {
-              ...payload,
-              isLoading: false
-            }
-          }));
-        } catch {
-          setSchedules((current) => ({
-            ...current,
-            [stationId]: {
-              ...current[stationId],
-              isLoading: false,
-              error: t("schedule.error")
-            }
-          }));
-        }
-      })
-    );
-  }, []);
-
-  const stopPlayback = useCallback(() => {
-    manualStopRef.current = true;
-    const audio = audioRef.current;
-
-    if (audio) {
-      audio.pause();
-      audio.removeAttribute("src");
-      audio.load();
-    }
-
-    setPlaybackState("idle");
-    setPlaybackError(undefined);
-    clearMediaSessionPlaybackState();
-    setPersistentPlayerState({
-      activeStationId,
-      playbackState: "idle"
-    });
+  // Sync the local schedule display selection with the active station ID
+  useEffect(() => {
+    setScheduleStationId(activeStationId);
   }, [activeStationId]);
-
-  const playStation = useCallback(
-    async (station: Station) => {
-      const audio = audioRef.current;
-
-      if (!audio) {
-        return;
-      }
-
-      manualStopRef.current = false;
-      setActiveStationId(station.id);
-      setScheduleStationId(station.id);
-      setPlaybackState("buffering");
-      setPlaybackError(undefined);
-      window.localStorage.setItem("neuralcast:last-station", station.id);
-
-      if (audio.src !== station.streamUrl) {
-        audio.pause();
-        audio.src = station.streamUrl;
-        audio.load();
-      }
-
-      try {
-        await audio.play();
-      } catch {
-        setPlaybackState("error");
-        setPlaybackError(t("player.playbackBlocked"));
-      }
-
-      void refreshNowPlaying([station.id]);
-    },
-    [refreshNowPlaying]
-  );
-
-  useEffect(() => {
-    const lastStation = window.localStorage.getItem("neuralcast:last-station");
-
-    if (lastStation && isStationId(lastStation)) {
-      setActiveStationId(lastStation);
-      setScheduleStationId(lastStation);
-    }
-  }, []);
-
-  useEffect(() => {
-    const persistedState = getPersistentPlayerState();
-    const audio = getPersistentAudioElement();
-
-    if (!persistedState) {
-      return;
-    }
-
-    setActiveStationId(persistedState.activeStationId);
-    setScheduleStationId(persistedState.activeStationId);
-
-    if (!audio.paused && audio.src) {
-      setPlaybackState("playing");
-      setPlaybackError(undefined);
-    } else {
-      setPlaybackState(persistedState.playbackState);
-    }
-
-    void refreshNowPlaying([persistedState.activeStationId]);
-  }, [refreshNowPlaying]);
 
   useEffect(() => {
     if (!isScheduleOpen) {
@@ -251,92 +96,6 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [songRequestState.stationId]);
-
-  useEffect(() => {
-    audioRef.current = getPersistentAudioElement();
-    const audio = audioRef.current;
-
-    if (!audio) {
-      return;
-    }
-
-    const handleLoadStart = () => {
-      if (!manualStopRef.current) {
-        setPlaybackState("buffering");
-      }
-    };
-    const handleWaiting = () => {
-      if (!manualStopRef.current) {
-        setPlaybackState("buffering");
-      }
-    };
-    const handlePlaying = () => setPlaybackState("playing");
-    const handlePause = () => {
-      if (!manualStopRef.current && audio.src) {
-        setPlaybackState("paused");
-      }
-    };
-    const handleError = () => {
-      if (!manualStopRef.current) {
-        setPlaybackState("error");
-        setPlaybackError(t("player.streamLoadError"));
-      }
-    };
-
-    audio.addEventListener("loadstart", handleLoadStart);
-    audio.addEventListener("waiting", handleWaiting);
-    audio.addEventListener("stalled", handleWaiting);
-    audio.addEventListener("playing", handlePlaying);
-    audio.addEventListener("pause", handlePause);
-    audio.addEventListener("error", handleError);
-
-    return () => {
-      audio.removeEventListener("loadstart", handleLoadStart);
-      audio.removeEventListener("waiting", handleWaiting);
-      audio.removeEventListener("stalled", handleWaiting);
-      audio.removeEventListener("playing", handlePlaying);
-      audio.removeEventListener("pause", handlePause);
-      audio.removeEventListener("error", handleError);
-    };
-  }, [t]);
-
-  useEffect(() => {
-    setPersistentPlayerState({
-      activeStationId,
-      playbackState,
-      nowPlaying: nowPlaying[activeStationId]
-    });
-  }, [activeStationId, nowPlaying, playbackState]);
-
-  useEffect(() => {
-    void refreshNowPlaying();
-    void refreshSchedules();
-
-    const metadataInterval = window.setInterval(() => {
-      if (!document.hidden) {
-        void refreshNowPlaying();
-      }
-    }, 25000);
-    const scheduleInterval = window.setInterval(() => {
-      if (!document.hidden) {
-        void refreshSchedules();
-      }
-    }, 300000);
-    const handleVisibility = () => {
-      if (!document.hidden) {
-        void refreshNowPlaying([activeStationId]);
-        void refreshSchedules();
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibility);
-
-    return () => {
-      window.clearInterval(metadataInterval);
-      window.clearInterval(scheduleInterval);
-      document.removeEventListener("visibilitychange", handleVisibility);
-    };
-  }, [activeStationId, refreshNowPlaying, refreshSchedules]);
 
   useEffect(() => {
     if (!("serviceWorker" in navigator)) {
@@ -371,20 +130,6 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
   }, []);
 
-  useEffect(() => {
-    registerMediaSessionHandlers({
-      onPlay: () => {
-        void playStation(activeStation);
-      },
-      onPause: stopPlayback,
-      onStop: stopPlayback
-    });
-  }, [activeStation, playStation, stopPlayback]);
-
-  useEffect(() => {
-    updateMediaSession(activeStation, nowPlaying[activeStation.id], playbackState === "playing");
-  }, [activeStation, nowPlaying, playbackState]);
-
   const requestInstall = async () => {
     if (!installPrompt) {
       window.alert(t("player.installFallbackAndroid"));
@@ -406,17 +151,13 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       setSkippingStationId(station.id);
 
       try {
-        const response = await fetch(`/api/admin/skip/${station.id}`, {
-          method: "POST",
-          cache: "no-store"
-        });
-        const payload = (await response.json()) as { message?: string; error?: string };
+        const result = await skipTrackAction(station.id);
 
-        if (!response.ok) {
-          throw new Error(payload.error || "Unable to skip the current track.");
+        if (!result.success) {
+          throw new Error(result.error || "Unable to skip the current track.");
         }
 
-        setAdminMessage(payload.message || `Skipped current track on ${station.name}.`);
+        setAdminMessage(result.message || `Skipped current track on ${station.name}.`);
         window.setTimeout(() => {
           void refreshNowPlaying([station.id]);
         }, 1200);
@@ -486,21 +227,13 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       }));
 
       try {
-        const response = await fetch(`/api/requests/${stationId}`, {
-          method: "POST",
-          cache: "no-store",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ requestUrl: song.requestUrl })
-        });
-        const payload = (await response.json()) as { message?: string; error?: string };
+        const result = await submitSongRequestAction(stationId, song.requestUrl);
 
-        if (!response.ok) {
-          throw new Error(payload.error || t("request.submitError"));
+        if (!result.success) {
+          throw new Error(result.error || t("request.submitError"));
         }
 
-        setAdminMessage(payload.message || t("request.success"));
+        setAdminMessage(result.message || t("request.success"));
         closeSongRequests();
       } catch (error) {
         setSongRequestState((current) => ({
@@ -606,65 +339,5 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
         onStop={stopPlayback}
       />
     </main>
-  );
-}
-
-function createInitialNowPlayingState(): Record<StationId, StationNowPlayingState> {
-  return STATIONS.reduce(
-    (state, station) => ({
-      ...state,
-      [station.id]: {
-        stationId: station.id,
-        isLoading: true
-      }
-    }),
-    {} as Record<StationId, StationNowPlayingState>
-  );
-}
-
-function createInitialScheduleState(): Record<StationId, StationScheduleState> {
-  return STATIONS.reduce(
-    (state, station) => ({
-      ...state,
-      [station.id]: {
-        stationId: station.id,
-        isLoading: true
-      }
-    }),
-    {} as Record<StationId, StationScheduleState>
-  );
-}
-
-function markNowPlayingLoading(
-  current: Record<StationId, StationNowPlayingState>,
-  stationIds: StationId[]
-): Record<StationId, StationNowPlayingState> {
-  return stationIds.reduce(
-    (state, stationId) => ({
-      ...state,
-      [stationId]: {
-        ...state[stationId],
-        isLoading: true,
-        error: undefined
-      }
-    }),
-    current
-  );
-}
-
-function markScheduleLoading(
-  current: Record<StationId, StationScheduleState>,
-  stationIds: StationId[]
-): Record<StationId, StationScheduleState> {
-  return stationIds.reduce(
-    (state, stationId) => ({
-      ...state,
-      [stationId]: {
-        ...state[stationId],
-        isLoading: true,
-        error: undefined
-      }
-    }),
-    current
   );
 }

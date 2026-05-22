@@ -4,6 +4,7 @@ import { cookies, headers } from "next/headers";
 import { LanguageProvider } from "@/lib/i18n";
 import { LOCALE_COOKIE_KEY, resolvePreferredLocale } from "@/lib/locale";
 import { PersistentMiniPlayerOverlay } from "@/components/PersistentMiniPlayerOverlay";
+import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
 import "./globals.css";
 
 const themeBootScript = `
@@ -61,8 +62,10 @@ export default async function RootLayout({
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <LanguageProvider initialLocale={initialLocale}>
-          {children}
-          <PersistentMiniPlayerOverlay />
+          <AudioPlayerProvider>
+            {children}
+            <PersistentMiniPlayerOverlay />
+          </AudioPlayerProvider>
         </LanguageProvider>
         <Analytics />
       </body>
