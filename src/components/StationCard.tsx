@@ -50,7 +50,7 @@ export function StationCard({
     nowPlaying.listeners === undefined
       ? t("common.listenersUnknown")
       : t("common.listeners", { count: nowPlaying.listeners });
-  const liveNowText = schedule.error ? t("common.unavailable") : getSegmentTitle(schedule.liveSegment, locale);
+  const activePlaylistText = schedule.error ? t("common.unavailable") : getActivePlaylistText(schedule.liveSegment, locale);
 
   return (
     <article
@@ -67,31 +67,37 @@ export function StationCard({
           <div className="stationTitleBlock">
             <h2>{station.name}</h2>
             <p>{getStationDescription(station.id, t)}</p>
-          </div>
 
-          <div className="stationControlGroup">
-            {isActive && playbackState !== "idle" ? (
-              <span className={`stateChip ${isOnAir ? "stateChipLive" : ""} ${isBusy ? "stateChipBusy" : ""}`}>
-                {isOnAir ? <WaveformBars /> : null}
-                {statusLabel}
-              </span>
-            ) : null}
-            <button
-              className="playButton"
-              type="button"
-              onClick={() => (shouldStop ? onStop() : onPlay(station))}
-              aria-label={`${shouldStop ? t("common.stop") : t("common.play")} ${station.name}`}
-            >
-              <span className={shouldStop ? "stopGlyph" : "playGlyph"} aria-hidden="true" />
-              {shouldStop ? t("common.stop") : t("common.play")}
-            </button>
+            <div className="stationControlGroup">
+              <div className="stationPlaybackRow">
+                <button
+                  className="playButton"
+                  type="button"
+                  onClick={() => (shouldStop ? onStop() : onPlay(station))}
+                  aria-label={`${shouldStop ? t("common.stop") : t("common.play")} ${station.name}`}
+                >
+                  <span className={shouldStop ? "stopGlyph" : "playGlyph"} aria-hidden="true" />
+                  {shouldStop ? t("common.stop") : t("common.play")}
+                </button>
+                {isActive && playbackState !== "idle" ? (
+                  <span className={`stateChip ${isOnAir ? "stateChipLive" : ""} ${isBusy ? "stateChipBusy" : ""}`}>
+                    {isOnAir ? <WaveformBars /> : null}
+                    {statusLabel}
+                  </span>
+                ) : null}
+              </div>
+              <span className="listenerChip">{listenerText}</span>
+            </div>
           </div>
         </div>
 
         <div className="stationInfoSurface">
           <div className="stationMetaTopline">
             <span>{t("station.nowPlaying")}</span>
-            <span>{listenerText}</span>
+            <span className="stationActivePlaylists">
+              <span>{t("station.activePlaylists")}</span>
+              <strong>{activePlaylistText}</strong>
+            </span>
           </div>
 
           <div className="trackNowPlaying">
@@ -109,11 +115,6 @@ export function StationCard({
             </div>
           </div>
           {nowPlaying.error && !nowPlaying.text ? <em>{nowPlaying.error}</em> : null}
-
-          <div className="stationScheduleLine">
-            <span>{t("station.liveNow")}</span>
-            <strong>{liveNowText}</strong>
-          </div>
 
           <div className="stationActions">
             <button
@@ -136,7 +137,7 @@ export function StationCard({
                 disabled={isSkippingTrack}
               >
                 <StationActionIcon icon="skip" />
-                {isSkippingTrack ? "Skipping..." : "Skip song"}
+                {isSkippingTrack ? t("station.skippingSong") : t("station.skipSong")}
               </button>
             ) : null}
           </div>
@@ -144,6 +145,18 @@ export function StationCard({
       </div>
     </article>
   );
+}
+
+function getActivePlaylistText(segment: StationScheduleState["liveSegment"], locale: ReturnType<typeof useI18n>["locale"]): string {
+  if (!segment) {
+    return locale === "es" ? "Esperando la programación." : "Waiting for schedule.";
+  }
+
+  if (segment.playlistNames.length > 0) {
+    return segment.playlistNames.join(", ");
+  }
+
+  return getSegmentTitle(segment, locale);
 }
 
 function StationActionIcon({ icon }: { icon: "schedule" | "request" | "skip" }) {

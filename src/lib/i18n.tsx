@@ -42,8 +42,11 @@ type TranslationKey =
   | "stations.ariaLabel"
   | "station.nowPlaying"
   | "station.liveNow"
+  | "station.activePlaylists"
   | "station.schedule"
   | "station.requestSong"
+  | "station.skipSong"
+  | "station.skippingSong"
   | "station.description.neuralcast"
   | "station.description.neuralforge"
   | "request.title"
@@ -149,8 +152,11 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "stations.ariaLabel": "Stations",
     "station.nowPlaying": "Now playing",
     "station.liveNow": "Live now",
+    "station.activePlaylists": "Active playlists",
     "station.schedule": "Schedule",
     "station.requestSong": "Request song",
+    "station.skipSong": "Skip song",
+    "station.skippingSong": "Skipping...",
     "station.description.neuralcast": "Mixed AI radio selection",
     "station.description.neuralforge": "Heavy variant with an AI host",
     "request.title": "Request a song",
@@ -263,8 +269,11 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "stations.ariaLabel": "Emisoras",
     "station.nowPlaying": "Sonando ahora",
     "station.liveNow": "En directo",
+    "station.activePlaylists": "Listas activas",
     "station.schedule": "Programación",
     "station.requestSong": "Pedir canción",
+    "station.skipSong": "Saltar canción",
+    "station.skippingSong": "Saltando...",
     "station.description.neuralcast": "Selección mixta de radio con IA",
     "station.description.neuralforge": "Variante pesada con un locutor de IA",
     "request.title": "Pedir una canción",

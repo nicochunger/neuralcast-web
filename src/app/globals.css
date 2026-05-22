@@ -453,12 +453,14 @@ img {
 .stationCardHeader {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 14px;
 }
 
 .stationTitleBlock {
+  display: grid;
   min-width: 0;
+  gap: 0;
 }
 
 .stationTitleBlock h2 {
@@ -484,16 +486,24 @@ img {
 }
 
 .stationControlGroup {
+  display: grid;
+  justify-items: start;
+  gap: 7px;
+  max-width: min(100%, 620px);
+  margin-top: 14px;
+}
+
+.stationPlaybackRow {
   display: flex;
-  flex-wrap: wrap-reverse;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
   gap: 8px;
 }
 
 .stateChip,
+.listenerChip,
 .stationMetaTopline span,
-.stationScheduleLine span,
+.stationActivePlaylists span,
 .scheduleSummaryItem span,
 .scheduleHeader > span {
   color: var(--muted);
@@ -514,6 +524,21 @@ img {
   color: var(--ink);
   box-shadow: var(--state-chip-shadow);
   backdrop-filter: blur(12px);
+}
+
+.listenerChip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(8, 14, 23, 0.32);
+  color: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 8px 18px rgba(8, 14, 23, 0.16);
+  text-shadow: 0 1px 8px rgba(8, 14, 23, 0.34);
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
 }
 
 .stateChipLive {
@@ -605,7 +630,7 @@ img {
   grid-template-columns: minmax(0, 1fr) minmax(148px, 0.34fr);
   grid-template-areas:
     "meta meta"
-    "now live"
+    "now now"
     "actions actions";
   gap: 9px 18px;
   border: 0;
@@ -619,23 +644,59 @@ img {
 .stationMetaTopline {
   grid-area: meta;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 34px;
+  width: min(100%, 640px);
+  min-width: 0;
 }
 
-.stationMetaTopline span:last-child {
-  border: 1px solid rgba(255, 255, 255, 0.26);
+.stationActivePlaylists {
+  display: inline-flex;
+  position: relative;
+  align-items: baseline;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.stationActivePlaylists::before {
+  position: absolute;
+  top: 50%;
+  left: -18px;
+  width: 4px;
+  height: 4px;
   border-radius: 999px;
-  padding: 5px 9px;
-  background: rgba(8, 14, 23, 0.32);
-  box-shadow: 0 8px 18px rgba(8, 14, 23, 0.16);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 1px 8px rgba(8, 14, 23, 0.28);
+  content: "";
+  transform: translate(-50%, -50%);
+}
+
+.stationActivePlaylists span {
+  flex: 0 0 auto;
+}
+
+.stationActivePlaylists span::after {
+  content: ":";
+}
+
+.stationActivePlaylists strong {
+  flex: 1 1 auto;
+  overflow: hidden;
+  min-width: 0;
+  color: white;
+  font-size: 0.94rem;
+  font-weight: 760;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 10px rgba(8, 14, 23, 0.38);
   white-space: nowrap;
 }
 
 .stationInfoSurface .stationMetaTopline span,
-.stationInfoSurface .stationScheduleLine span {
+.stationInfoSurface .stationActivePlaylists span {
   color: rgba(255, 255, 255, 0.74);
   text-shadow: 0 1px 8px rgba(8, 14, 23, 0.34);
 }
@@ -2469,16 +2530,20 @@ img {
   }
 
   .stationControlGroup {
-    max-width: 45%;
+    max-width: min(100%, 620px);
   }
 
   .stationInfoSurface {
     grid-template-columns: minmax(0, 1fr) minmax(136px, 0.36fr);
     grid-template-areas:
       "meta meta"
-      "now live"
+      "now now"
       "actions actions";
     gap: 9px 14px;
+  }
+
+  .stationMetaTopline {
+    align-items: baseline;
   }
 
   .trackNowPlaying {
@@ -2591,12 +2656,19 @@ img {
     width: 100%;
   }
 
+  .stationCardHeader {
+    display: grid;
+  }
+
+  .stationControlGroup {
+    max-width: none;
+  }
+
   .stationInfoSurface {
     grid-template-columns: 1fr;
     grid-template-areas:
       "meta"
       "now"
-      "live"
       "actions";
   }
 
@@ -2610,9 +2682,16 @@ img {
   }
 
   .stationMetaTopline {
-    align-items: flex-start;
-    display: grid;
-    gap: 6px;
+    width: 100%;
+    gap: 24px;
+  }
+
+  .stationActivePlaylists::before {
+    left: -13px;
+  }
+
+  .stationActivePlaylists {
+    min-width: 0;
   }
 
   .trackTitle {
