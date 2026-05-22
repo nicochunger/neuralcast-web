@@ -459,6 +459,7 @@ img {
 
 .stationTitleBlock {
   display: grid;
+  flex: 1 1 auto;
   min-width: 0;
   gap: 0;
 }
@@ -487,6 +488,7 @@ img {
 
 .stationControlGroup {
   display: grid;
+  flex: 0 0 auto;
   justify-items: end;
   gap: 8px;
   max-width: min(100%, 220px);
@@ -2651,12 +2653,14 @@ img {
   }
 
   .stationCardHeader {
-    display: grid;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
   }
 
   .stationControlGroup {
-    max-width: none;
-    justify-items: start;
+    max-width: 46%;
+    justify-items: end;
   }
 
   .stationInfoSurface {
