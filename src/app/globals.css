@@ -606,7 +606,7 @@ img {
   grid-template-areas:
     "meta meta"
     "now live"
-    "now actions";
+    "actions actions";
   gap: 9px 18px;
   border: 0;
   border-radius: 0;
@@ -792,8 +792,8 @@ img {
 
 .stationActions {
   grid-area: actions;
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: wrap;
   align-self: end;
   gap: 8px;
 }
@@ -893,10 +893,36 @@ img {
 }
 
 .stationCommandButton {
+  display: inline-flex;
+  flex: 1 1 132px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   min-height: 38px;
   border-radius: 10px;
   padding: 0 12px;
   font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.stationActionIcon {
+  display: inline-grid;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  place-items: center;
+  color: currentColor;
+}
+
+.stationActionIcon svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.85;
 }
 
 .adminActionButton {
@@ -2451,7 +2477,7 @@ img {
     grid-template-areas:
       "meta meta"
       "now live"
-      "now actions";
+      "actions actions";
     gap: 9px 14px;
   }
 

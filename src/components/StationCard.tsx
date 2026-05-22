@@ -121,9 +121,11 @@ export function StationCard({
               type="button"
               onClick={() => onSelectSchedule(station)}
             >
+              <StationActionIcon icon="schedule" />
               {t("station.schedule")}
             </button>
             <button className="actionButton stationCommandButton requestActionButton" type="button" onClick={() => onRequestSong(station)}>
+              <StationActionIcon icon="request" />
               {t("station.requestSong")}
             </button>
             {showAdminSkip ? (
@@ -133,6 +135,7 @@ export function StationCard({
                 onClick={() => onSkipTrack(station)}
                 disabled={isSkippingTrack}
               >
+                <StationActionIcon icon="skip" />
                 {isSkippingTrack ? "Skipping..." : "Skip song"}
               </button>
             ) : null}
@@ -140,6 +143,44 @@ export function StationCard({
         </div>
       </div>
     </article>
+  );
+}
+
+function StationActionIcon({ icon }: { icon: "schedule" | "request" | "skip" }) {
+  if (icon === "request") {
+    return (
+      <span className="stationActionIcon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M9 18V5l11-2v13" />
+          <path d="M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3Z" />
+          <path d="M20 16a3 3 0 1 1-3-3 3 3 0 0 1 3 3Z" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (icon === "skip") {
+    return (
+      <span className="stationActionIcon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="m5 5 8 7-8 7V5Z" />
+          <path d="m13 5 8 7-8 7V5Z" />
+        </svg>
+      </span>
+    );
+  }
+
+  return (
+    <span className="stationActionIcon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <path d="M7 3v3" />
+        <path d="M17 3v3" />
+        <path d="M4 8h16" />
+        <path d="M5 5h14a1 1 0 0 1 1 1v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a1 1 0 0 1 1-1Z" />
+        <path d="M8 12h3" />
+        <path d="M8 16h6" />
+      </svg>
+    </span>
   );
 }
 
