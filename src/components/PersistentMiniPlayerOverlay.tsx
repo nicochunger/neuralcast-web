@@ -9,19 +9,19 @@ import {
   subscribePersistentPlayer
 } from "@/lib/persistentPlayer";
 import { STATIONS } from "@/lib/stations";
-import type { PlaybackState, StationId } from "@/types/radio";
+import type { PlaybackState, StationId, StationNowPlayingState } from "@/types/radio";
 
 export function PersistentMiniPlayerOverlay() {
   const pathname = usePathname();
   const [activeStationId, setActiveStationId] = useState<StationId | null>(null);
   const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
-  const [trackText, setTrackText] = useState<string | undefined>(undefined);
+  const [nowPlaying, setNowPlaying] = useState<StationNowPlayingState | undefined>(undefined);
 
   useEffect(() => {
     return subscribePersistentPlayer((state) => {
       setActiveStationId(state.activeStationId);
       setPlaybackState(state.playbackState);
-      setTrackText(state.trackText);
+      setNowPlaying(state.nowPlaying);
     });
   }, []);
 
@@ -39,7 +39,7 @@ export function PersistentMiniPlayerOverlay() {
     <MiniPlayer
       station={station}
       playbackState={playbackState}
-      nowPlaying={{ stationId: activeStationId, text: trackText, isLoading: false }}
+      nowPlaying={nowPlaying ?? { stationId: activeStationId, isLoading: false }}
       onPlay={() => {
         void getPersistentAudioElement().play();
       }}

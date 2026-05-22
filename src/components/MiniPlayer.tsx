@@ -14,14 +14,15 @@ interface MiniPlayerProps {
 export function MiniPlayer({ station, playbackState, nowPlaying, onPlay, onStop }: MiniPlayerProps) {
   const { t } = useI18n();
   const isPlaying = playbackState === "playing" || playbackState === "buffering";
-  const track = getMiniTrackText(nowPlaying) ?? t("common.liveStream");
+  const track = getMiniTrackDetails(nowPlaying, t("common.liveStream"));
+  const artwork = nowPlaying.art ?? station.artworkImage;
 
   return (
     <aside className={`miniPlayer ${isPlaying ? "miniPlayerVisible" : ""}`} aria-live="polite">
-      <img src={station.artworkImage} alt="" className="miniArtwork" />
+      <img src={artwork} alt="" className="miniArtwork" />
       <div>
-        <span>{station.name}</span>
-        <strong>{track}</strong>
+        <strong>{track.title}</strong>
+        {track.artist ? <span>{track.artist}</span> : null}
       </div>
       <button className="miniButton" type="button" onClick={() => (isPlaying ? onStop() : onPlay(station))}>
         {isPlaying ? t("common.stop") : t("common.play")}
@@ -30,9 +31,17 @@ export function MiniPlayer({ station, playbackState, nowPlaying, onPlay, onStop 
   );
 }
 
-function getMiniTrackText(nowPlaying: StationNowPlayingState): string | undefined {
-  if (nowPlaying.artist && nowPlaying.title) {
-    return `${nowPlaying.artist} - ${nowPlaying.title}`;
+interface MiniTrackDetails {
+  title: string;
+  artist?: string;
+}
+
+function getMiniTrackDetails(nowPlaying: StationNowPlayingState, fallbackTitle: string): MiniTrackDetails {
+  if (nowPlaying.title) {
+    return {
+      title: nowPlaying.title,
+      artist: nowPlaying.artist
+    };
   }
 
   if (nowPlaying.text) {
@@ -40,16 +49,26 @@ function getMiniTrackText(nowPlaying: StationNowPlayingState): string | undefine
 
     if (parts.length >= 3) {
       const [artist, , ...titleParts] = parts;
-      return `${artist} - ${titleParts.join(" - ")}`;
+      return {
+        title: titleParts.join(" - "),
+        artist
+      };
     }
 
     if (parts.length >= 2) {
       const [artist, ...titleParts] = parts;
-      return `${artist} - ${titleParts.join(" - ")}`;
+      return {
+        title: titleParts.join(" - "),
+        artist
+      };
     }
 
-    return nowPlaying.text;
+    return {
+      title: nowPlaying.text
+    };
   }
 
-  return undefined;
+  return {
+    title: fallbackTitle
+  };
 }

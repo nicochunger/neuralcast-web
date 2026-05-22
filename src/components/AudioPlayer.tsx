@@ -304,7 +304,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     setPersistentPlayerState({
       activeStationId,
       playbackState,
-      trackText: nowPlaying[activeStationId]?.text
+      nowPlaying: nowPlaying[activeStationId]
     });
   }, [activeStationId, nowPlaying, playbackState]);
 

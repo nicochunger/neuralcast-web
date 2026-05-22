@@ -1,9 +1,9 @@
-import type { PlaybackState, StationId } from "@/types/radio";
+import type { PlaybackState, StationId, StationNowPlayingState } from "@/types/radio";
 
 export interface PersistentPlayerState {
   activeStationId: StationId;
   playbackState: PlaybackState;
-  trackText?: string;
+  nowPlaying?: StationNowPlayingState;
 }
 
 type Listener = (state: PersistentPlayerState) => void;
