@@ -627,10 +627,11 @@ img {
 .stationMetaTopline span:last-child {
   border: 1px solid rgba(255, 255, 255, 0.26);
   border-radius: 999px;
-  padding: 4px 8px;
-  background: rgba(8, 14, 23, 0.28);
+  padding: 5px 9px;
+  background: rgba(8, 14, 23, 0.32);
   box-shadow: 0 8px 18px rgba(8, 14, 23, 0.16);
   backdrop-filter: blur(10px);
+  white-space: nowrap;
 }
 
 .stationInfoSurface .stationMetaTopline span,
@@ -650,15 +651,15 @@ img {
   min-width: 0;
   width: fit-content;
   max-width: min(100%, 640px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 20px;
   padding: 10px 14px 10px 10px;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1)),
-    rgba(7, 12, 20, 0.42);
+    linear-gradient(135deg, color-mix(in srgb, var(--station-accent), transparent 88%), rgba(255, 255, 255, 0.1)),
+    rgba(7, 12, 20, 0.38);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 16px 34px rgba(7, 11, 18, 0.2);
+    0 16px 34px rgba(7, 11, 18, 0.18);
   backdrop-filter: blur(18px) saturate(1.12);
 }
 
@@ -772,15 +773,17 @@ img {
   grid-area: live;
   display: grid;
   align-self: start;
+  min-width: 0;
   gap: 3px;
   border-top: 0;
-  padding-top: 0;
+  border-left: 2px solid color-mix(in srgb, var(--station-accent), white 18%);
+  padding-left: 9px;
 }
 
 .stationScheduleLine strong {
   overflow: hidden;
   color: white;
-  font-size: 0.96rem;
+  font-size: 0.94rem;
   font-weight: 650;
   text-shadow: 0 1px 10px rgba(8, 14, 23, 0.38);
   text-overflow: ellipsis;
@@ -881,6 +884,7 @@ img {
 }
 
 .actionButton {
+  justify-content: center;
   border-color: rgba(255, 255, 255, 0.24);
   color: white;
   background: rgba(255, 255, 255, 0.14);
@@ -888,10 +892,19 @@ img {
   backdrop-filter: blur(12px);
 }
 
+.stationCommandButton {
+  min-height: 38px;
+  border-radius: 10px;
+  padding: 0 12px;
+  font-size: 0.88rem;
+}
+
 .adminActionButton {
   border-color: color-mix(in srgb, var(--station-accent), white 26%);
   color: white;
-  background: color-mix(in srgb, var(--station-accent), transparent 62%);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--station-accent), rgba(185, 75, 67, 0.6) 24%), rgba(185, 75, 67, 0.22)),
+    rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
   backdrop-filter: blur(12px);
   font-weight: 780;
@@ -2387,6 +2400,10 @@ img {
 
   .stationInfoSurface {
     grid-template-columns: minmax(0, 1fr) minmax(136px, 0.36fr);
+    grid-template-areas:
+      "meta meta"
+      "now live"
+      "now actions";
     gap: 9px 14px;
   }
 
@@ -2516,6 +2533,12 @@ img {
     padding: 8px;
     width: 100%;
     max-width: 100%;
+  }
+
+  .stationMetaTopline {
+    align-items: flex-start;
+    display: grid;
+    gap: 6px;
   }
 
   .trackTitle {

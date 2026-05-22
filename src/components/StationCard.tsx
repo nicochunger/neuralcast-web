@@ -117,18 +117,18 @@ export function StationCard({
 
           <div className="stationActions">
             <button
-              className={`actionButton ${isScheduleSelected ? "actionButtonActive" : ""}`}
+              className={`actionButton stationCommandButton ${isScheduleSelected ? "actionButtonActive" : ""}`}
               type="button"
               onClick={() => onSelectSchedule(station)}
             >
               {t("station.schedule")}
             </button>
-            <button className="actionButton requestActionButton" type="button" onClick={() => onRequestSong(station)}>
+            <button className="actionButton stationCommandButton requestActionButton" type="button" onClick={() => onRequestSong(station)}>
               {t("station.requestSong")}
             </button>
             {showAdminSkip ? (
               <button
-                className="adminActionButton"
+                className="adminActionButton stationCommandButton"
                 type="button"
                 onClick={() => onSkipTrack(station)}
                 disabled={isSkippingTrack}
