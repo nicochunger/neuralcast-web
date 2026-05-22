@@ -16,6 +16,7 @@ interface AdminConsoleProps {
 
 type AdminOperation = typeof HOST_ADMIN_OPERATION_FORCE_ARCHETYPE | typeof HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR;
 type AdminConsoleView = "live" | "scheduler" | "jobs";
+type AdminMessageTone = "success" | "error";
 
 const POLL_INTERVAL_MS = 4000;
 
@@ -51,6 +52,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
   const [activeJob, setActiveJob] = useState<HostAdminJob | null>(null);
   const [isPollingJob, setIsPollingJob] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [messageTone, setMessageTone] = useState<AdminMessageTone | null>(null);
   const [activeConsoleView, setActiveConsoleView] = useState<AdminConsoleView>("live");
 
   const forceArchetypeCapability = capabilities.operations[HOST_ADMIN_OPERATION_FORCE_ARCHETYPE];
@@ -90,6 +92,21 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     return () => window.clearTimeout(timeout);
   }, [activeJob?.jobId, isPollingJob]);
 
+  function clearMessage() {
+    setMessage(null);
+    setMessageTone(null);
+  }
+
+  function showErrorMessage(nextMessage: string) {
+    setMessage(nextMessage);
+    setMessageTone("error");
+  }
+
+  function showSuccessMessage(nextMessage: string) {
+    setMessage(nextMessage);
+    setMessageTone("success");
+  }
+
   async function loadCapabilities() {
     if (!isHostAdminConfigured || isLoadingCapabilities) {
       return;
@@ -126,12 +143,12 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
         `Loaded ${loaded.stations.length} stations, ${loaded.archetypes.length} archetypes, and ${Object.keys(loaded.operations).length} operations.`
       );
       setIsCapabilitiesStatusError(false);
-      setMessage(null);
+      clearMessage();
     } catch (error) {
       const nextMessage = error instanceof Error ? error.message : "Unable to load host admin capabilities.";
       setCapabilitiesStatusMessage(nextMessage);
       setIsCapabilitiesStatusError(true);
-      setMessage(nextMessage);
+      showErrorMessage(nextMessage);
     } finally {
       setIsLoadingCapabilities(false);
     }
@@ -143,7 +160,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     }
 
     setSubmittingOperation(HOST_ADMIN_OPERATION_FORCE_ARCHETYPE);
-    setMessage(null);
+    clearMessage();
 
     try {
       const response = await fetch("/api/admin/host/force-archetype", {
@@ -175,9 +192,9 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       setActiveJob(nextJob);
       setIsPollingJob(true);
       setActiveConsoleView("jobs");
-      setMessage("Force archetype request accepted.");
+      showSuccessMessage("Force archetype request accepted.");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Unable to start a forced host run.");
+      showErrorMessage(error instanceof Error ? error.message : "Unable to start a forced host run.");
     } finally {
       setSubmittingOperation(null);
     }
@@ -192,7 +209,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     const seedSalt = seedMode === HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM ? scheduleGeneratorSeedSalt.trim() : "";
 
     if (seedMode === HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM && !seedSalt) {
-      setMessage("Enter a custom seed key first.");
+      showErrorMessage("Enter a custom seed key first.");
       return;
     }
 
@@ -208,7 +225,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     }
 
     setSubmittingOperation(HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR);
-    setMessage(null);
+    clearMessage();
 
     try {
       const response = await fetch("/api/admin/host/schedule-generator", {
@@ -270,9 +287,9 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       setActiveJob(nextJob);
       setIsPollingJob(true);
       setActiveConsoleView("jobs");
-      setMessage("Schedule generator request accepted.");
+      showSuccessMessage("Schedule generator request accepted.");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Unable to start the schedule generator.");
+      showErrorMessage(error instanceof Error ? error.message : "Unable to start the schedule generator.");
     } finally {
       setSubmittingOperation(null);
     }
@@ -294,11 +311,15 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       setIsPollingJob(!terminal);
 
       if (terminal) {
-        setMessage(buildJobStatusMessage(job));
+        if (job.status.toLowerCase() === "succeeded") {
+          showSuccessMessage(buildJobStatusMessage(job));
+        } else {
+          showErrorMessage(buildJobStatusMessage(job));
+        }
       }
     } catch (error) {
       setIsPollingJob(false);
-      setMessage(error instanceof Error ? error.message : "Unable to refresh host job status.");
+      showErrorMessage(error instanceof Error ? error.message : "Unable to refresh host job status.");
     }
   }
 
@@ -324,7 +345,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     const value = Number(trimmed);
 
     if (!Number.isFinite(value)) {
-      setMessage(`${label} must be a valid number.`);
+      showErrorMessage(`${label} must be a valid number.`);
       return null;
     }
 
@@ -343,16 +364,13 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     }
 
     if (!/^-?\d+$/.test(trimmed)) {
-      setMessage(`${label} must be a whole number.`);
+      showErrorMessage(`${label} must be a whole number.`);
       return null;
     }
 
     return Number.parseInt(trimmed, 10);
   }
 
-  const messageIsError =
-    message !== null &&
-    ["failed", "unable", "invalid", "unauthorized", "error"].some((fragment) => message.toLowerCase().includes(fragment));
   const operationsCount = Object.keys(capabilities.operations).length;
 
   return (
@@ -392,7 +410,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
             ) : null}
 
             {message ? (
-              <p className={`adminStatusNotice ${messageIsError ? "adminStatusNoticeError" : "adminStatusNoticeSuccess"}`}>
+              <p className={`adminStatusNotice ${messageTone === "error" ? "adminStatusNoticeError" : "adminStatusNoticeSuccess"}`}>
                 {message}
               </p>
             ) : null}
