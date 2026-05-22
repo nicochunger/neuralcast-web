@@ -733,8 +733,8 @@ img {
   text-shadow: 0 1px 10px rgba(8, 14, 23, 0.38);
 }
 
+.trackTitleText,
 .trackArtist,
-.trackSong,
 .trackAlbum {
   display: block;
   min-width: 0;
@@ -743,14 +743,14 @@ img {
   white-space: nowrap;
 }
 
-.trackArtist {
+.trackTitleText {
   color: white;
   font-size: 1.2rem;
   font-weight: 820;
   line-height: 1.12;
 }
 
-.trackSong {
+.trackArtist {
   color: rgba(255, 255, 255, 0.88);
   font-size: 1.08rem;
   font-weight: 680;

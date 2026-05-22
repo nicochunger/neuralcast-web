@@ -99,9 +99,9 @@ export function StationCard({
               {nowPlaying.art ? <img src={nowPlaying.art} alt="" loading="lazy" /> : <span>{getArtworkInitial(track)}</span>}
             </div>
             <div className="trackTitle" aria-label={track.label}>
-              <strong className="trackArtist">{track.artist}</strong>
-              {track.song ? (
-                <span className="trackSong">{track.song}</span>
+              <strong className="trackTitleText">{track.title}</strong>
+              {track.artist ? (
+                <span className="trackArtist">{track.artist}</span>
               ) : null}
               {track.album ? (
                 <span className="trackAlbum">{track.album}</span>
@@ -167,8 +167,8 @@ function getStatusLabel(
 }
 
 interface TrackDetails {
-  artist: string;
-  song?: string;
+  title: string;
+  artist?: string;
   album?: string;
   label: string;
 }
@@ -177,61 +177,64 @@ function getTrackDetails(
   nowPlaying: StationNowPlayingState,
   t: ReturnType<typeof useI18n>["t"]
 ): TrackDetails {
-  if (nowPlaying.text) {
-    if (nowPlaying.artist || nowPlaying.title) {
-      return {
-        artist: nowPlaying.artist ?? nowPlaying.text,
-        song: nowPlaying.title,
-        album: nowPlaying.album,
-        label: nowPlaying.text
-      };
-    }
+  if (nowPlaying.artist || nowPlaying.title) {
+    const title = nowPlaying.title ?? nowPlaying.text ?? nowPlaying.artist ?? t("track.unavailable");
+    const label = [title, nowPlaying.artist, nowPlaying.album].filter(Boolean).join(" - ");
 
+    return {
+      title,
+      artist: nowPlaying.artist,
+      album: nowPlaying.album,
+      label
+    };
+  }
+
+  if (nowPlaying.text) {
     const parts = nowPlaying.text.split(" - ").map((part) => part.trim()).filter(Boolean);
 
     if (parts.length >= 3) {
       const [artist, album, ...songParts] = parts;
-      const song = songParts.join(" - ");
+      const title = songParts.join(" - ");
 
       return {
+        title,
         artist,
-        song,
         album,
         label: nowPlaying.text
       };
     }
 
     if (parts.length === 2) {
-      const [artist, song] = parts;
+      const [artist, title] = parts;
 
       return {
+        title,
         artist,
-        song,
         label: nowPlaying.text
       };
     }
 
     return {
-      artist: nowPlaying.text,
+      title: nowPlaying.text,
       label: nowPlaying.text
     };
   }
 
   if (nowPlaying.isLoading) {
     return {
-      artist: t("track.waiting"),
+      title: t("track.waiting"),
       label: t("track.waiting")
     };
   }
 
   return {
-    artist: t("track.unavailable"),
+    title: t("track.unavailable"),
     label: t("track.unavailable")
   };
 }
 
 function getArtworkInitial(track: TrackDetails): string {
-  return (track.artist || track.song || "?").trim().charAt(0).toUpperCase() || "?";
+  return (track.title || track.artist || "?").trim().charAt(0).toUpperCase() || "?";
 }
 
 function WaveformBars() {
