@@ -1,4 +1,6 @@
 :root {
+  --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-display: "Avenir Next Condensed", "Avenir Next", "Trebuchet MS", sans-serif;
   color-scheme: light;
   --ink: #17212f;
   --muted: #5c6675;
@@ -53,6 +55,11 @@
   --error-bg: color-mix(in srgb, var(--red), white 88%);
   --mini-bg: rgba(255, 255, 255, 0.94);
   --theme-icon-cutout: var(--surface-soft);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-surface:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.08)),
+    rgba(11, 18, 28, 0.18);
+  --glass-shadow: 0 18px 42px rgba(8, 14, 23, 0.22);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -187,7 +194,7 @@ body {
   margin: 0;
   color: var(--ink);
   background: var(--body-background);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -252,6 +259,8 @@ img {
   margin: 0;
   font-size: 1.28rem;
   font-weight: 760;
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
   line-height: 1.05;
 }
 
@@ -392,6 +401,7 @@ img {
   color: var(--lime);
   font-size: 0.76rem;
   font-weight: 800;
+  font-family: var(--font-display);
   letter-spacing: 0;
   text-transform: uppercase;
 }
@@ -407,10 +417,11 @@ img {
   min-height: 352px;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 24px;
   background: var(--surface);
   box-shadow: var(--shadow);
   isolation: isolate;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
 }
 
 .stationCard::before {
@@ -436,8 +447,23 @@ img {
 }
 
 .stationCardActive {
-  border-color: color-mix(in srgb, var(--station-accent), white 12%);
-  box-shadow: 0 22px 58px color-mix(in srgb, var(--station-accent), transparent 82%);
+  border-color: color-mix(in srgb, var(--station-accent), white 18%);
+  box-shadow:
+    0 24px 60px color-mix(in srgb, var(--station-accent), transparent 78%),
+    0 10px 28px rgba(7, 11, 18, 0.22);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .stationCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 26px 64px rgba(31, 45, 61, 0.18);
+  }
+
+  .stationCardActive:hover {
+    box-shadow:
+      0 30px 72px color-mix(in srgb, var(--station-accent), transparent 72%),
+      0 14px 34px rgba(7, 11, 18, 0.28);
+  }
 }
 
 .stationCardInner {
@@ -446,8 +472,8 @@ img {
   min-height: 352px;
   flex-direction: column;
   justify-content: space-between;
-  gap: 22px;
-  padding: 16px;
+  gap: 24px;
+  padding: 20px;
 }
 
 .stationCardHeader {
@@ -465,7 +491,9 @@ img {
   margin: 0;
   color: white;
   font-size: 1.52rem;
-  font-weight: 760;
+  font-weight: 700;
+  font-family: var(--font-display);
+  letter-spacing: -0.04em;
   line-height: 1.05;
   text-shadow: 0 2px 14px rgba(9, 17, 28, 0.34);
 }
@@ -568,9 +596,12 @@ img {
 .miniButton,
 .themeButton {
   min-height: 42px;
-  border-radius: 8px;
+  border-radius: 14px;
   cursor: pointer;
   font-weight: 780;
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, border-color 180ms ease;
 }
 
 .playButton {
@@ -580,9 +611,14 @@ img {
   min-width: 102px;
   justify-content: center;
   padding: 0 14px;
-  background: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--station-accent, var(--ink)), white 14%);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--station-accent, var(--ink)), white 8%), rgba(9, 15, 25, 0.92)),
+    var(--ink);
   color: var(--paper);
-  box-shadow: var(--button-shadow);
+  box-shadow:
+    0 16px 34px color-mix(in srgb, var(--station-accent, var(--ink)), transparent 74%),
+    var(--button-shadow);
 }
 
 .playGlyph {
@@ -601,19 +637,34 @@ img {
 }
 
 .stationInfoSurface {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(148px, 0.34fr);
   grid-template-areas:
     "meta meta"
     "now live"
     "now actions";
-  gap: 9px 18px;
-  border: 0;
-  border-radius: 0;
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
+  gap: 12px 18px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: 26px;
+  padding: 16px 18px;
+  background: var(--glass-surface);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(18px) saturate(1.12);
+}
+
+.stationInfoSurface::before {
+  position: absolute;
+  inset: -24% auto auto -6%;
+  width: 180px;
+  height: 180px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--station-accent), transparent 76%);
+  content: "";
+  filter: blur(18px);
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 .stationMetaTopline {
@@ -641,6 +692,7 @@ img {
 }
 
 .trackNowPlaying {
+  position: relative;
   grid-area: now;
   display: inline-grid;
   grid-template-columns: 86px minmax(0, 1fr);
@@ -652,15 +704,16 @@ img {
   width: fit-content;
   max-width: min(100%, 640px);
   border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 20px;
+  border-radius: 22px;
   padding: 10px 14px 10px 10px;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--station-accent), transparent 88%), rgba(255, 255, 255, 0.1)),
-    rgba(7, 12, 20, 0.38);
+    linear-gradient(135deg, color-mix(in srgb, var(--station-accent), transparent 84%), rgba(255, 255, 255, 0.12)),
+    rgba(7, 12, 20, 0.42);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 16px 34px rgba(7, 11, 18, 0.18);
+    0 18px 38px rgba(7, 11, 18, 0.24);
   backdrop-filter: blur(18px) saturate(1.12);
+  transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
 .trackArtwork {
@@ -746,7 +799,9 @@ img {
 .trackTitleText {
   color: white;
   font-size: 1.2rem;
-  font-weight: 820;
+  font-weight: 720;
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
   line-height: 1.12;
 }
 
@@ -774,16 +829,16 @@ img {
   display: grid;
   align-self: start;
   min-width: 0;
-  gap: 3px;
+  gap: 4px;
   border-top: 0;
   border-left: 2px solid color-mix(in srgb, var(--station-accent), white 18%);
-  padding-left: 9px;
+  padding: 2px 0 2px 12px;
 }
 
 .stationScheduleLine strong {
   overflow: hidden;
   color: white;
-  font-size: 0.94rem;
+  font-size: 0.98rem;
   font-weight: 650;
   text-shadow: 0 1px 10px rgba(8, 14, 23, 0.38);
   text-overflow: ellipsis;
@@ -793,8 +848,8 @@ img {
 .stationActions {
   grid-area: actions;
   display: grid;
-  grid-template-columns: 1fr;
-  align-self: end;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-self: stretch;
   gap: 8px;
 }
 
@@ -893,10 +948,14 @@ img {
 }
 
 .stationCommandButton {
-  min-height: 38px;
-  border-radius: 10px;
-  padding: 0 12px;
+  min-height: 42px;
+  border-radius: 14px;
+  padding: 0 14px;
   font-size: 0.88rem;
+}
+
+.stationActions .adminActionButton {
+  grid-column: 1 / -1;
 }
 
 .adminActionButton {
@@ -917,7 +976,9 @@ img {
 
 .actionButtonActive {
   border-color: color-mix(in srgb, var(--station-accent), white 28%);
-  background: color-mix(in srgb, var(--station-accent), transparent 76%);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--station-accent), transparent 58%), rgba(255, 255, 255, 0.14)),
+    rgba(255, 255, 255, 0.08);
   color: white;
 }
 
@@ -1276,7 +1337,7 @@ img {
 .adminPanel,
 .adminHero {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 24px;
   background: var(--panel-bg);
   box-shadow: var(--shadow-soft), var(--panel-inset);
 }
@@ -1291,6 +1352,8 @@ img {
 .adminHero h2,
 .adminPanel h3 {
   margin: 0;
+  font-family: var(--font-display);
+  letter-spacing: -0.04em;
 }
 
 .authLead,
@@ -1352,6 +1415,8 @@ img {
   min-height: 44px;
   border-radius: 8px;
   font-weight: 780;
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
 .authSubmitButton {
@@ -1389,6 +1454,9 @@ img {
   gap: 16px;
   margin-top: 18px;
   padding: 26px 28px;
+  background:
+    radial-gradient(circle at top right, rgba(47, 123, 104, 0.16), transparent 32%),
+    var(--panel-bg);
 }
 
 .adminBackLink {
@@ -1406,6 +1474,17 @@ img {
   justify-content: space-between;
   gap: 16px;
   margin-top: 18px;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-raised), white 16%),
+      color-mix(in srgb, var(--surface), white 8%)
+    ),
+    var(--surface);
+  box-shadow: var(--shadow-soft);
 }
 
 .adminSignedInText {
@@ -1425,7 +1504,7 @@ img {
   align-content: start;
   gap: 14px;
   min-height: 220px;
-  padding: 22px;
+  padding: 24px;
 }
 
 .adminPanel p {
@@ -1458,10 +1537,17 @@ img {
   gap: 12px;
 }
 
+.adminSectionHeading {
+  display: grid;
+  gap: 4px;
+}
+
 .adminSection h4,
 .adminSubsection h5 {
   margin: 0;
   font-size: 1rem;
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
 }
 
 .adminSubsection p,
@@ -1489,6 +1575,8 @@ img {
   color: var(--ink);
   cursor: pointer;
   font-weight: 720;
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
 .adminChipActive {
@@ -1516,7 +1604,7 @@ img {
 .adminField select {
   min-height: 46px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 0 14px;
   background: var(--surface);
   color: var(--ink);
@@ -1573,6 +1661,7 @@ img {
   background: var(--surface-soft);
   font-size: 0.84rem;
   font-weight: 780;
+  font-family: var(--font-display);
 }
 
 .adminJobBadgeAccepted,
@@ -1603,6 +1692,103 @@ img {
   font-size: 0.82rem;
   line-height: 1.45;
   white-space: pre-wrap;
+}
+
+.adminOverviewPanel {
+  gap: 18px;
+}
+
+.adminOverviewStats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.adminOverviewStat {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-raised), white 16%),
+      color-mix(in srgb, var(--surface-soft), white 8%)
+    ),
+    var(--surface-soft);
+}
+
+.adminOverviewStat span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.adminOverviewStat strong {
+  font-size: 1.12rem;
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+.adminConsoleTabs {
+  display: none;
+}
+
+.adminConsoleTab {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.adminConsoleTabActive {
+  border-color: color-mix(in srgb, var(--focus), white 22%);
+  background: color-mix(in srgb, var(--focus), white 85%);
+  color: color-mix(in srgb, var(--focus), #17212f 24%);
+  box-shadow: var(--shadow-soft);
+}
+
+.adminWorkspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
+  align-items: start;
+  gap: 16px;
+}
+
+.adminWorkspacePrimary,
+.adminWorkspaceSecondary {
+  display: grid;
+  gap: 16px;
+}
+
+.adminWorkspaceSecondary {
+  position: sticky;
+  top: 94px;
+}
+
+.adminWorkspaceSection {
+  min-height: auto;
+}
+
+.adminEmptyState {
+  display: grid;
+  gap: 8px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 18px;
+  padding: 18px;
+  background: var(--summary-bg);
+}
+
+.adminEmptyState strong {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
 .aboutShell {
@@ -1647,6 +1833,7 @@ img {
 .aboutSectionHeading h3,
 .aboutNarrativeBlock h3 {
   margin: 0;
+  font-family: var(--font-display);
   letter-spacing: 0;
 }
 
@@ -2313,16 +2500,22 @@ img {
   left: max(14px, env(safe-area-inset-left));
   z-index: 10;
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  max-width: 680px;
+  max-width: 760px;
   margin: 0 auto;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 10px;
-  background: var(--mini-bg);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--line-strong);
+  border-radius: 22px;
+  padding: 12px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-raised), white 18%),
+      color-mix(in srgb, var(--surface), white 10%)
+    ),
+    var(--mini-bg);
+  box-shadow: 0 22px 48px rgba(17, 28, 42, 0.16);
   opacity: 0;
   pointer-events: none;
   transform: translateY(18px);
@@ -2337,26 +2530,44 @@ img {
 }
 
 .miniArtwork {
-  width: 44px;
+  width: 48px;
   aspect-ratio: 1;
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid var(--line);
   object-fit: cover;
 }
 
-.miniPlayer div {
+.miniCopy {
   display: grid;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
 }
 
-.miniPlayer span {
+.miniStationName,
+.miniTrackArtist {
   color: var(--muted);
-  font-size: 0.82rem;
+}
+
+.miniStationName {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .miniPlayer strong {
   overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.miniTrackArtist {
+  overflow: hidden;
+  font-size: 0.84rem;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -2494,6 +2705,32 @@ img {
   .adminToolbar,
   .adminPanelHeader,
   .adminFieldGrid {
+    display: grid;
+  }
+
+  .adminOverviewStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .adminWorkspace {
+    grid-template-columns: 1fr;
+  }
+
+  .adminWorkspaceSecondary {
+    position: static;
+  }
+
+  .adminConsoleTabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .adminWorkspaceSection {
+    display: none;
+  }
+
+  .adminWorkspaceSectionActive {
     display: grid;
   }
 
@@ -2707,6 +2944,10 @@ img {
   .adminHero,
   .adminPanel {
     padding: 22px 18px;
+  }
+
+  .stationActions {
+    grid-template-columns: 1fr;
   }
 
   .aboutLead,

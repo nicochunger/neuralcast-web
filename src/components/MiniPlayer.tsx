@@ -20,9 +20,10 @@ export function MiniPlayer({ station, playbackState, nowPlaying, onPlay, onStop 
   return (
     <aside className={`miniPlayer ${isPlaying ? "miniPlayerVisible" : ""}`} aria-live="polite">
       <img src={artwork} alt="" className="miniArtwork" />
-      <div>
+      <div className="miniCopy">
+        <span className="miniStationName">{station.name}</span>
         <strong>{track.title}</strong>
-        {track.artist ? <span>{track.artist}</span> : null}
+        {track.artist ? <span className="miniTrackArtist">{track.artist}</span> : null}
       </div>
       <button className="miniButton" type="button" onClick={() => (isPlaying ? onStop() : onPlay(station))}>
         {isPlaying ? t("common.stop") : t("common.play")}

@@ -15,6 +15,7 @@ interface AdminConsoleProps {
 }
 
 type AdminOperation = typeof HOST_ADMIN_OPERATION_FORCE_ARCHETYPE | typeof HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR;
+type AdminConsoleView = "live" | "scheduler" | "jobs";
 
 const POLL_INTERVAL_MS = 4000;
 
@@ -50,6 +51,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
   const [activeJob, setActiveJob] = useState<HostAdminJob | null>(null);
   const [isPollingJob, setIsPollingJob] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [activeConsoleView, setActiveConsoleView] = useState<AdminConsoleView>("live");
 
   const forceArchetypeCapability = capabilities.operations[HOST_ADMIN_OPERATION_FORCE_ARCHETYPE];
   const scheduleGeneratorCapability = capabilities.operations[HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR];
@@ -172,6 +174,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
 
       setActiveJob(nextJob);
       setIsPollingJob(true);
+      setActiveConsoleView("jobs");
       setMessage("Force archetype request accepted.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to start a forced host run.");
@@ -266,6 +269,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
 
       setActiveJob(nextJob);
       setIsPollingJob(true);
+      setActiveConsoleView("jobs");
       setMessage("Schedule generator request accepted.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to start the schedule generator.");
@@ -346,6 +350,11 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     return Number.parseInt(trimmed, 10);
   }
 
+  const messageIsError =
+    message !== null &&
+    ["failed", "unable", "invalid", "unauthorized", "error"].some((fragment) => message.toLowerCase().includes(fragment));
+  const operationsCount = Object.keys(capabilities.operations).length;
+
   return (
     <>
       <section className="adminHero">
@@ -365,11 +374,11 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
         </section>
       ) : (
         <div className="adminConsoleStack">
-          <section className="adminPanel">
+          <section className="adminPanel adminOverviewPanel">
             <div className="adminPanelHeader">
               <div>
                 <h3>Host orchestrator</h3>
-                <p>The VPS-backed host admin API is configured server-side for this web app.</p>
+                <p>The VPS-backed host admin API is configured server-side. Pick a station here, then move between live overrides, scheduling, and job monitoring.</p>
               </div>
               <button className="adminGhostButton" type="button" onClick={() => void loadCapabilities()} disabled={isLoadingCapabilities}>
                 {isLoadingCapabilities ? "Refreshing..." : "Refresh capabilities"}
@@ -382,9 +391,37 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
               </p>
             ) : null}
 
+            {message ? (
+              <p className={`adminStatusNotice ${messageIsError ? "adminStatusNoticeError" : "adminStatusNoticeSuccess"}`}>
+                {message}
+              </p>
+            ) : null}
+
+            <div className="adminOverviewStats">
+              <div className="adminOverviewStat">
+                <span>Stations</span>
+                <strong>{capabilities.stations.length}</strong>
+              </div>
+              <div className="adminOverviewStat">
+                <span>Archetypes</span>
+                <strong>{capabilities.archetypes.length}</strong>
+              </div>
+              <div className="adminOverviewStat">
+                <span>Operations</span>
+                <strong>{operationsCount}</strong>
+              </div>
+              <div className="adminOverviewStat">
+                <span>Jobs</span>
+                <strong>{isPollingJob ? "Running" : activeJob ? toStatusLabel(activeJob.status) : "Idle"}</strong>
+              </div>
+            </div>
+
             {capabilities.stations.length ? (
               <div className="adminSection">
-                <h4>Station</h4>
+                <div className="adminSectionHeading">
+                  <h4>Target station</h4>
+                  <p>Select the station that the control room should target.</p>
+                </div>
                 <div className="adminChipRow">
                   {capabilities.stations.map((stationId) => (
                     <button
@@ -399,248 +436,315 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                 </div>
               </div>
             ) : null}
-
-            {supportsOperation(HOST_ADMIN_OPERATION_FORCE_ARCHETYPE) ? (
-              <section className="adminSection">
-                <h4>Force Archetype</h4>
-                {capabilities.archetypes.length === 0 && !isLoadingCapabilities ? (
-                  <p>No archetypes are loaded yet. Refresh capabilities to fetch them from the server.</p>
-                ) : null}
-
-                <label className="adminField">
-                  <span>Archetype</span>
-                  <select
-                    value={selectedArchetype ?? ""}
-                    onChange={(event) => {
-                      const archetype = event.target.value || null;
-                      setSelectedArchetype(archetype);
-                      setSelectedTrackFocus((current) =>
-                        archetype && capabilities.trackFocusArchetypes.includes(archetype) ? current : null
-                      );
-                    }}
-                    disabled={capabilities.archetypes.length === 0}
-                  >
-                    <option value="">Select archetype</option>
-                    {capabilities.archetypes.map((archetype) => (
-                      <option key={archetype} value={archetype}>
-                        {toArchetypeLabel(archetype)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                {forceArchetypeCapability?.dryRunSupported ? (
-                  <div className="adminChipRow">
-                    <button
-                      className={`adminChip ${forceArchetypeDryRun ? "adminChipActive" : ""}`}
-                      type="button"
-                      onClick={() => setForceArchetypeDryRun((value) => !value)}
-                    >
-                      Dry run
-                    </button>
-                  </div>
-                ) : null}
-
-                {supportsTrackFocus ? (
-                  <div className="adminSubsection">
-                    <div>
-                      <h5>Track focus</h5>
-                      <p>Optional. Leave it unset to let the server pick the focus automatically.</p>
-                    </div>
-                    <div className="adminChipRow">
-                      {capabilities.trackFocusValues.map((trackFocus) => (
-                        <button
-                          key={trackFocus}
-                          className={`adminChip ${selectedTrackFocus === trackFocus ? "adminChipActive" : ""}`}
-                          type="button"
-                          onClick={() => setSelectedTrackFocus(trackFocus)}
-                        >
-                          {toTrackFocusLabel(trackFocus)}
-                        </button>
-                      ))}
-                    </div>
-                    <button className="adminTextButton" type="button" onClick={() => setSelectedTrackFocus(null)} disabled={!selectedTrackFocus}>
-                      Use server default
-                    </button>
-                  </div>
-                ) : null}
-
-                <button
-                  className="authSubmitButton adminPrimaryButton"
-                  type="button"
-                  onClick={() => void runForceArchetype()}
-                  disabled={!selectedStationId || !selectedArchetype || isLoadingCapabilities || Boolean(submittingOperation) || isPollingJob}
-                >
-                  {submittingOperation === HOST_ADMIN_OPERATION_FORCE_ARCHETYPE
-                    ? "Submitting..."
-                    : isPollingJob && activeJob?.operation === HOST_ADMIN_OPERATION_FORCE_ARCHETYPE
-                      ? "Job Running..."
-                      : "Run Force Archetype"}
-                </button>
-              </section>
-            ) : null}
-
-            {supportsOperation(HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR) ? (
-              <section className="adminSection">
-                <h4>Schedule Generator</h4>
-                <p>Run the schedule generator for the selected station.</p>
-
-                {(scheduleGeneratorCapability?.dryRunSupported || scheduleGeneratorCapability?.forceApplySupported) ? (
-                  <div className="adminChipRow">
-                    {scheduleGeneratorCapability?.dryRunSupported ? (
-                      <button
-                        className={`adminChip ${scheduleGeneratorDryRun ? "adminChipActive" : ""}`}
-                        type="button"
-                        onClick={() => {
-                          setScheduleGeneratorDryRun((value) => {
-                            const next = !value;
-
-                            if (next) {
-                              setScheduleGeneratorForceApply(false);
-                            }
-
-                            return next;
-                          });
-                        }}
-                      >
-                        Dry run
-                      </button>
-                    ) : null}
-                    {scheduleGeneratorCapability?.forceApplySupported ? (
-                      <button
-                        className={`adminChip ${scheduleGeneratorForceApply ? "adminChipActive" : ""}`}
-                        type="button"
-                        onClick={() => setScheduleGeneratorForceApply((value) => !value)}
-                        disabled={scheduleGeneratorDryRun}
-                      >
-                        Force apply
-                      </button>
-                    ) : null}
-                  </div>
-                ) : null}
-
-                {scheduleGeneratorCapability?.supportedSeedModes.length ? (
-                  <div className="adminSubsection">
-                    <div>
-                      <h5>Seed mode</h5>
-                      <p>Use stable mode for deterministic weekly plans, fresh for a reroll, or custom to reproduce a manual variation.</p>
-                    </div>
-                    <div className="adminChipRow">
-                      {scheduleGeneratorCapability.supportedSeedModes.map((seedMode) => (
-                        <button
-                          key={seedMode}
-                          className={`adminChip ${normalizedScheduleSeedMode === seedMode ? "adminChipActive" : ""}`}
-                          type="button"
-                          onClick={() => {
-                            setSelectedScheduleGeneratorSeedMode(seedMode);
-                            if (seedMode !== HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM) {
-                              setScheduleGeneratorSeedSalt("");
-                            }
-                          }}
-                        >
-                          {toSeedModeLabel(seedMode)}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-
-                {normalizedScheduleSeedMode === HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM ? (
-                  <label className="adminField">
-                    <span>Custom seed key</span>
-                    <input value={scheduleGeneratorSeedSalt} onChange={(event) => setScheduleGeneratorSeedSalt(event.target.value)} />
-                  </label>
-                ) : null}
-
-                {scheduleGeneratorCapability?.weekStartDateSupported ? (
-                  <label className="adminField">
-                    <span>Week start date (YYYY-MM-DD)</span>
-                    <input value={scheduleGeneratorWeekStartDate} onChange={(event) => setScheduleGeneratorWeekStartDate(event.target.value)} />
-                  </label>
-                ) : null}
-
-                {(supportsTuningField("open_ratio_min") ||
-                  supportsTuningField("open_ratio_max") ||
-                  supportsTuningField("min_open_slots") ||
-                  supportsTuningField("max_open_slots") ||
-                  supportsTuningField("min_block_minutes") ||
-                  supportsTuningField("max_block_minutes")) ? (
-                  <div className="adminSubsection">
-                    <div>
-                      <h5>Tuning</h5>
-                      <p>Leave fields blank to use the server defaults.</p>
-                    </div>
-                    <div className="adminFieldGrid">
-                      {supportsTuningField("open_ratio_min") ? (
-                        <label className="adminField">
-                          <span>Open ratio min</span>
-                          <input value={scheduleGeneratorOpenRatioMin} onChange={(event) => setScheduleGeneratorOpenRatioMin(event.target.value)} inputMode="decimal" />
-                        </label>
-                      ) : null}
-                      {supportsTuningField("open_ratio_max") ? (
-                        <label className="adminField">
-                          <span>Open ratio max</span>
-                          <input value={scheduleGeneratorOpenRatioMax} onChange={(event) => setScheduleGeneratorOpenRatioMax(event.target.value)} inputMode="decimal" />
-                        </label>
-                      ) : null}
-                      {supportsTuningField("min_open_slots") ? (
-                        <label className="adminField">
-                          <span>Min open slots</span>
-                          <input value={scheduleGeneratorMinOpenSlots} onChange={(event) => setScheduleGeneratorMinOpenSlots(event.target.value)} inputMode="numeric" />
-                        </label>
-                      ) : null}
-                      {supportsTuningField("max_open_slots") ? (
-                        <label className="adminField">
-                          <span>Max open slots</span>
-                          <input value={scheduleGeneratorMaxOpenSlots} onChange={(event) => setScheduleGeneratorMaxOpenSlots(event.target.value)} inputMode="numeric" />
-                        </label>
-                      ) : null}
-                      {supportsTuningField("min_block_minutes") ? (
-                        <label className="adminField">
-                          <span>Min block minutes</span>
-                          <input value={scheduleGeneratorMinBlockMinutes} onChange={(event) => setScheduleGeneratorMinBlockMinutes(event.target.value)} inputMode="numeric" />
-                        </label>
-                      ) : null}
-                      {supportsTuningField("max_block_minutes") ? (
-                        <label className="adminField">
-                          <span>Max block minutes</span>
-                          <input value={scheduleGeneratorMaxBlockMinutes} onChange={(event) => setScheduleGeneratorMaxBlockMinutes(event.target.value)} inputMode="numeric" />
-                        </label>
-                      ) : null}
-                    </div>
-                  </div>
-                ) : null}
-
-                <button
-                  className="authSubmitButton adminPrimaryButton"
-                  type="button"
-                  onClick={() => void runScheduleGenerator()}
-                  disabled={!selectedStationId || isLoadingCapabilities || Boolean(submittingOperation) || isPollingJob}
-                >
-                  {submittingOperation === HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR
-                    ? "Submitting..."
-                    : isPollingJob && activeJob?.operation === HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR
-                      ? "Job Running..."
-                      : "Run Schedule Generator"}
-                </button>
-              </section>
-            ) : null}
           </section>
 
-          {message ? (
-            <p className={`playerError ${message.toLowerCase().includes("failed") || message.toLowerCase().includes("unable") || message.toLowerCase().includes("invalid") ? "" : "adminMessageSuccess"}`}>
-              {message}
-            </p>
-          ) : null}
+          <div className="adminConsoleTabs" role="tablist" aria-label="Admin console sections">
+            <button
+              className={`adminConsoleTab ${activeConsoleView === "live" ? "adminConsoleTabActive" : ""}`}
+              type="button"
+              onClick={() => setActiveConsoleView("live")}
+            >
+              Live Overrides
+            </button>
+            <button
+              className={`adminConsoleTab ${activeConsoleView === "scheduler" ? "adminConsoleTabActive" : ""}`}
+              type="button"
+              onClick={() => setActiveConsoleView("scheduler")}
+            >
+              Scheduler
+            </button>
+            <button
+              className={`adminConsoleTab ${activeConsoleView === "jobs" ? "adminConsoleTabActive" : ""}`}
+              type="button"
+              onClick={() => setActiveConsoleView("jobs")}
+            >
+              Jobs & Logs
+            </button>
+          </div>
 
-          {activeJob ? <HostAdminJobPanel job={activeJob} isPolling={isPollingJob} /> : null}
+          <div className="adminWorkspace">
+            <div className="adminWorkspacePrimary">
+              <section
+                className={`adminPanel adminWorkspaceSection ${activeConsoleView === "live" ? "adminWorkspaceSectionActive" : ""}`}
+              >
+                <div className="adminSectionHeading">
+                  <h3>Live Overrides</h3>
+                  <p>Use these controls for immediate host intervention on the selected station.</p>
+                </div>
+
+                {supportsOperation(HOST_ADMIN_OPERATION_FORCE_ARCHETYPE) ? (
+                  <>
+                    {capabilities.archetypes.length === 0 && !isLoadingCapabilities ? (
+                      <p>No archetypes are loaded yet. Refresh capabilities to fetch them from the server.</p>
+                    ) : null}
+
+                    <label className="adminField">
+                      <span>Archetype</span>
+                      <select
+                        value={selectedArchetype ?? ""}
+                        onChange={(event) => {
+                          const archetype = event.target.value || null;
+                          setSelectedArchetype(archetype);
+                          setSelectedTrackFocus((current) =>
+                            archetype && capabilities.trackFocusArchetypes.includes(archetype) ? current : null
+                          );
+                        }}
+                        disabled={capabilities.archetypes.length === 0}
+                      >
+                        <option value="">Select archetype</option>
+                        {capabilities.archetypes.map((archetype) => (
+                          <option key={archetype} value={archetype}>
+                            {toArchetypeLabel(archetype)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    {forceArchetypeCapability?.dryRunSupported ? (
+                      <div className="adminChipRow">
+                        <button
+                          className={`adminChip ${forceArchetypeDryRun ? "adminChipActive" : ""}`}
+                          type="button"
+                          onClick={() => setForceArchetypeDryRun((value) => !value)}
+                        >
+                          Dry run
+                        </button>
+                      </div>
+                    ) : null}
+
+                    {supportsTrackFocus ? (
+                      <div className="adminSubsection">
+                        <div className="adminSectionHeading">
+                          <h5>Track focus</h5>
+                          <p>Optional. Leave it unset to let the server pick the focus automatically.</p>
+                        </div>
+                        <div className="adminChipRow">
+                          {capabilities.trackFocusValues.map((trackFocus) => (
+                            <button
+                              key={trackFocus}
+                              className={`adminChip ${selectedTrackFocus === trackFocus ? "adminChipActive" : ""}`}
+                              type="button"
+                              onClick={() => setSelectedTrackFocus(trackFocus)}
+                            >
+                              {toTrackFocusLabel(trackFocus)}
+                            </button>
+                          ))}
+                        </div>
+                        <button className="adminTextButton" type="button" onClick={() => setSelectedTrackFocus(null)} disabled={!selectedTrackFocus}>
+                          Use server default
+                        </button>
+                      </div>
+                    ) : null}
+
+                    <button
+                      className="authSubmitButton adminPrimaryButton"
+                      type="button"
+                      onClick={() => void runForceArchetype()}
+                      disabled={!selectedStationId || !selectedArchetype || isLoadingCapabilities || Boolean(submittingOperation) || isPollingJob}
+                    >
+                      {submittingOperation === HOST_ADMIN_OPERATION_FORCE_ARCHETYPE
+                        ? "Submitting..."
+                        : isPollingJob && activeJob?.operation === HOST_ADMIN_OPERATION_FORCE_ARCHETYPE
+                          ? "Job Running..."
+                          : "Run Force Archetype"}
+                    </button>
+                  </>
+                ) : (
+                  <div className="adminEmptyState">
+                    <strong>Live overrides unavailable</strong>
+                    <p>The host does not currently expose the force-archetype operation.</p>
+                  </div>
+                )}
+              </section>
+
+              <section
+                className={`adminPanel adminWorkspaceSection ${activeConsoleView === "scheduler" ? "adminWorkspaceSectionActive" : ""}`}
+              >
+                <div className="adminSectionHeading">
+                  <h3>Scheduler Generator</h3>
+                  <p>Configure generation strategy, timing, and tuning for the selected station.</p>
+                </div>
+
+                {supportsOperation(HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR) ? (
+                  <>
+                    {(scheduleGeneratorCapability?.dryRunSupported || scheduleGeneratorCapability?.forceApplySupported) ? (
+                      <div className="adminChipRow">
+                        {scheduleGeneratorCapability?.dryRunSupported ? (
+                          <button
+                            className={`adminChip ${scheduleGeneratorDryRun ? "adminChipActive" : ""}`}
+                            type="button"
+                            onClick={() => {
+                              setScheduleGeneratorDryRun((value) => {
+                                const next = !value;
+
+                                if (next) {
+                                  setScheduleGeneratorForceApply(false);
+                                }
+
+                                return next;
+                              });
+                            }}
+                          >
+                            Dry run
+                          </button>
+                        ) : null}
+                        {scheduleGeneratorCapability?.forceApplySupported ? (
+                          <button
+                            className={`adminChip ${scheduleGeneratorForceApply ? "adminChipActive" : ""}`}
+                            type="button"
+                            onClick={() => setScheduleGeneratorForceApply((value) => !value)}
+                            disabled={scheduleGeneratorDryRun}
+                          >
+                            Force apply
+                          </button>
+                        ) : null}
+                      </div>
+                    ) : null}
+
+                    {scheduleGeneratorCapability?.supportedSeedModes.length ? (
+                      <div className="adminSubsection">
+                        <div className="adminSectionHeading">
+                          <h5>Seed mode</h5>
+                          <p>Use stable mode for deterministic weekly plans, fresh for a reroll, or custom to reproduce a manual variation.</p>
+                        </div>
+                        <div className="adminChipRow">
+                          {scheduleGeneratorCapability.supportedSeedModes.map((seedMode) => (
+                            <button
+                              key={seedMode}
+                              className={`adminChip ${normalizedScheduleSeedMode === seedMode ? "adminChipActive" : ""}`}
+                              type="button"
+                              onClick={() => {
+                                setSelectedScheduleGeneratorSeedMode(seedMode);
+                                if (seedMode !== HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM) {
+                                  setScheduleGeneratorSeedSalt("");
+                                }
+                              }}
+                            >
+                              {toSeedModeLabel(seedMode)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {normalizedScheduleSeedMode === HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM ? (
+                      <label className="adminField">
+                        <span>Custom seed key</span>
+                        <input value={scheduleGeneratorSeedSalt} onChange={(event) => setScheduleGeneratorSeedSalt(event.target.value)} />
+                      </label>
+                    ) : null}
+
+                    {scheduleGeneratorCapability?.weekStartDateSupported ? (
+                      <label className="adminField">
+                        <span>Week start date (YYYY-MM-DD)</span>
+                        <input value={scheduleGeneratorWeekStartDate} onChange={(event) => setScheduleGeneratorWeekStartDate(event.target.value)} />
+                      </label>
+                    ) : null}
+
+                    {(supportsTuningField("open_ratio_min") ||
+                      supportsTuningField("open_ratio_max") ||
+                      supportsTuningField("min_open_slots") ||
+                      supportsTuningField("max_open_slots") ||
+                      supportsTuningField("min_block_minutes") ||
+                      supportsTuningField("max_block_minutes")) ? (
+                      <div className="adminSubsection">
+                        <div className="adminSectionHeading">
+                          <h5>Tuning</h5>
+                          <p>Leave fields blank to use the server defaults.</p>
+                        </div>
+                        <div className="adminFieldGrid">
+                          {supportsTuningField("open_ratio_min") ? (
+                            <label className="adminField">
+                              <span>Open ratio min</span>
+                              <input value={scheduleGeneratorOpenRatioMin} onChange={(event) => setScheduleGeneratorOpenRatioMin(event.target.value)} inputMode="decimal" />
+                            </label>
+                          ) : null}
+                          {supportsTuningField("open_ratio_max") ? (
+                            <label className="adminField">
+                              <span>Open ratio max</span>
+                              <input value={scheduleGeneratorOpenRatioMax} onChange={(event) => setScheduleGeneratorOpenRatioMax(event.target.value)} inputMode="decimal" />
+                            </label>
+                          ) : null}
+                          {supportsTuningField("min_open_slots") ? (
+                            <label className="adminField">
+                              <span>Min open slots</span>
+                              <input value={scheduleGeneratorMinOpenSlots} onChange={(event) => setScheduleGeneratorMinOpenSlots(event.target.value)} inputMode="numeric" />
+                            </label>
+                          ) : null}
+                          {supportsTuningField("max_open_slots") ? (
+                            <label className="adminField">
+                              <span>Max open slots</span>
+                              <input value={scheduleGeneratorMaxOpenSlots} onChange={(event) => setScheduleGeneratorMaxOpenSlots(event.target.value)} inputMode="numeric" />
+                            </label>
+                          ) : null}
+                          {supportsTuningField("min_block_minutes") ? (
+                            <label className="adminField">
+                              <span>Min block minutes</span>
+                              <input value={scheduleGeneratorMinBlockMinutes} onChange={(event) => setScheduleGeneratorMinBlockMinutes(event.target.value)} inputMode="numeric" />
+                            </label>
+                          ) : null}
+                          {supportsTuningField("max_block_minutes") ? (
+                            <label className="adminField">
+                              <span>Max block minutes</span>
+                              <input value={scheduleGeneratorMaxBlockMinutes} onChange={(event) => setScheduleGeneratorMaxBlockMinutes(event.target.value)} inputMode="numeric" />
+                            </label>
+                          ) : null}
+                        </div>
+                      </div>
+                    ) : null}
+
+                    <button
+                      className="authSubmitButton adminPrimaryButton"
+                      type="button"
+                      onClick={() => void runScheduleGenerator()}
+                      disabled={!selectedStationId || isLoadingCapabilities || Boolean(submittingOperation) || isPollingJob}
+                    >
+                      {submittingOperation === HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR
+                        ? "Submitting..."
+                        : isPollingJob && activeJob?.operation === HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR
+                          ? "Job Running..."
+                          : "Run Schedule Generator"}
+                    </button>
+                  </>
+                ) : (
+                  <div className="adminEmptyState">
+                    <strong>Scheduler unavailable</strong>
+                    <p>The host does not currently expose the schedule generator operation.</p>
+                  </div>
+                )}
+              </section>
+            </div>
+
+            <div className="adminWorkspaceSecondary">
+              {activeJob ? (
+                <HostAdminJobPanel
+                  job={activeJob}
+                  isPolling={isPollingJob}
+                  className={activeConsoleView === "jobs" ? "adminWorkspaceSectionActive" : ""}
+                />
+              ) : (
+                <section
+                  className={`adminPanel adminWorkspaceSection ${activeConsoleView === "jobs" ? "adminWorkspaceSectionActive" : ""}`}
+                >
+                  <div className="adminSectionHeading">
+                    <h3>Jobs & Logs</h3>
+                    <p>Monitor the latest host run and inspect the tail output from the orchestrator.</p>
+                  </div>
+                  <div className="adminEmptyState">
+                    <strong>No jobs yet</strong>
+                    <p>Run a live override or schedule generation task to populate this panel.</p>
+                  </div>
+                </section>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </>
   );
 }
 
-function HostAdminJobPanel({ job, isPolling }: { job: HostAdminJob; isPolling: boolean }) {
+function HostAdminJobPanel({ job, isPolling, className = "" }: { job: HostAdminJob; isPolling: boolean; className?: string }) {
   const statusLabel = toStatusLabel(job.status);
   const scheduleLines = job.scheduleOptions
     ? [
@@ -660,13 +764,11 @@ function HostAdminJobPanel({ job, isPolling }: { job: HostAdminJob; isPolling: b
     : [];
 
   return (
-    <section className="adminPanel adminConsoleStack">
+    <section className={`adminPanel adminConsoleStack adminWorkspaceSection ${className}`.trim()}>
       <div className="adminPanelHeader">
         <div>
-          <h3>Latest Host Job</h3>
-          <p>
-            {stationLabel(job.station)} · {toOperationLabel(job.operation)}
-          </p>
+          <h3>Jobs & Logs</h3>
+          <p>{stationLabel(job.station)} · {toOperationLabel(job.operation)}</p>
         </div>
         <span className={`adminJobBadge adminJobBadge${toStatusClassName(job.status)}`}>
           {isPolling && !isTerminalJobStatus(job.status) ? "Polling..." : statusLabel}
