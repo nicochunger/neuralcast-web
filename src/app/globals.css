@@ -2874,12 +2874,14 @@ img {
 
 @media (max-width: 440px) {
   .stationCardHeader {
-    display: grid;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
   }
 
   .stationControlGroup {
-    max-width: none;
-    justify-content: flex-start;
+    max-width: 46%;
+    justify-items: end;
   }
 }
 
