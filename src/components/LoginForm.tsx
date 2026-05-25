@@ -3,15 +3,15 @@
 import { FormEvent, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/lib/i18n";
 
 interface LoginFormProps {
   callbackUrl: string;
 }
 
-const DEFAULT_ERROR_MESSAGE = "We couldn't sign you in with those credentials.";
-
 export function LoginForm({ callbackUrl }: LoginFormProps) {
   const router = useRouter();
+  const { t } = useI18n();
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
@@ -34,12 +34,12 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
     setIsPending(false);
 
     if (!result) {
-      setError(DEFAULT_ERROR_MESSAGE);
+      setError(t("auth.error"));
       return;
     }
 
     if (result.error) {
-      setError(DEFAULT_ERROR_MESSAGE);
+      setError(t("auth.error"));
       return;
     }
 
@@ -50,16 +50,16 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
   return (
     <form className="authForm" onSubmit={handleSubmit}>
       <label className="authField">
-        <span>Email</span>
+        <span>{t("auth.email")}</span>
         <input name="email" type="email" autoComplete="username" required />
       </label>
       <label className="authField">
-        <span>Password</span>
+        <span>{t("auth.password")}</span>
         <input name="password" type="password" autoComplete="current-password" required />
       </label>
       {error ? <p className="authError">{error}</p> : null}
       <button className="authSubmitButton" type="submit" disabled={isPending}>
-        {isPending ? "Signing in..." : "Sign in"}
+        {isPending ? t("auth.signingIn") : t("auth.signIn")}
       </button>
     </form>
   );

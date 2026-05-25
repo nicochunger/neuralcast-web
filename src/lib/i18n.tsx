@@ -19,6 +19,8 @@ type TranslationKey =
   | "common.liveStream"
   | "common.listeners"
   | "common.listenersUnknown"
+  | "common.refreshing"
+  | "common.submitting"
   | "nav.label"
   | "nav.live"
   | "nav.about"
@@ -26,6 +28,94 @@ type TranslationKey =
   | "footer.connection"
   | "footer.iosInstall"
   | "footer.admin"
+  | "auth.eyebrow"
+  | "auth.title"
+  | "auth.lead"
+  | "auth.notConfigured"
+  | "auth.configureEnv"
+  | "auth.email"
+  | "auth.password"
+  | "auth.signIn"
+  | "auth.signingIn"
+  | "auth.error"
+  | "auth.signOut"
+  | "admin.signedInAs"
+  | "admin.controlRoom"
+  | "admin.title"
+  | "admin.lead"
+  | "admin.hostOrchestrator"
+  | "admin.hostNotConfigured"
+  | "admin.hostConfigured"
+  | "admin.loadingCapabilities"
+  | "admin.loadCapabilitiesError"
+  | "admin.refreshJobError"
+  | "admin.loadedCapabilities"
+  | "admin.refreshCapabilities"
+  | "admin.station"
+  | "admin.forceArchetype"
+  | "admin.noArchetypes"
+  | "admin.archetype"
+  | "admin.selectArchetype"
+  | "admin.dryRun"
+  | "admin.trackFocus"
+  | "admin.trackFocusDescription"
+  | "admin.useServerDefault"
+  | "admin.runForceArchetype"
+  | "admin.jobRunning"
+  | "admin.forceArchetypeAccepted"
+  | "admin.forceArchetypeError"
+  | "admin.scheduleGenerator"
+  | "admin.scheduleGeneratorDescription"
+  | "admin.scheduleGeneratorAccepted"
+  | "admin.scheduleGeneratorError"
+  | "admin.forceApply"
+  | "admin.seedMode"
+  | "admin.seedModeDescription"
+  | "admin.customSeedKey"
+  | "admin.enterCustomSeed"
+  | "admin.weekStartDate"
+  | "admin.tuning"
+  | "admin.tuningDescription"
+  | "admin.openRatioMin"
+  | "admin.openRatioMax"
+  | "admin.minOpenSlots"
+  | "admin.maxOpenSlots"
+  | "admin.minBlockMinutes"
+  | "admin.maxBlockMinutes"
+  | "admin.invalidNumber"
+  | "admin.invalidInteger"
+  | "admin.runScheduleGenerator"
+  | "admin.latestHostJob"
+  | "admin.polling"
+  | "admin.archetypeLine"
+  | "admin.focusLine"
+  | "admin.modeDryRun"
+  | "admin.forceApplyEnabled"
+  | "admin.seedModeLine"
+  | "admin.customSeedLine"
+  | "admin.seedSaltLine"
+  | "admin.weekStartLine"
+  | "admin.openRatioMinLine"
+  | "admin.openRatioMaxLine"
+  | "admin.minOpenSlotsLine"
+  | "admin.maxOpenSlotsLine"
+  | "admin.minBlockMinutesLine"
+  | "admin.maxBlockMinutesLine"
+  | "admin.exitCodeLine"
+  | "admin.acceptedAtLine"
+  | "admin.startedAtLine"
+  | "admin.finishedAtLine"
+  | "admin.jobCompleted"
+  | "admin.jobFailed"
+  | "admin.focusCurrent"
+  | "admin.focusNext"
+  | "admin.seedStableWeek"
+  | "admin.seedFresh"
+  | "admin.seedCustom"
+  | "admin.statusAccepted"
+  | "admin.statusRunning"
+  | "admin.statusSucceeded"
+  | "admin.statusFailed"
   | "player.playbackBlocked"
   | "player.streamLoadError"
   | "player.installFallbackAndroid"
@@ -127,6 +217,8 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "common.liveStream": "Live stream",
     "common.listeners": "Listeners: {count}",
     "common.listenersUnknown": "Listeners: --",
+    "common.refreshing": "Refreshing...",
+    "common.submitting": "Submitting...",
     "nav.label": "Primary navigation",
     "nav.live": "Listen",
     "nav.about": "About",
@@ -134,6 +226,94 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "footer.connection": "Live streams require a network connection.",
     "footer.iosInstall": "Add to Home Screen on iOS from the Share menu.",
     "footer.admin": "Admin Console",
+    "auth.eyebrow": "Admin access",
+    "auth.title": "Sign in to manage NeuralCast",
+    "auth.lead": "This private area will be used for live controls like skipping songs and triggering host snippets.",
+    "auth.notConfigured": "Admin login is not configured yet.",
+    "auth.configureEnv": "Add `NEXTAUTH_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD_HASH` in Vercel and your local env file.",
+    "auth.email": "Email",
+    "auth.password": "Password",
+    "auth.signIn": "Sign in",
+    "auth.signingIn": "Signing in...",
+    "auth.error": "We couldn't sign you in with those credentials.",
+    "auth.signOut": "Sign out",
+    "admin.signedInAs": "Signed in as {email}.",
+    "admin.controlRoom": "Control room",
+    "admin.title": "Admin dashboard",
+    "admin.lead": "Skip-track controls stay on the main radio page. The full host console lives here and mirrors the Android app's orchestration tools.",
+    "admin.hostOrchestrator": "Host orchestrator",
+    "admin.hostNotConfigured": "Add `HOST_ADMIN_BASE_URL` and `HOST_ADMIN_TOKEN` in your env vars to unlock the full AI host console.",
+    "admin.hostConfigured": "The VPS-backed host admin API is configured server-side for this web app.",
+    "admin.loadingCapabilities": "Loading admin capabilities...",
+    "admin.loadCapabilitiesError": "Unable to load host admin capabilities.",
+    "admin.refreshJobError": "Unable to refresh host job status.",
+    "admin.loadedCapabilities": "Loaded {stations} stations, {archetypes} archetypes, and {operations} operations.",
+    "admin.refreshCapabilities": "Refresh capabilities",
+    "admin.station": "Station",
+    "admin.forceArchetype": "Force Archetype",
+    "admin.noArchetypes": "No archetypes are loaded yet. Refresh capabilities to fetch them from the server.",
+    "admin.archetype": "Archetype",
+    "admin.selectArchetype": "Select archetype",
+    "admin.dryRun": "Dry run",
+    "admin.trackFocus": "Track focus",
+    "admin.trackFocusDescription": "Optional. Leave it unset to let the server pick the focus automatically.",
+    "admin.useServerDefault": "Use server default",
+    "admin.runForceArchetype": "Run Force Archetype",
+    "admin.jobRunning": "Job Running...",
+    "admin.forceArchetypeAccepted": "Force archetype request accepted.",
+    "admin.forceArchetypeError": "Unable to start a forced host run.",
+    "admin.scheduleGenerator": "Schedule Generator",
+    "admin.scheduleGeneratorDescription": "Run the schedule generator for the selected station.",
+    "admin.scheduleGeneratorAccepted": "Schedule generator request accepted.",
+    "admin.scheduleGeneratorError": "Unable to start the schedule generator.",
+    "admin.forceApply": "Force apply",
+    "admin.seedMode": "Seed mode",
+    "admin.seedModeDescription": "Use stable mode for deterministic weekly plans, fresh for a reroll, or custom to reproduce a manual variation.",
+    "admin.customSeedKey": "Custom seed key",
+    "admin.enterCustomSeed": "Enter a custom seed key first.",
+    "admin.weekStartDate": "Week start date (YYYY-MM-DD)",
+    "admin.tuning": "Tuning",
+    "admin.tuningDescription": "Leave fields blank to use the server defaults.",
+    "admin.openRatioMin": "Open ratio min",
+    "admin.openRatioMax": "Open ratio max",
+    "admin.minOpenSlots": "Min open slots",
+    "admin.maxOpenSlots": "Max open slots",
+    "admin.minBlockMinutes": "Min block minutes",
+    "admin.maxBlockMinutes": "Max block minutes",
+    "admin.invalidNumber": "{label} must be a valid number.",
+    "admin.invalidInteger": "{label} must be a whole number.",
+    "admin.runScheduleGenerator": "Run Schedule Generator",
+    "admin.latestHostJob": "Latest Host Job",
+    "admin.polling": "Polling...",
+    "admin.archetypeLine": "Archetype: {value}",
+    "admin.focusLine": "Focus: {value}",
+    "admin.modeDryRun": "Mode: Dry run",
+    "admin.forceApplyEnabled": "Force apply enabled",
+    "admin.seedModeLine": "Seed mode: {value}",
+    "admin.customSeedLine": "Custom seed: {value}",
+    "admin.seedSaltLine": "Seed salt: {value}",
+    "admin.weekStartLine": "Week start: {value}",
+    "admin.openRatioMinLine": "Open ratio min: {value}",
+    "admin.openRatioMaxLine": "Open ratio max: {value}",
+    "admin.minOpenSlotsLine": "Min open slots: {value}",
+    "admin.maxOpenSlotsLine": "Max open slots: {value}",
+    "admin.minBlockMinutesLine": "Min block minutes: {value}",
+    "admin.maxBlockMinutesLine": "Max block minutes: {value}",
+    "admin.exitCodeLine": "Exit code: {value}",
+    "admin.acceptedAtLine": "Accepted: {value}",
+    "admin.startedAtLine": "Started: {value}",
+    "admin.finishedAtLine": "Finished: {value}",
+    "admin.jobCompleted": "{operation} completed for {station}.",
+    "admin.jobFailed": "{operation} failed for {station}{suffix}.",
+    "admin.focusCurrent": "Current track",
+    "admin.focusNext": "Next track",
+    "admin.seedStableWeek": "Stable week",
+    "admin.seedFresh": "Fresh",
+    "admin.seedCustom": "Custom",
+    "admin.statusAccepted": "Accepted",
+    "admin.statusRunning": "Running",
+    "admin.statusSucceeded": "Succeeded",
+    "admin.statusFailed": "Failed",
     "player.playbackBlocked":
       "Playback was blocked or the stream could not be reached. Tap Play again after checking the network.",
     "player.streamLoadError": "The stream could not be loaded.",
@@ -244,13 +424,103 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "common.liveStream": "Transmisión en directo",
     "common.listeners": "Oyentes: {count}",
     "common.listenersUnknown": "Oyentes: --",
+    "common.refreshing": "Actualizando...",
+    "common.submitting": "Enviando...",
     "nav.label": "Navegación principal",
     "nav.live": "Escuchar",
     "nav.about": "Acerca de",
     "nav.backToRadio": "Volver a la radio",
     "footer.connection": "Las transmisiones en directo requieren conexión de red.",
     "footer.iosInstall": "En iOS, usa el menú Compartir para añadirla a la pantalla de inicio.",
-    "footer.admin": "Admin Console",
+    "footer.admin": "Consola de administración",
+    "auth.eyebrow": "Acceso de administración",
+    "auth.title": "Iniciá sesión para gestionar NeuralCast",
+    "auth.lead": "Esta zona privada se usa para controles en directo, como saltar canciones y activar intervenciones del host.",
+    "auth.notConfigured": "El inicio de sesión de administración todavía no está configurado.",
+    "auth.configureEnv": "Agregá `NEXTAUTH_SECRET`, `ADMIN_EMAIL` y `ADMIN_PASSWORD_HASH` en Vercel y en tu archivo de entorno local.",
+    "auth.email": "Email",
+    "auth.password": "Contraseña",
+    "auth.signIn": "Iniciar sesión",
+    "auth.signingIn": "Iniciando sesión...",
+    "auth.error": "No pudimos iniciar sesión con esas credenciales.",
+    "auth.signOut": "Cerrar sesión",
+    "admin.signedInAs": "Sesión iniciada como {email}.",
+    "admin.controlRoom": "Sala de control",
+    "admin.title": "Panel de administración",
+    "admin.lead": "Los controles para saltar canciones quedan en la página principal de la radio. La consola completa del host vive acá y replica las herramientas de orquestación de la app de Android.",
+    "admin.hostOrchestrator": "Orquestador del host",
+    "admin.hostNotConfigured": "Agregá `HOST_ADMIN_BASE_URL` y `HOST_ADMIN_TOKEN` en tus variables de entorno para habilitar la consola completa del host con IA.",
+    "admin.hostConfigured": "La API de administración del host en el VPS está configurada del lado del servidor para esta app web.",
+    "admin.loadingCapabilities": "Cargando capacidades de administración...",
+    "admin.loadCapabilitiesError": "No se pudieron cargar las capacidades de administración del host.",
+    "admin.refreshJobError": "No se pudo actualizar el estado del trabajo del host.",
+    "admin.loadedCapabilities": "Se cargaron {stations} emisoras, {archetypes} arquetipos y {operations} operaciones.",
+    "admin.refreshCapabilities": "Actualizar capacidades",
+    "admin.station": "Emisora",
+    "admin.forceArchetype": "Forzar arquetipo",
+    "admin.noArchetypes": "Todavía no hay arquetipos cargados. Actualizá las capacidades para traerlos desde el servidor.",
+    "admin.archetype": "Arquetipo",
+    "admin.selectArchetype": "Seleccionar arquetipo",
+    "admin.dryRun": "Prueba",
+    "admin.trackFocus": "Foco de canción",
+    "admin.trackFocusDescription": "Opcional. Dejalo sin configurar para que el servidor elija el foco automáticamente.",
+    "admin.useServerDefault": "Usar valor del servidor",
+    "admin.runForceArchetype": "Ejecutar arquetipo forzado",
+    "admin.jobRunning": "Trabajo en ejecución...",
+    "admin.forceArchetypeAccepted": "Solicitud de arquetipo forzado aceptada.",
+    "admin.forceArchetypeError": "No se pudo iniciar una ejecución forzada del host.",
+    "admin.scheduleGenerator": "Generador de programación",
+    "admin.scheduleGeneratorDescription": "Ejecutar el generador de programación para la emisora seleccionada.",
+    "admin.scheduleGeneratorAccepted": "Solicitud del generador de programación aceptada.",
+    "admin.scheduleGeneratorError": "No se pudo iniciar el generador de programación.",
+    "admin.forceApply": "Aplicar cambios",
+    "admin.seedMode": "Modo de semilla",
+    "admin.seedModeDescription": "Usá el modo estable para planes semanales deterministas, fresco para regenerar, o personalizado para reproducir una variación manual.",
+    "admin.customSeedKey": "Clave de semilla personalizada",
+    "admin.enterCustomSeed": "Primero ingresá una clave de semilla personalizada.",
+    "admin.weekStartDate": "Fecha de inicio de semana (YYYY-MM-DD)",
+    "admin.tuning": "Ajustes",
+    "admin.tuningDescription": "Dejá los campos vacíos para usar los valores predeterminados del servidor.",
+    "admin.openRatioMin": "Ratio abierto mín.",
+    "admin.openRatioMax": "Ratio abierto máx.",
+    "admin.minOpenSlots": "Mín. espacios abiertos",
+    "admin.maxOpenSlots": "Máx. espacios abiertos",
+    "admin.minBlockMinutes": "Minutos mín. de bloque",
+    "admin.maxBlockMinutes": "Minutos máx. de bloque",
+    "admin.invalidNumber": "{label} debe ser un número válido.",
+    "admin.invalidInteger": "{label} debe ser un número entero.",
+    "admin.runScheduleGenerator": "Ejecutar generador",
+    "admin.latestHostJob": "Último trabajo del host",
+    "admin.polling": "Consultando...",
+    "admin.archetypeLine": "Arquetipo: {value}",
+    "admin.focusLine": "Foco: {value}",
+    "admin.modeDryRun": "Modo: prueba",
+    "admin.forceApplyEnabled": "Aplicación forzada activada",
+    "admin.seedModeLine": "Modo de semilla: {value}",
+    "admin.customSeedLine": "Semilla personalizada: {value}",
+    "admin.seedSaltLine": "Salt de semilla: {value}",
+    "admin.weekStartLine": "Inicio de semana: {value}",
+    "admin.openRatioMinLine": "Ratio abierto mín.: {value}",
+    "admin.openRatioMaxLine": "Ratio abierto máx.: {value}",
+    "admin.minOpenSlotsLine": "Mín. espacios abiertos: {value}",
+    "admin.maxOpenSlotsLine": "Máx. espacios abiertos: {value}",
+    "admin.minBlockMinutesLine": "Minutos mín. de bloque: {value}",
+    "admin.maxBlockMinutesLine": "Minutos máx. de bloque: {value}",
+    "admin.exitCodeLine": "Código de salida: {value}",
+    "admin.acceptedAtLine": "Aceptado: {value}",
+    "admin.startedAtLine": "Iniciado: {value}",
+    "admin.finishedAtLine": "Finalizado: {value}",
+    "admin.jobCompleted": "{operation} completado para {station}.",
+    "admin.jobFailed": "{operation} falló para {station}{suffix}.",
+    "admin.focusCurrent": "Canción actual",
+    "admin.focusNext": "Próxima canción",
+    "admin.seedStableWeek": "Semana estable",
+    "admin.seedFresh": "Fresco",
+    "admin.seedCustom": "Personalizado",
+    "admin.statusAccepted": "Aceptado",
+    "admin.statusRunning": "En ejecución",
+    "admin.statusSucceeded": "Completado",
+    "admin.statusFailed": "Fallido",
     "player.playbackBlocked":
       "La reproducción se bloqueó o no se pudo acceder a la transmisión. Pulsa Reproducir de nuevo después de comprobar la red.",
     "player.streamLoadError": "No se pudo cargar la transmisión.",

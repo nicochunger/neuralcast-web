@@ -1,8 +1,11 @@
 "use client";
 
 import { signOut } from "next-auth/react";
+import { useI18n } from "@/lib/i18n";
 
 export function SignOutButton() {
+  const { t } = useI18n();
+
   return (
     <button
       className="headerContextButton"
@@ -11,7 +14,7 @@ export function SignOutButton() {
         void signOut({ callbackUrl: "/" });
       }}
     >
-      Sign out
+      {t("auth.signOut")}
     </button>
   );
 }

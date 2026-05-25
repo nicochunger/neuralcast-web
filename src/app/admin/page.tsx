@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminConsole } from "@/components/AdminConsole";
+import { AdminToolbar } from "@/components/AdminToolbar";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SignOutButton } from "@/components/SignOutButton";
 import { getAuthSession } from "@/lib/auth";
@@ -18,14 +18,7 @@ export default async function AdminPage() {
   return (
     <main className="appShell adminShell">
       <SiteHeader extraActions={<SignOutButton />} />
-      <div className="adminToolbar">
-        <p className="adminSignedInText">
-          Signed in as <strong>{session.user.email}</strong>.
-        </p>
-        <Link href="/" className="adminBackLink">
-          Back to radio
-        </Link>
-      </div>
+      <AdminToolbar email={session.user.email} />
       <AdminConsole isHostAdminConfigured={hostAdminConfigured} />
     </main>
   );

@@ -8,6 +8,7 @@ import {
   HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM,
   HOST_ADMIN_SCHEDULE_SEED_MODE_FRESH
 } from "@/types/hostAdmin";
+import { useI18n } from "@/lib/i18n";
 import { DEFAULT_STATION_ID, STATIONS } from "@/lib/stations";
 
 interface AdminConsoleProps {
@@ -27,6 +28,7 @@ const emptyCapabilities: HostAdminCapabilities = {
 };
 
 export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
+  const { t } = useI18n();
   const [capabilities, setCapabilities] = useState<HostAdminCapabilities>(emptyCapabilities);
   const [capabilitiesStatusMessage, setCapabilitiesStatusMessage] = useState<string | null>(null);
   const [isCapabilitiesStatusError, setIsCapabilitiesStatusError] = useState(false);
@@ -94,7 +96,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     }
 
     setIsLoadingCapabilities(true);
-    setCapabilitiesStatusMessage("Loading admin capabilities...");
+    setCapabilitiesStatusMessage(t("admin.loadingCapabilities"));
     setIsCapabilitiesStatusError(false);
 
     try {
@@ -102,7 +104,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       const payload = await response.json();
 
       if (!response.ok) {
-        throw new Error(payload.error || "Unable to load host admin capabilities.");
+        throw new Error(payload.error || t("admin.refreshJobError"));
       }
 
       const loaded = payload as HostAdminCapabilities;
@@ -121,12 +123,16 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
         return supportedSeedModes.includes(current) ? current : defaultSeedMode;
       });
       setCapabilitiesStatusMessage(
-        `Loaded ${loaded.stations.length} stations, ${loaded.archetypes.length} archetypes, and ${Object.keys(loaded.operations).length} operations.`
+        t("admin.loadedCapabilities", {
+          stations: loaded.stations.length,
+          archetypes: loaded.archetypes.length,
+          operations: Object.keys(loaded.operations).length
+        })
       );
       setIsCapabilitiesStatusError(false);
       setMessage(null);
     } catch (error) {
-      const nextMessage = error instanceof Error ? error.message : "Unable to load host admin capabilities.";
+      const nextMessage = error instanceof Error ? error.message : t("admin.loadCapabilitiesError");
       setCapabilitiesStatusMessage(nextMessage);
       setIsCapabilitiesStatusError(true);
       setMessage(nextMessage);
@@ -157,7 +163,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       const payload = await response.json();
 
       if (!response.ok) {
-        throw new Error(payload.error || "Unable to start a forced host run.");
+        throw new Error(payload.error || t("admin.forceArchetypeError"));
       }
 
       const nextJob: HostAdminJob = {
@@ -172,9 +178,9 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
 
       setActiveJob(nextJob);
       setIsPollingJob(true);
-      setMessage("Force archetype request accepted.");
+      setMessage(t("admin.forceArchetypeAccepted"));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Unable to start a forced host run.");
+      setMessage(error instanceof Error ? error.message : t("admin.forceArchetypeError"));
     } finally {
       setSubmittingOperation(null);
     }
@@ -189,16 +195,16 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     const seedSalt = seedMode === HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM ? scheduleGeneratorSeedSalt.trim() : "";
 
     if (seedMode === HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM && !seedSalt) {
-      setMessage("Enter a custom seed key first.");
+      setMessage(t("admin.enterCustomSeed"));
       return;
     }
 
-    const openRatioMin = parseOptionalNumber("Open ratio min", scheduleGeneratorOpenRatioMin, true);
-    const openRatioMax = parseOptionalNumber("Open ratio max", scheduleGeneratorOpenRatioMax, true);
-    const minOpenSlots = parseOptionalInteger("Min open slots", scheduleGeneratorMinOpenSlots, true);
-    const maxOpenSlots = parseOptionalInteger("Max open slots", scheduleGeneratorMaxOpenSlots, true);
-    const minBlockMinutes = parseOptionalInteger("Min block minutes", scheduleGeneratorMinBlockMinutes, true);
-    const maxBlockMinutes = parseOptionalInteger("Max block minutes", scheduleGeneratorMaxBlockMinutes, true);
+    const openRatioMin = parseOptionalNumber(t("admin.openRatioMin"), scheduleGeneratorOpenRatioMin, true);
+    const openRatioMax = parseOptionalNumber(t("admin.openRatioMax"), scheduleGeneratorOpenRatioMax, true);
+    const minOpenSlots = parseOptionalInteger(t("admin.minOpenSlots"), scheduleGeneratorMinOpenSlots, true);
+    const maxOpenSlots = parseOptionalInteger(t("admin.maxOpenSlots"), scheduleGeneratorMaxOpenSlots, true);
+    const minBlockMinutes = parseOptionalInteger(t("admin.minBlockMinutes"), scheduleGeneratorMinBlockMinutes, true);
+    const maxBlockMinutes = parseOptionalInteger(t("admin.maxBlockMinutes"), scheduleGeneratorMaxBlockMinutes, true);
 
     if ([openRatioMin, openRatioMax, minOpenSlots, maxOpenSlots, minBlockMinutes, maxBlockMinutes].includes(null)) {
       return;
@@ -235,7 +241,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       const payload = await response.json();
 
       if (!response.ok) {
-        throw new Error(payload.error || "Unable to start the schedule generator.");
+        throw new Error(payload.error || t("admin.scheduleGeneratorError"));
       }
 
       const nextJob: HostAdminJob = {
@@ -266,9 +272,9 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
 
       setActiveJob(nextJob);
       setIsPollingJob(true);
-      setMessage("Schedule generator request accepted.");
+      setMessage(t("admin.scheduleGeneratorAccepted"));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Unable to start the schedule generator.");
+      setMessage(error instanceof Error ? error.message : t("admin.scheduleGeneratorError"));
     } finally {
       setSubmittingOperation(null);
     }
@@ -280,7 +286,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       const payload = await response.json();
 
       if (!response.ok) {
-        throw new Error(payload.error || "Unable to refresh host job status.");
+        throw new Error(payload.error || t("admin.loadCapabilitiesError"));
       }
 
       const job = payload as HostAdminJob;
@@ -290,11 +296,11 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       setIsPollingJob(!terminal);
 
       if (terminal) {
-        setMessage(buildJobStatusMessage(job));
+        setMessage(buildJobStatusMessage(job, t));
       }
     } catch (error) {
       setIsPollingJob(false);
-      setMessage(error instanceof Error ? error.message : "Unable to refresh host job status.");
+      setMessage(error instanceof Error ? error.message : t("admin.refreshJobError"));
     }
   }
 
@@ -320,7 +326,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     const value = Number(trimmed);
 
     if (!Number.isFinite(value)) {
-      setMessage(`${label} must be a valid number.`);
+      setMessage(t("admin.invalidNumber", { label }));
       return null;
     }
 
@@ -339,7 +345,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     }
 
     if (!/^-?\d+$/.test(trimmed)) {
-      setMessage(`${label} must be a whole number.`);
+      setMessage(t("admin.invalidInteger", { label }));
       return null;
     }
 
@@ -350,29 +356,27 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     <>
       <section className="adminHero">
         <div>
-          <p className="sectionEyebrow">Control room</p>
-          <h2>Admin dashboard</h2>
-          <p className="adminLead">
-            Skip-track controls stay on the main radio page. The full host console lives here and mirrors the Android app’s orchestration tools.
-          </p>
+          <p className="sectionEyebrow">{t("admin.controlRoom")}</p>
+          <h2>{t("admin.title")}</h2>
+          <p className="adminLead">{t("admin.lead")}</p>
         </div>
       </section>
 
       {!isHostAdminConfigured ? (
         <section className="adminPanel adminConsoleStack">
-          <h3>Host orchestrator</h3>
-          <p>Add `HOST_ADMIN_BASE_URL` and `HOST_ADMIN_TOKEN` in your env vars to unlock the full AI host console.</p>
+          <h3>{t("admin.hostOrchestrator")}</h3>
+          <p>{t("admin.hostNotConfigured")}</p>
         </section>
       ) : (
         <div className="adminConsoleStack">
           <section className="adminPanel">
             <div className="adminPanelHeader">
               <div>
-                <h3>Host orchestrator</h3>
-                <p>The VPS-backed host admin API is configured server-side for this web app.</p>
+                <h3>{t("admin.hostOrchestrator")}</h3>
+                <p>{t("admin.hostConfigured")}</p>
               </div>
               <button className="adminGhostButton" type="button" onClick={() => void loadCapabilities()} disabled={isLoadingCapabilities}>
-                {isLoadingCapabilities ? "Refreshing..." : "Refresh capabilities"}
+                {isLoadingCapabilities ? t("common.refreshing") : t("admin.refreshCapabilities")}
               </button>
             </div>
 
@@ -384,7 +388,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
 
             {capabilities.stations.length ? (
               <div className="adminSection">
-                <h4>Station</h4>
+                <h4>{t("admin.station")}</h4>
                 <div className="adminChipRow">
                   {capabilities.stations.map((stationId) => (
                     <button
@@ -402,13 +406,13 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
 
             {supportsOperation(HOST_ADMIN_OPERATION_FORCE_ARCHETYPE) ? (
               <section className="adminSection">
-                <h4>Force Archetype</h4>
+                <h4>{t("admin.forceArchetype")}</h4>
                 {capabilities.archetypes.length === 0 && !isLoadingCapabilities ? (
-                  <p>No archetypes are loaded yet. Refresh capabilities to fetch them from the server.</p>
+                  <p>{t("admin.noArchetypes")}</p>
                 ) : null}
 
                 <label className="adminField">
-                  <span>Archetype</span>
+                  <span>{t("admin.archetype")}</span>
                   <select
                     value={selectedArchetype ?? ""}
                     onChange={(event) => {
@@ -420,7 +424,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                     }}
                     disabled={capabilities.archetypes.length === 0}
                   >
-                    <option value="">Select archetype</option>
+                    <option value="">{t("admin.selectArchetype")}</option>
                     {capabilities.archetypes.map((archetype) => (
                       <option key={archetype} value={archetype}>
                         {toArchetypeLabel(archetype)}
@@ -436,7 +440,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                       type="button"
                       onClick={() => setForceArchetypeDryRun((value) => !value)}
                     >
-                      Dry run
+                      {t("admin.dryRun")}
                     </button>
                   </div>
                 ) : null}
@@ -444,8 +448,8 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                 {supportsTrackFocus ? (
                   <div className="adminSubsection">
                     <div>
-                      <h5>Track focus</h5>
-                      <p>Optional. Leave it unset to let the server pick the focus automatically.</p>
+                      <h5>{t("admin.trackFocus")}</h5>
+                      <p>{t("admin.trackFocusDescription")}</p>
                     </div>
                     <div className="adminChipRow">
                       {capabilities.trackFocusValues.map((trackFocus) => (
@@ -455,12 +459,12 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                           type="button"
                           onClick={() => setSelectedTrackFocus(trackFocus)}
                         >
-                          {toTrackFocusLabel(trackFocus)}
+                          {toTrackFocusLabel(trackFocus, t)}
                         </button>
                       ))}
                     </div>
                     <button className="adminTextButton" type="button" onClick={() => setSelectedTrackFocus(null)} disabled={!selectedTrackFocus}>
-                      Use server default
+                      {t("admin.useServerDefault")}
                     </button>
                   </div>
                 ) : null}
@@ -472,18 +476,18 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                   disabled={!selectedStationId || !selectedArchetype || isLoadingCapabilities || Boolean(submittingOperation) || isPollingJob}
                 >
                   {submittingOperation === HOST_ADMIN_OPERATION_FORCE_ARCHETYPE
-                    ? "Submitting..."
+                    ? t("common.submitting")
                     : isPollingJob && activeJob?.operation === HOST_ADMIN_OPERATION_FORCE_ARCHETYPE
-                      ? "Job Running..."
-                      : "Run Force Archetype"}
+                      ? t("admin.jobRunning")
+                      : t("admin.runForceArchetype")}
                 </button>
               </section>
             ) : null}
 
             {supportsOperation(HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR) ? (
               <section className="adminSection">
-                <h4>Schedule Generator</h4>
-                <p>Run the schedule generator for the selected station.</p>
+                <h4>{t("admin.scheduleGenerator")}</h4>
+                <p>{t("admin.scheduleGeneratorDescription")}</p>
 
                 {(scheduleGeneratorCapability?.dryRunSupported || scheduleGeneratorCapability?.forceApplySupported) ? (
                   <div className="adminChipRow">
@@ -503,7 +507,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                           });
                         }}
                       >
-                        Dry run
+                        {t("admin.dryRun")}
                       </button>
                     ) : null}
                     {scheduleGeneratorCapability?.forceApplySupported ? (
@@ -513,7 +517,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                         onClick={() => setScheduleGeneratorForceApply((value) => !value)}
                         disabled={scheduleGeneratorDryRun}
                       >
-                        Force apply
+                        {t("admin.forceApply")}
                       </button>
                     ) : null}
                   </div>
@@ -522,8 +526,8 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                 {scheduleGeneratorCapability?.supportedSeedModes.length ? (
                   <div className="adminSubsection">
                     <div>
-                      <h5>Seed mode</h5>
-                      <p>Use stable mode for deterministic weekly plans, fresh for a reroll, or custom to reproduce a manual variation.</p>
+                      <h5>{t("admin.seedMode")}</h5>
+                      <p>{t("admin.seedModeDescription")}</p>
                     </div>
                     <div className="adminChipRow">
                       {scheduleGeneratorCapability.supportedSeedModes.map((seedMode) => (
@@ -538,7 +542,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                             }
                           }}
                         >
-                          {toSeedModeLabel(seedMode)}
+                          {toSeedModeLabel(seedMode, t)}
                         </button>
                       ))}
                     </div>
@@ -547,14 +551,14 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
 
                 {normalizedScheduleSeedMode === HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM ? (
                   <label className="adminField">
-                    <span>Custom seed key</span>
+                    <span>{t("admin.customSeedKey")}</span>
                     <input value={scheduleGeneratorSeedSalt} onChange={(event) => setScheduleGeneratorSeedSalt(event.target.value)} />
                   </label>
                 ) : null}
 
                 {scheduleGeneratorCapability?.weekStartDateSupported ? (
                   <label className="adminField">
-                    <span>Week start date (YYYY-MM-DD)</span>
+                    <span>{t("admin.weekStartDate")}</span>
                     <input value={scheduleGeneratorWeekStartDate} onChange={(event) => setScheduleGeneratorWeekStartDate(event.target.value)} />
                   </label>
                 ) : null}
@@ -567,43 +571,43 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                   supportsTuningField("max_block_minutes")) ? (
                   <div className="adminSubsection">
                     <div>
-                      <h5>Tuning</h5>
-                      <p>Leave fields blank to use the server defaults.</p>
+                      <h5>{t("admin.tuning")}</h5>
+                      <p>{t("admin.tuningDescription")}</p>
                     </div>
                     <div className="adminFieldGrid">
                       {supportsTuningField("open_ratio_min") ? (
                         <label className="adminField">
-                          <span>Open ratio min</span>
+                          <span>{t("admin.openRatioMin")}</span>
                           <input value={scheduleGeneratorOpenRatioMin} onChange={(event) => setScheduleGeneratorOpenRatioMin(event.target.value)} inputMode="decimal" />
                         </label>
                       ) : null}
                       {supportsTuningField("open_ratio_max") ? (
                         <label className="adminField">
-                          <span>Open ratio max</span>
+                          <span>{t("admin.openRatioMax")}</span>
                           <input value={scheduleGeneratorOpenRatioMax} onChange={(event) => setScheduleGeneratorOpenRatioMax(event.target.value)} inputMode="decimal" />
                         </label>
                       ) : null}
                       {supportsTuningField("min_open_slots") ? (
                         <label className="adminField">
-                          <span>Min open slots</span>
+                          <span>{t("admin.minOpenSlots")}</span>
                           <input value={scheduleGeneratorMinOpenSlots} onChange={(event) => setScheduleGeneratorMinOpenSlots(event.target.value)} inputMode="numeric" />
                         </label>
                       ) : null}
                       {supportsTuningField("max_open_slots") ? (
                         <label className="adminField">
-                          <span>Max open slots</span>
+                          <span>{t("admin.maxOpenSlots")}</span>
                           <input value={scheduleGeneratorMaxOpenSlots} onChange={(event) => setScheduleGeneratorMaxOpenSlots(event.target.value)} inputMode="numeric" />
                         </label>
                       ) : null}
                       {supportsTuningField("min_block_minutes") ? (
                         <label className="adminField">
-                          <span>Min block minutes</span>
+                          <span>{t("admin.minBlockMinutes")}</span>
                           <input value={scheduleGeneratorMinBlockMinutes} onChange={(event) => setScheduleGeneratorMinBlockMinutes(event.target.value)} inputMode="numeric" />
                         </label>
                       ) : null}
                       {supportsTuningField("max_block_minutes") ? (
                         <label className="adminField">
-                          <span>Max block minutes</span>
+                          <span>{t("admin.maxBlockMinutes")}</span>
                           <input value={scheduleGeneratorMaxBlockMinutes} onChange={(event) => setScheduleGeneratorMaxBlockMinutes(event.target.value)} inputMode="numeric" />
                         </label>
                       ) : null}
@@ -618,17 +622,17 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                   disabled={!selectedStationId || isLoadingCapabilities || Boolean(submittingOperation) || isPollingJob}
                 >
                   {submittingOperation === HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR
-                    ? "Submitting..."
+                    ? t("common.submitting")
                     : isPollingJob && activeJob?.operation === HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR
-                      ? "Job Running..."
-                      : "Run Schedule Generator"}
+                      ? t("admin.jobRunning")
+                      : t("admin.runScheduleGenerator")}
                 </button>
               </section>
             ) : null}
           </section>
 
           {message ? (
-            <p className={`playerError ${message.toLowerCase().includes("failed") || message.toLowerCase().includes("unable") || message.toLowerCase().includes("invalid") ? "" : "adminMessageSuccess"}`}>
+            <p className={`playerError ${isAdminErrorMessage(message) ? "" : "adminMessageSuccess"}`}>
               {message}
             </p>
           ) : null}
@@ -641,21 +645,24 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
 }
 
 function HostAdminJobPanel({ job, isPolling }: { job: HostAdminJob; isPolling: boolean }) {
-  const statusLabel = toStatusLabel(job.status);
+  const { t } = useI18n();
+  const statusLabel = toStatusLabel(job.status, t);
   const scheduleLines = job.scheduleOptions
     ? [
-        job.scheduleOptions.forceApply ? "Force apply enabled" : null,
-        job.scheduleOptions.seedMode ? `Seed mode: ${toSeedModeLabel(job.scheduleOptions.seedMode)}` : null,
+        job.scheduleOptions.forceApply ? t("admin.forceApplyEnabled") : null,
+        job.scheduleOptions.seedMode ? t("admin.seedModeLine", { value: toSeedModeLabel(job.scheduleOptions.seedMode, t) }) : null,
         job.scheduleOptions.seedSalt
-          ? `${job.scheduleOptions.seedMode === HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM ? "Custom seed" : "Seed salt"}: ${job.scheduleOptions.seedSalt}`
+          ? job.scheduleOptions.seedMode === HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM
+            ? t("admin.customSeedLine", { value: job.scheduleOptions.seedSalt })
+            : t("admin.seedSaltLine", { value: job.scheduleOptions.seedSalt })
           : null,
-        job.scheduleOptions.weekStartDate ? `Week start: ${job.scheduleOptions.weekStartDate}` : null,
-        job.scheduleOptions.openRatioMin !== undefined ? `Open ratio min: ${job.scheduleOptions.openRatioMin}` : null,
-        job.scheduleOptions.openRatioMax !== undefined ? `Open ratio max: ${job.scheduleOptions.openRatioMax}` : null,
-        job.scheduleOptions.minOpenSlots !== undefined ? `Min open slots: ${job.scheduleOptions.minOpenSlots}` : null,
-        job.scheduleOptions.maxOpenSlots !== undefined ? `Max open slots: ${job.scheduleOptions.maxOpenSlots}` : null,
-        job.scheduleOptions.minBlockMinutes !== undefined ? `Min block minutes: ${job.scheduleOptions.minBlockMinutes}` : null,
-        job.scheduleOptions.maxBlockMinutes !== undefined ? `Max block minutes: ${job.scheduleOptions.maxBlockMinutes}` : null
+        job.scheduleOptions.weekStartDate ? t("admin.weekStartLine", { value: job.scheduleOptions.weekStartDate }) : null,
+        job.scheduleOptions.openRatioMin !== undefined ? t("admin.openRatioMinLine", { value: job.scheduleOptions.openRatioMin }) : null,
+        job.scheduleOptions.openRatioMax !== undefined ? t("admin.openRatioMaxLine", { value: job.scheduleOptions.openRatioMax }) : null,
+        job.scheduleOptions.minOpenSlots !== undefined ? t("admin.minOpenSlotsLine", { value: job.scheduleOptions.minOpenSlots }) : null,
+        job.scheduleOptions.maxOpenSlots !== undefined ? t("admin.maxOpenSlotsLine", { value: job.scheduleOptions.maxOpenSlots }) : null,
+        job.scheduleOptions.minBlockMinutes !== undefined ? t("admin.minBlockMinutesLine", { value: job.scheduleOptions.minBlockMinutes }) : null,
+        job.scheduleOptions.maxBlockMinutes !== undefined ? t("admin.maxBlockMinutesLine", { value: job.scheduleOptions.maxBlockMinutes }) : null
       ].filter(Boolean)
     : [];
 
@@ -663,26 +670,26 @@ function HostAdminJobPanel({ job, isPolling }: { job: HostAdminJob; isPolling: b
     <section className="adminPanel adminConsoleStack">
       <div className="adminPanelHeader">
         <div>
-          <h3>Latest Host Job</h3>
+          <h3>{t("admin.latestHostJob")}</h3>
           <p>
-            {stationLabel(job.station)} · {toOperationLabel(job.operation)}
+            {stationLabel(job.station)} · {toOperationLabel(job.operation, t)}
           </p>
         </div>
         <span className={`adminJobBadge adminJobBadge${toStatusClassName(job.status)}`}>
-          {isPolling && !isTerminalJobStatus(job.status) ? "Polling..." : statusLabel}
+          {isPolling && !isTerminalJobStatus(job.status) ? t("admin.polling") : statusLabel}
         </span>
       </div>
 
-      {job.archetype ? <p>Archetype: {toArchetypeLabel(job.archetype)}</p> : null}
-      {job.trackFocus ? <p>Focus: {toTrackFocusLabel(job.trackFocus)}</p> : null}
-      {job.dryRun ? <p>Mode: Dry run</p> : null}
+      {job.archetype ? <p>{t("admin.archetypeLine", { value: toArchetypeLabel(job.archetype) })}</p> : null}
+      {job.trackFocus ? <p>{t("admin.focusLine", { value: toTrackFocusLabel(job.trackFocus, t) })}</p> : null}
+      {job.dryRun ? <p>{t("admin.modeDryRun")}</p> : null}
       {scheduleLines.map((line) => (
         <p key={line}>{line}</p>
       ))}
-      {job.exitCode !== undefined ? <p>Exit code: {job.exitCode}</p> : null}
-      {job.acceptedAt ? <p>Accepted: {job.acceptedAt}</p> : null}
-      {job.startedAt ? <p>Started: {job.startedAt}</p> : null}
-      {job.finishedAt ? <p>Finished: {job.finishedAt}</p> : null}
+      {job.exitCode !== undefined ? <p>{t("admin.exitCodeLine", { value: job.exitCode })}</p> : null}
+      {job.acceptedAt ? <p>{t("admin.acceptedAtLine", { value: job.acceptedAt })}</p> : null}
+      {job.startedAt ? <p>{t("admin.startedAtLine", { value: job.startedAt })}</p> : null}
+      {job.finishedAt ? <p>{t("admin.finishedAtLine", { value: job.finishedAt })}</p> : null}
       {job.logTail ? <pre className="adminLogTail">{job.logTail.trim()}</pre> : null}
     </section>
   );
@@ -708,14 +715,23 @@ function isTerminalJobStatus(status: string) {
   return status.toLowerCase() === "succeeded" || status.toLowerCase() === "failed";
 }
 
-function buildJobStatusMessage(job: HostAdminJob) {
-  const operationLabel = job.operation === HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR ? "Schedule generator" : "Force archetype";
+function isAdminErrorMessage(message: string) {
+  const normalized = message.toLowerCase();
+  return ["failed", "unable", "invalid", "falló", "no se pudo", "debe"].some((term) => normalized.includes(term));
+}
+
+function buildJobStatusMessage(job: HostAdminJob, t: ReturnType<typeof useI18n>["t"]) {
+  const operationLabel = toOperationLabel(job.operation, t);
 
   if (job.status.toLowerCase() === "succeeded") {
-    return `${operationLabel} completed for ${job.station}.`;
+    return t("admin.jobCompleted", { operation: operationLabel, station: job.station });
   }
 
-  return `${operationLabel} failed for ${job.station}${job.exitCode !== undefined ? ` (exit code ${job.exitCode})` : ""}.`;
+  return t("admin.jobFailed", {
+    operation: operationLabel,
+    station: job.station,
+    suffix: job.exitCode !== undefined ? ` (${t("admin.exitCodeLine", { value: job.exitCode })})` : ""
+  });
 }
 
 function stationLabel(stationId: string) {
@@ -726,56 +742,56 @@ function toArchetypeLabel(value: string) {
   return humanize(value);
 }
 
-function toTrackFocusLabel(value: string) {
+function toTrackFocusLabel(value: string, t: ReturnType<typeof useI18n>["t"]) {
   if (value === "current") {
-    return "Current track";
+    return t("admin.focusCurrent");
   }
 
   if (value === "next") {
-    return "Next track";
+    return t("admin.focusNext");
   }
 
   return humanize(value);
 }
 
-function toSeedModeLabel(value: string) {
+function toSeedModeLabel(value: string, t: ReturnType<typeof useI18n>["t"]) {
   if (value === "stable_week") {
-    return "Stable week";
+    return t("admin.seedStableWeek");
   }
 
   if (value === "fresh") {
-    return "Fresh";
+    return t("admin.seedFresh");
   }
 
   if (value === "custom") {
-    return "Custom";
+    return t("admin.seedCustom");
   }
 
   return humanize(value);
 }
 
-function toOperationLabel(value: string) {
+function toOperationLabel(value: string, t: ReturnType<typeof useI18n>["t"]) {
   if (value === HOST_ADMIN_OPERATION_FORCE_ARCHETYPE) {
-    return "Force Archetype";
+    return t("admin.forceArchetype");
   }
 
   if (value === HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR) {
-    return "Schedule Generator";
+    return t("admin.scheduleGenerator");
   }
 
   return humanize(value);
 }
 
-function toStatusLabel(value: string) {
+function toStatusLabel(value: string, t: ReturnType<typeof useI18n>["t"]) {
   switch (value.toLowerCase()) {
     case "accepted":
-      return "Accepted";
+      return t("admin.statusAccepted");
     case "running":
-      return "Running";
+      return t("admin.statusRunning");
     case "succeeded":
-      return "Succeeded";
+      return t("admin.statusSucceeded");
     default:
-      return "Failed";
+      return t("admin.statusFailed");
   }
 }
 

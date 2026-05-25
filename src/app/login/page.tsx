@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
-import { LoginForm } from "@/components/LoginForm";
+import { LoginPageContent } from "@/components/LoginPageContent";
 import { getAuthSession, isAdminAuthConfigured } from "@/lib/auth";
 
 interface LoginPageProps {
@@ -18,18 +18,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     return (
       <main className="appShell authShell">
         <SiteHeader />
-
-        <section className="authCard">
-          <p className="sectionEyebrow">Admin access</p>
-          <h2>Sign in to manage NeuralCast</h2>
-          <p className="authLead">
-            This private area will be used for live controls like skipping songs and triggering host snippets.
-          </p>
-          <div className="authNotice">
-            <p>Admin login is not configured yet.</p>
-            <p>Add `NEXTAUTH_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD_HASH` in Vercel and your local env file.</p>
-          </div>
-        </section>
+        <LoginPageContent callbackUrl={destination} isConfigured={false} />
       </main>
     );
   }
@@ -43,15 +32,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <main className="appShell authShell">
       <SiteHeader />
-
-      <section className="authCard">
-        <p className="sectionEyebrow">Admin access</p>
-        <h2>Sign in to manage NeuralCast</h2>
-        <p className="authLead">
-          This private area will be used for live controls like skipping songs and triggering host snippets.
-        </p>
-        <LoginForm callbackUrl={destination} />
-      </section>
+      <LoginPageContent callbackUrl={destination} isConfigured />
     </main>
   );
 }
