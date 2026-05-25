@@ -236,6 +236,14 @@ img {
   align-items: center;
   gap: 12px;
   min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.brandLockup:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--station-accent, var(--accent)) 62%, transparent);
+  outline-offset: 6px;
+  border-radius: 10px;
 }
 
 .brandIcon {
