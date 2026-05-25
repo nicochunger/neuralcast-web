@@ -150,6 +150,10 @@ function getActivePlaylistText(segment: StationScheduleState["liveSegment"], loc
     return locale === "es" ? "Esperando la programación." : "Waiting for schedule.";
   }
 
+  if (segment.kind === "open-rotation") {
+    return getSegmentTitle(segment, locale);
+  }
+
   if (segment.playlistNames.length > 0) {
     return segment.playlistNames.join(", ");
   }
