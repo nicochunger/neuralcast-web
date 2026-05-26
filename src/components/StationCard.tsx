@@ -54,7 +54,7 @@ export function StationCard({
 
   return (
     <article
-      className={`stationCard ${isActive ? "stationCardActive" : ""}`}
+      className={`stationCard stationCard-${station.id} ${isActive ? "stationCardActive" : ""}`}
       style={
         {
           "--station-bg": `url(${station.backgroundImage})`,
