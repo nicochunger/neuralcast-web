@@ -280,7 +280,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
             playbackState={playbackState}
             nowPlaying={nowPlaying[station.id]}
             schedule={schedules[station.id]}
-            isScheduleSelected={station.id === scheduleStationId}
+            isScheduleSelected={isScheduleOpen && station.id === scheduleStationId}
             onPlay={playStation}
             onStop={stopPlayback}
             onSelectSchedule={(selectedStation) => {
