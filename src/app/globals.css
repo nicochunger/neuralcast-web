@@ -1159,9 +1159,9 @@ img {
 }
 
 .adminActionButton {
-  border-color: var(--station-card-accent-border);
-  color: var(--station-card-title);
-  background: var(--station-card-admin-action-bg);
+  border-color: var(--station-card-strong-accent-border);
+  color: color-mix(in srgb, var(--station-accent), var(--station-card-title) 62%);
+  background: var(--station-card-action-bg);
   box-shadow: var(--station-card-action-shadow);
   backdrop-filter: blur(12px);
   font-weight: 780;
@@ -1179,8 +1179,8 @@ img {
 }
 
 .requestActionButton {
-  border-color: var(--station-card-strong-accent-border);
-  background: var(--station-card-request-action-bg);
+  border-color: var(--station-card-action-border);
+  background: var(--station-card-action-bg);
 }
 
 .playButton:hover,
