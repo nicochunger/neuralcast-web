@@ -28,6 +28,7 @@ interface AudioPlayerContextValue {
 }
 
 const AudioPlayerContext = createContext<AudioPlayerContextValue | undefined>(undefined);
+let sharedAudioElement: HTMLAudioElement | null = null;
 
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const { t } = useI18n();
@@ -51,11 +52,12 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   );
 
   const getAudioElement = useCallback(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.preload = "none";
+    if (!sharedAudioElement) {
+      sharedAudioElement = new Audio();
+      sharedAudioElement.preload = "none";
     }
 
+    audioRef.current = sharedAudioElement;
     return audioRef.current;
   }, []);
 
