@@ -6,6 +6,8 @@ import { SignOutButton } from "@/components/SignOutButton";
 import { getAuthSession } from "@/lib/auth";
 import { isHostAdminConfigured } from "@/lib/hostAdmin";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminPage() {
   const session = await getAuthSession();
 

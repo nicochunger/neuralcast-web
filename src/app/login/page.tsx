@@ -3,6 +3,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { LoginPageContent } from "@/components/LoginPageContent";
 import { getAuthSession, isAdminAuthConfigured } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 interface LoginPageProps {
   searchParams: Promise<{
     callbackUrl?: string;
