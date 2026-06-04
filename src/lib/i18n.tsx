@@ -4,6 +4,8 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import {
   LOCALE_COOKIE_KEY,
   LOCALE_STORAGE_KEY,
+  isLocale,
+  resolvePreferredLocale,
   type Locale,
 } from "@/lib/locale";
 import type { ScheduleSegment, StationId } from "@/types/radio";
@@ -629,6 +631,7 @@ interface I18nContextValue {
 }
 
 const I18nContext = createContext<I18nContextValue | undefined>(undefined);
+const COOKIE_MAX_AGE_SECONDS = 31536000;
 
 export function LanguageProvider({
   children,
@@ -638,12 +641,28 @@ export function LanguageProvider({
   initialLocale: Locale;
 }) {
   const [locale, setLocale] = useState<Locale>(initialLocale);
+  const [hasRestoredLocale, setHasRestoredLocale] = useState(false);
 
   useEffect(() => {
+    const storedLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY) ?? readLocaleCookie();
+    const preferredLocale = resolvePreferredLocale({
+      storedLocale,
+      browserLanguage: window.navigator.language
+    });
+
+    setLocale(preferredLocale);
+    setHasRestoredLocale(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasRestoredLocale) {
+      return;
+    }
+
     window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
-    document.cookie = `${LOCALE_COOKIE_KEY}=${locale}; path=/; max-age=31536000; samesite=lax`;
+    document.cookie = `${LOCALE_COOKIE_KEY}=${locale}; path=/; max-age=${COOKIE_MAX_AGE_SECONDS}; samesite=lax`;
     document.documentElement.lang = locale;
-  }, [locale]);
+  }, [hasRestoredLocale, locale]);
 
   return (
     <I18nContext.Provider
@@ -725,4 +744,14 @@ function interpolate(template: string, params?: TranslationParams): string {
     (message, [key, value]) => message.replaceAll(`{${key}}`, String(value)),
     template
   );
+}
+
+function readLocaleCookie(): Locale | undefined {
+  const localeCookie = document.cookie
+    .split(";")
+    .map((cookie) => cookie.trim())
+    .find((cookie) => cookie.startsWith(`${LOCALE_COOKIE_KEY}=`));
+
+  const value = localeCookie?.slice(LOCALE_COOKIE_KEY.length + 1);
+  return isLocale(value) ? value : undefined;
 }

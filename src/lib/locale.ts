@@ -4,6 +4,7 @@ export const LOCALE_COOKIE_KEY = "neuralcast-locale";
 export const SUPPORTED_LOCALES = ["en", "es"] as const;
 
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
+export const DEFAULT_LOCALE: Locale = "en";
 
 const SPANISH_SPEAKING_COUNTRIES = new Set([
   "AR",
@@ -56,7 +57,7 @@ export function resolvePreferredLocale({
     return "es";
   }
 
-  return "en";
+  return DEFAULT_LOCALE;
 }
 
 export function isLocale(value: string | null | undefined): value is Locale {

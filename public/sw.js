@@ -1,8 +1,8 @@
-const CACHE_NAME = "neuralcast-shell-v3";
+const CACHE_NAME = "neuralcast-shell-v4";
 const SHELL_ASSETS = [
   "/",
   "/manifest.webmanifest",
-  "/neuralcast-logo.png",
+  "/neuralcast-logo-160.webp",
   "/icons/neuralcast-icon-192.png",
   "/icons/neuralcast-icon-512.png",
   "/icons/neuralcast-apple-touch-icon.png"

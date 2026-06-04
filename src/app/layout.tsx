@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
-import { cookies, headers } from "next/headers";
 import { LanguageProvider } from "@/lib/i18n";
-import { LOCALE_COOKIE_KEY, resolvePreferredLocale } from "@/lib/locale";
+import { DEFAULT_LOCALE } from "@/lib/locale";
 import { PersistentMiniPlayerOverlay } from "@/components/PersistentMiniPlayerOverlay";
 import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
 import "./globals.css";
@@ -44,24 +43,16 @@ export const viewport: Viewport = {
   themeColor: "#f4f7fa"
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const requestHeaders = await headers();
-  const initialLocale = resolvePreferredLocale({
-    storedLocale: cookieStore.get(LOCALE_COOKIE_KEY)?.value,
-    browserLanguage: requestHeaders.get("accept-language"),
-    countryCode: requestHeaders.get("x-vercel-ip-country")
-  });
-
   return (
-    <html lang={initialLocale} suppressHydrationWarning>
+    <html lang={DEFAULT_LOCALE} suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
-        <LanguageProvider initialLocale={initialLocale}>
+        <LanguageProvider initialLocale={DEFAULT_LOCALE}>
           <AudioPlayerProvider>
             {children}
             <PersistentMiniPlayerOverlay />

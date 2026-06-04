@@ -1,14 +1,13 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import { DEFAULT_STATION_ID, STATIONS } from "@/lib/stations";
 import { MiniPlayer } from "@/components/MiniPlayer";
-import { SchedulePreview } from "@/components/SchedulePreview";
 import { SiteHeader } from "@/components/SiteHeader";
-import { SongRequestModal } from "@/components/SongRequestModal";
 import { StationCard } from "@/components/StationCard";
 import { submitSongRequestAction } from "@/lib/actions";
 import type {
@@ -27,6 +26,21 @@ interface AudioPlayerProps {
   isAdmin: boolean;
 }
 
+interface AdminSessionResponse {
+  user?: {
+    isAdmin?: boolean;
+  };
+}
+
+const SchedulePreview = dynamic(
+  () => import("@/components/SchedulePreview").then((mod) => mod.SchedulePreview),
+  { ssr: false }
+);
+const SongRequestModal = dynamic(
+  () => import("@/components/SongRequestModal").then((mod) => mod.SongRequestModal),
+  { ssr: false }
+);
+
 export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   const { t } = useI18n();
   const {
@@ -38,9 +52,11 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     schedules,
     playStation,
     stopPlayback,
-    refreshNowPlaying
+    refreshNowPlaying,
+    refreshSchedules
   } = useAudioPlayer();
 
+  const [showAdminControls, setShowAdminControls] = useState(isAdmin);
   const [scheduleStationId, setScheduleStationId] = useState<StationId>(DEFAULT_STATION_ID);
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [adminMessage, setAdminMessage] = useState<string | undefined>();
@@ -67,6 +83,39 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   useEffect(() => {
     setScheduleStationId(activeStationId);
   }, [activeStationId]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      setShowAdminControls(true);
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadAdminSession = async () => {
+      try {
+        const response = await fetch("/api/auth/session", { cache: "no-store" });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const session = (await response.json()) as AdminSessionResponse;
+
+        if (isMounted && session.user?.isAdmin === true) {
+          setShowAdminControls(true);
+        }
+      } catch {
+        // Public listeners should not block on admin session detection.
+      }
+    };
+
+    void loadAdminSession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAdmin]);
 
   useEffect(() => {
     if (!isScheduleOpen) {
@@ -144,7 +193,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
 
   const skipTrack = useCallback(
     async (station: Station) => {
-      if (!isAdmin || skippingStationId) {
+      if (!showAdminControls || skippingStationId) {
         return;
       }
 
@@ -172,7 +221,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
         setSkippingStationId(null);
       }
     },
-    [isAdmin, refreshNowPlaying, skippingStationId]
+    [refreshNowPlaying, showAdminControls, skippingStationId]
   );
 
   const openSongRequests = useCallback(
@@ -286,9 +335,10 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
             onSelectSchedule={(selectedStation) => {
               setScheduleStationId(selectedStation.id);
               setIsScheduleOpen(true);
+              void refreshSchedules([selectedStation.id]);
             }}
             onRequestSong={openSongRequests}
-            showAdminSkip={isAdmin}
+            showAdminSkip={showAdminControls}
             isSkippingTrack={skippingStationId === station.id}
             onSkipTrack={skipTrack}
           />

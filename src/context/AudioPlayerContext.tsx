@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { createContext, useContext, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "@/lib/i18n";
 import { clearMediaSessionPlaybackState, registerMediaSessionHandlers, updateMediaSession } from "@/lib/mediaSession";
@@ -32,6 +33,7 @@ let sharedAudioElement: HTMLAudioElement | null = null;
 
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const { t } = useI18n();
+  const pathname = usePathname();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const manualStopRef = useRef(false);
 
@@ -231,34 +233,67 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
 
   // Handle Polling Intervals & Visibility Changes
   useEffect(() => {
-    void refreshNowPlaying();
-    void refreshSchedules();
+    const isHomeRoute = pathname === "/";
+    const shouldSyncNowPlaying = isHomeRoute || playbackState !== "idle";
+    const shouldSyncSchedules = isHomeRoute;
+
+    if (!shouldSyncNowPlaying && !shouldSyncSchedules) {
+      return;
+    }
+
+    if (shouldSyncNowPlaying) {
+      void refreshNowPlaying();
+    }
+
+    const loadSchedules = () => {
+      void refreshSchedules();
+    };
+    let idleCallbackId: number | undefined;
+    let scheduleTimeoutId: ReturnType<typeof globalThis.setTimeout> | undefined;
+
+    if (shouldSyncSchedules) {
+      if ("requestIdleCallback" in window) {
+        idleCallbackId = window.requestIdleCallback(loadSchedules, { timeout: 2500 });
+      } else {
+        scheduleTimeoutId = globalThis.setTimeout(loadSchedules, 1200);
+      }
+    }
 
     const metadataInterval = window.setInterval(() => {
-      if (!document.hidden) {
+      if (shouldSyncNowPlaying && !document.hidden) {
         void refreshNowPlaying();
       }
     }, 25000);
     const scheduleInterval = window.setInterval(() => {
-      if (!document.hidden) {
+      if (shouldSyncSchedules && !document.hidden) {
         void refreshSchedules();
       }
     }, 300000);
     const handleVisibility = () => {
       if (!document.hidden) {
-        void refreshNowPlaying([activeStationId]);
-        void refreshSchedules();
+        if (shouldSyncNowPlaying) {
+          void refreshNowPlaying([activeStationId]);
+        }
+        if (shouldSyncSchedules) {
+          void refreshSchedules();
+        }
       }
     };
 
     document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
+      if (idleCallbackId !== undefined) {
+        window.cancelIdleCallback(idleCallbackId);
+      }
+      if (scheduleTimeoutId !== undefined) {
+        globalThis.clearTimeout(scheduleTimeoutId);
+      }
       window.clearInterval(metadataInterval);
       window.clearInterval(scheduleInterval);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [activeStationId, refreshNowPlaying, refreshSchedules]);
+  }, [activeStationId, pathname, playbackState, refreshNowPlaying, refreshSchedules]);
 
   // Media Session handlers & metadata synchronization
   useEffect(() => {

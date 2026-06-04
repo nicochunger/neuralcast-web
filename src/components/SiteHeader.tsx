@@ -80,7 +80,7 @@ export function SiteHeader({ extraActions }: { extraActions?: ReactNode }) {
   return (
     <header className="appHeader">
       <Link className="brandLockup" href="/" aria-label={t("nav.backToRadio")}>
-        <img src="/neuralcast-logo.png" alt="" className="brandIcon" />
+        <img src="/neuralcast-logo-160.webp" alt="" className="brandIcon" width="160" height="160" />
         <div>
           <h1>NeuralCast</h1>
           <p>{t("app.tagline")}</p>
