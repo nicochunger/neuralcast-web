@@ -1160,6 +1160,54 @@ img {
   stroke-width: 1.85;
 }
 
+.skipSuccessIcon {
+  display: inline-grid;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  place-items: center;
+  color: currentColor;
+  transform-origin: center;
+  animation: skipSuccessPop 340ms cubic-bezier(0.2, 1.4, 0.35, 1) both;
+}
+
+.skipSuccessIcon svg {
+  display: block;
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.7;
+  animation: skipSuccessDraw 420ms ease 90ms forwards;
+}
+
+@keyframes skipSuccessPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.14);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes skipSuccessDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 .adminActionButton {
   border-color: var(--station-card-strong-accent-border);
   color: color-mix(in srgb, var(--station-accent), var(--station-card-title) 62%);
@@ -1167,6 +1215,11 @@ img {
   box-shadow: var(--station-card-action-shadow);
   backdrop-filter: blur(12px);
   font-weight: 780;
+}
+
+.adminActionButtonSuccess {
+  border-color: color-mix(in srgb, var(--lime), var(--station-card-title) 14%);
+  color: color-mix(in srgb, var(--lime), var(--station-card-title) 24%);
 }
 
 .adminActionButton:disabled {

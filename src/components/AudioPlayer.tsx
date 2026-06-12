@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import { DEFAULT_STATION_ID, STATIONS } from "@/lib/stations";
@@ -64,6 +64,8 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   const [isAndroid, setIsAndroid] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [skippingStationId, setSkippingStationId] = useState<StationId | null>(null);
+  const [skippedStationId, setSkippedStationId] = useState<StationId | null>(null);
+  const skipConfirmationTimerRef = useRef<number | undefined>(undefined);
   const [songRequestState, setSongRequestState] = useState<SongRequestState>({
     stationName: "",
     isLoading: false,
@@ -180,6 +182,14 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (skipConfirmationTimerRef.current !== undefined) {
+        window.clearTimeout(skipConfirmationTimerRef.current);
+      }
+    };
+  }, []);
+
   const requestInstall = async () => {
     if (!installPrompt) {
       window.alert(t("player.installFallbackAndroid"));
@@ -198,6 +208,10 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       }
 
       setAdminMessage(undefined);
+      setSkippedStationId(null);
+      if (skipConfirmationTimerRef.current !== undefined) {
+        window.clearTimeout(skipConfirmationTimerRef.current);
+      }
       setSkippingStationId(station.id);
 
       try {
@@ -211,7 +225,11 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
           throw new Error(payload.error || "Unable to skip the current track.");
         }
 
-        setAdminMessage(payload.message || `Skipped current track on ${station.name}.`);
+        setSkippedStationId(station.id);
+        skipConfirmationTimerRef.current = window.setTimeout(() => {
+          setSkippedStationId((current) => (current === station.id ? null : current));
+          skipConfirmationTimerRef.current = undefined;
+        }, 3200);
         window.setTimeout(() => {
           void refreshNowPlaying([station.id]);
         }, 1200);
@@ -340,6 +358,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
             onRequestSong={openSongRequests}
             showAdminSkip={showAdminControls}
             isSkippingTrack={skippingStationId === station.id}
+            hasSkippedTrack={skippedStationId === station.id}
             onSkipTrack={skipTrack}
           />
         ))}

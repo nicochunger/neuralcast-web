@@ -22,6 +22,7 @@ interface StationCardProps {
   onRequestSong: (station: Station) => void;
   showAdminSkip: boolean;
   isSkippingTrack: boolean;
+  hasSkippedTrack: boolean;
   onSkipTrack: (station: Station) => void;
 }
 
@@ -38,6 +39,7 @@ export function StationCard({
   onRequestSong,
   showAdminSkip,
   isSkippingTrack,
+  hasSkippedTrack,
   onSkipTrack
 }: StationCardProps) {
   const { locale, t } = useI18n();
@@ -129,13 +131,14 @@ export function StationCard({
             </button>
             {showAdminSkip ? (
               <button
-                className="adminActionButton stationCommandButton"
+                className={`adminActionButton stationCommandButton ${hasSkippedTrack ? "adminActionButtonSuccess" : ""}`}
                 type="button"
                 onClick={() => onSkipTrack(station)}
                 disabled={isSkippingTrack}
+                aria-live="polite"
               >
-                <StationActionIcon icon="skip" />
-                {isSkippingTrack ? t("station.skippingSong") : t("station.skipSong")}
+                {hasSkippedTrack ? <SkipSuccessIcon /> : <StationActionIcon icon="skip" />}
+                {hasSkippedTrack ? t("station.skippedSong") : isSkippingTrack ? t("station.skippingSong") : t("station.skipSong")}
               </button>
             ) : null}
           </div>
@@ -159,6 +162,16 @@ function getActivePlaylistText(segment: StationScheduleState["liveSegment"], loc
   }
 
   return getSegmentTitle(segment, locale);
+}
+
+function SkipSuccessIcon() {
+  return (
+    <span className="skipSuccessIcon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <path d="M5 12.5 9.5 17 19 7" />
+      </svg>
+    </span>
+  );
 }
 
 function StationActionIcon({ icon }: { icon: "schedule" | "request" | "skip" }) {

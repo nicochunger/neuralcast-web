@@ -139,6 +139,7 @@ type TranslationKey =
   | "station.requestSong"
   | "station.skipSong"
   | "station.skippingSong"
+  | "station.skippedSong"
   | "station.description.neuralcast"
   | "station.description.neuralforge"
   | "request.title"
@@ -339,6 +340,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "station.requestSong": "Request song",
     "station.skipSong": "Skip song",
     "station.skippingSong": "Skipping...",
+    "station.skippedSong": "Skipped",
     "station.description.neuralcast": "Mixed AI radio selection",
     "station.description.neuralforge": "Heavy variant with an AI host",
     "request.title": "Request a song",
@@ -546,6 +548,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "station.requestSong": "Pedir canción",
     "station.skipSong": "Saltar canción",
     "station.skippingSong": "Saltando...",
+    "station.skippedSong": "Saltada",
     "station.description.neuralcast": "Selección mixta de radio con IA",
     "station.description.neuralforge": "Variante pesada con un locutor de IA",
     "request.title": "Pedir una canción",
