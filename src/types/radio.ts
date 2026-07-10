@@ -76,5 +76,6 @@ export interface SongRequestState {
   isLoading: boolean;
   songs: RequestableSong[];
   submittingRequestId?: string;
+  successfulRequestId?: string;
   error?: string;
 }

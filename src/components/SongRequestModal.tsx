@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type CSSProperties } from "react";
 import { useI18n } from "@/lib/i18n";
+import { AnimatedSuccessIcon } from "@/components/AnimatedSuccessIcon";
 import type { RequestableSong, SongRequestState, Station } from "@/types/radio";
 
 interface SongRequestModalProps {
@@ -40,6 +41,7 @@ export function SongRequestModal({ station, requestState, onRequestSong, onDismi
         role="dialog"
         aria-modal="true"
         aria-labelledby="request-modal-title"
+        tabIndex={-1}
         style={
           {
             "--station-accent": station.accentColor,
@@ -65,32 +67,36 @@ export function SongRequestModal({ station, requestState, onRequestSong, onDismi
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t("request.searchPlaceholder")}
-            autoFocus
+            data-modal-autofocus
           />
         </label>
 
         <div className="requestListShell">
           {requestState.isLoading ? (
-            <RequestMessage title={t("request.loading")} />
-          ) : requestState.error ? (
-            <RequestMessage title={requestState.error} />
+            <RequestMessage title={t("request.loading")} variant="loading" />
+          ) : requestState.error && requestState.songs.length === 0 ? (
+            <RequestMessage title={requestState.error} variant="error" />
           ) : requestState.songs.length === 0 ? (
-            <RequestMessage title={t("request.empty")} />
+            <RequestMessage title={t("request.empty")} variant="empty" />
           ) : filteredSongs.length === 0 ? (
-            <RequestMessage title={t("request.noMatches")} />
+            <RequestMessage title={t("request.noMatches")} variant="search" />
           ) : (
-            <ul className="requestSongList">
-              {filteredSongs.map((song) => (
-                <li key={song.requestId}>
-                  <SongRequestItem
-                    song={song}
-                    isSubmitting={requestState.submittingRequestId === song.requestId}
-                    isDisabled={requestState.submittingRequestId !== undefined}
-                    onRequestSong={onRequestSong}
-                  />
-                </li>
-              ))}
-            </ul>
+            <>
+              {requestState.error ? <p className="requestInlineError" role="alert">{requestState.error}</p> : null}
+              <ul className="requestSongList">
+                {filteredSongs.map((song) => (
+                  <li key={song.requestId}>
+                    <SongRequestItem
+                      song={song}
+                      isSubmitting={requestState.submittingRequestId === song.requestId}
+                      isSuccessful={requestState.successfulRequestId === song.requestId}
+                      isDisabled={requestState.submittingRequestId !== undefined}
+                      onRequestSong={onRequestSong}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </div>
       </section>
@@ -101,11 +107,13 @@ export function SongRequestModal({ station, requestState, onRequestSong, onDismi
 function SongRequestItem({
   song,
   isSubmitting,
+  isSuccessful,
   isDisabled,
   onRequestSong
 }: {
   song: RequestableSong;
   isSubmitting: boolean;
+  isSuccessful: boolean;
   isDisabled: boolean;
   onRequestSong: (song: RequestableSong) => void;
 }) {
@@ -124,21 +132,25 @@ function SongRequestItem({
         {song.genre ? <em>{song.genre}</em> : null}
       </div>
       <button
-        className="requestSongButton"
+        className={`requestSongButton ${isSubmitting ? "requestSongButtonSubmitting" : ""} ${isSuccessful ? "requestSongButtonSuccess" : ""}`}
         type="button"
         onClick={() => onRequestSong(song)}
-        disabled={isDisabled}
+        disabled={isDisabled || isSuccessful}
+        aria-live="polite"
       >
-        {isSubmitting ? t("request.submitting") : t("request.submit")}
+        {isSuccessful ? <AnimatedSuccessIcon /> : null}
+        {isSuccessful ? t("request.requested") : isSubmitting ? t("request.submitting") : t("request.submit")}
       </button>
     </article>
   );
 }
 
-function RequestMessage({ title }: { title: string }) {
+function RequestMessage({ title, variant }: { title: string; variant: "loading" | "error" | "empty" | "search" }) {
   return (
-    <div className="requestMessage">
-      <span aria-hidden="true" />
+    <div className={`requestMessage requestMessage-${variant}`} role={variant === "error" ? "alert" : "status"}>
+      <span className="requestMessageIcon" aria-hidden="true">
+        {variant === "error" ? "!" : variant === "empty" ? "♪" : variant === "search" ? "⌕" : null}
+      </span>
       <p>{title}</p>
     </div>
   );

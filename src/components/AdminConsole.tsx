@@ -33,7 +33,8 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
   const [capabilitiesStatusMessage, setCapabilitiesStatusMessage] = useState<string | null>(null);
   const [isCapabilitiesStatusError, setIsCapabilitiesStatusError] = useState(false);
   const [isLoadingCapabilities, setIsLoadingCapabilities] = useState(false);
-  const [selectedStationId, setSelectedStationId] = useState<string | null>(null);
+  const [forceArchetypeStationId, setForceArchetypeStationId] = useState<string | null>(null);
+  const [scheduleGeneratorStationId, setScheduleGeneratorStationId] = useState<string | null>(null);
   const [selectedArchetype, setSelectedArchetype] = useState<string | null>(null);
   const [selectedTrackFocus, setSelectedTrackFocus] = useState<string | null>(null);
   const [forceArchetypeDryRun, setForceArchetypeDryRun] = useState(false);
@@ -69,6 +70,9 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       ? selectedScheduleGeneratorSeedMode
       : defaultSeedMode;
   }, [scheduleGeneratorCapability, selectedScheduleGeneratorSeedMode]);
+  const isCustomSeedMissing =
+    normalizedScheduleSeedMode === HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM &&
+    scheduleGeneratorSeedSalt.trim().length === 0;
 
   useEffect(() => {
     if (!isHostAdminConfigured) {
@@ -109,7 +113,8 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
 
       const loaded = payload as HostAdminCapabilities;
       setCapabilities(loaded);
-      setSelectedStationId((current) => resolveSelectedStation(loaded.stations, current));
+      setForceArchetypeStationId((current) => resolveSelectedStation(loaded.stations, current));
+      setScheduleGeneratorStationId((current) => resolveSelectedStation(loaded.stations, current));
       setSelectedArchetype((current) => resolveSelectedArchetype(loaded.archetypes, current));
       setSelectedTrackFocus((current) => (current && loaded.trackFocusValues.includes(current) ? current : null));
       setSelectedScheduleGeneratorSeedMode((current) => {
@@ -142,7 +147,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
   }
 
   async function runForceArchetype() {
-    if (!selectedStationId || !selectedArchetype || submittingOperation || isPollingJob) {
+    if (!forceArchetypeStationId || !selectedArchetype || submittingOperation || isPollingJob) {
       return;
     }
 
@@ -154,7 +159,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          station: selectedStationId,
+          station: forceArchetypeStationId,
           archetype: selectedArchetype,
           trackFocus: supportsTrackFocus ? selectedTrackFocus : undefined,
           dryRun: forceArchetypeCapability?.dryRunSupported ? forceArchetypeDryRun : false
@@ -169,7 +174,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       const nextJob: HostAdminJob = {
         jobId: payload.jobId,
         operation: HOST_ADMIN_OPERATION_FORCE_ARCHETYPE,
-        station: selectedStationId,
+        station: forceArchetypeStationId,
         archetype: selectedArchetype,
         trackFocus: supportsTrackFocus ? selectedTrackFocus ?? undefined : undefined,
         dryRun: forceArchetypeCapability?.dryRunSupported ? forceArchetypeDryRun : false,
@@ -187,7 +192,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
   }
 
   async function runScheduleGenerator() {
-    if (!selectedStationId || submittingOperation || isPollingJob) {
+    if (!scheduleGeneratorStationId || submittingOperation || isPollingJob) {
       return;
     }
 
@@ -218,7 +223,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          station: selectedStationId,
+          station: scheduleGeneratorStationId,
           dryRun: scheduleGeneratorCapability?.dryRunSupported ? scheduleGeneratorDryRun : false,
           forceApply:
             scheduleGeneratorCapability?.forceApplySupported && !scheduleGeneratorDryRun
@@ -247,7 +252,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       const nextJob: HostAdminJob = {
         jobId: payload.jobId,
         operation: HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR,
-        station: selectedStationId,
+        station: scheduleGeneratorStationId,
         dryRun: scheduleGeneratorCapability?.dryRunSupported ? scheduleGeneratorDryRun : false,
         status: "accepted",
         scheduleOptions: {
@@ -385,17 +390,25 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                 {capabilitiesStatusMessage}
               </p>
             ) : null}
+          </section>
 
-            {capabilities.stations.length ? (
+          {supportsOperation(HOST_ADMIN_OPERATION_FORCE_ARCHETYPE) ? (
+            <section className="adminPanel adminOperationPanel">
+              <div className="adminOperationHeader">
+                <h3>{t("admin.forceArchetype")}</h3>
+              </div>
+              {capabilities.stations.length ? (
               <div className="adminSection">
                 <h4>{t("admin.station")}</h4>
-                <div className="adminChipRow">
+                <div className="adminChipRow" role="radiogroup" aria-label={t("admin.station")}>
                   {capabilities.stations.map((stationId) => (
                     <button
                       key={stationId}
-                      className={`adminChip ${selectedStationId === stationId ? "adminChipActive" : ""}`}
+                      className={`adminChip ${forceArchetypeStationId === stationId ? "adminChipActive" : ""}`}
                       type="button"
-                      onClick={() => setSelectedStationId(stationId)}
+                      onClick={() => setForceArchetypeStationId(stationId)}
+                      role="radio"
+                      aria-checked={forceArchetypeStationId === stationId}
                     >
                       {stationLabel(stationId)}
                     </button>
@@ -404,9 +417,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
               </div>
             ) : null}
 
-            {supportsOperation(HOST_ADMIN_OPERATION_FORCE_ARCHETYPE) ? (
-              <section className="adminSection">
-                <h4>{t("admin.forceArchetype")}</h4>
+              <div className="adminOperationBody">
                 {capabilities.archetypes.length === 0 && !isLoadingCapabilities ? (
                   <p>{t("admin.noArchetypes")}</p>
                 ) : null}
@@ -434,12 +445,15 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                 </label>
 
                 {forceArchetypeCapability?.dryRunSupported ? (
-                  <div className="adminChipRow">
+                  <div className="adminToggleRow">
                     <button
-                      className={`adminChip ${forceArchetypeDryRun ? "adminChipActive" : ""}`}
+                      className={`adminToggle ${forceArchetypeDryRun ? "adminToggleActive" : ""}`}
                       type="button"
                       onClick={() => setForceArchetypeDryRun((value) => !value)}
+                      role="switch"
+                      aria-checked={forceArchetypeDryRun}
                     >
+                      <span className="adminToggleTrack" aria-hidden="true"><span /></span>
                       {t("admin.dryRun")}
                     </button>
                   </div>
@@ -451,21 +465,29 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                       <h5>{t("admin.trackFocus")}</h5>
                       <p>{t("admin.trackFocusDescription")}</p>
                     </div>
-                    <div className="adminChipRow">
+                    <div className="adminChipRow" role="radiogroup" aria-label={t("admin.trackFocus")}>
+                      <button
+                        className={`adminChip ${selectedTrackFocus === null ? "adminChipActive" : ""}`}
+                        type="button"
+                        onClick={() => setSelectedTrackFocus(null)}
+                        role="radio"
+                        aria-checked={selectedTrackFocus === null}
+                      >
+                        {t("admin.useServerDefault")}
+                      </button>
                       {capabilities.trackFocusValues.map((trackFocus) => (
                         <button
                           key={trackFocus}
                           className={`adminChip ${selectedTrackFocus === trackFocus ? "adminChipActive" : ""}`}
                           type="button"
                           onClick={() => setSelectedTrackFocus(trackFocus)}
+                          role="radio"
+                          aria-checked={selectedTrackFocus === trackFocus}
                         >
                           {toTrackFocusLabel(trackFocus, t)}
                         </button>
                       ))}
                     </div>
-                    <button className="adminTextButton" type="button" onClick={() => setSelectedTrackFocus(null)} disabled={!selectedTrackFocus}>
-                      {t("admin.useServerDefault")}
-                    </button>
                   </div>
                 ) : null}
 
@@ -473,7 +495,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                   className="authSubmitButton adminPrimaryButton"
                   type="button"
                   onClick={() => void runForceArchetype()}
-                  disabled={!selectedStationId || !selectedArchetype || isLoadingCapabilities || Boolean(submittingOperation) || isPollingJob}
+                  disabled={!forceArchetypeStationId || !selectedArchetype || isLoadingCapabilities || Boolean(submittingOperation) || isPollingJob}
                 >
                   {submittingOperation === HOST_ADMIN_OPERATION_FORCE_ARCHETYPE
                     ? t("common.submitting")
@@ -481,19 +503,47 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                       ? t("admin.jobRunning")
                       : t("admin.runForceArchetype")}
                 </button>
-              </section>
-            ) : null}
+                {!forceArchetypeStationId || !selectedArchetype ? (
+                  <p className="adminDisabledHint">{t("admin.selectStationAndArchetypeHint")}</p>
+                ) : null}
+              </div>
+            </section>
+          ) : null}
 
-            {supportsOperation(HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR) ? (
-              <section className="adminSection">
-                <h4>{t("admin.scheduleGenerator")}</h4>
+          {supportsOperation(HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR) ? (
+            <section className="adminPanel adminOperationPanel">
+              <div className="adminOperationHeader">
+                <h3>{t("admin.scheduleGenerator")}</h3>
                 <p>{t("admin.scheduleGeneratorDescription")}</p>
+              </div>
+
+              {capabilities.stations.length ? (
+                <div className="adminSection">
+                  <h4>{t("admin.station")}</h4>
+                  <div className="adminChipRow" role="radiogroup" aria-label={t("admin.station")}>
+                    {capabilities.stations.map((stationId) => (
+                      <button
+                        key={stationId}
+                        className={`adminChip ${scheduleGeneratorStationId === stationId ? "adminChipActive" : ""}`}
+                        type="button"
+                        onClick={() => setScheduleGeneratorStationId(stationId)}
+                        role="radio"
+                        aria-checked={scheduleGeneratorStationId === stationId}
+                      >
+                        {stationLabel(stationId)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="adminOperationBody">
 
                 {(scheduleGeneratorCapability?.dryRunSupported || scheduleGeneratorCapability?.forceApplySupported) ? (
-                  <div className="adminChipRow">
+                  <div className="adminToggleRow">
                     {scheduleGeneratorCapability?.dryRunSupported ? (
                       <button
-                        className={`adminChip ${scheduleGeneratorDryRun ? "adminChipActive" : ""}`}
+                        className={`adminToggle ${scheduleGeneratorDryRun ? "adminToggleActive" : ""}`}
                         type="button"
                         onClick={() => {
                           setScheduleGeneratorDryRun((value) => {
@@ -506,21 +556,30 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                             return next;
                           });
                         }}
+                        role="switch"
+                        aria-checked={scheduleGeneratorDryRun}
                       >
+                        <span className="adminToggleTrack" aria-hidden="true"><span /></span>
                         {t("admin.dryRun")}
                       </button>
                     ) : null}
                     {scheduleGeneratorCapability?.forceApplySupported ? (
                       <button
-                        className={`adminChip ${scheduleGeneratorForceApply ? "adminChipActive" : ""}`}
+                        className={`adminToggle ${scheduleGeneratorForceApply ? "adminToggleActive" : ""}`}
                         type="button"
                         onClick={() => setScheduleGeneratorForceApply((value) => !value)}
                         disabled={scheduleGeneratorDryRun}
+                        role="switch"
+                        aria-checked={scheduleGeneratorForceApply}
                       >
+                        <span className="adminToggleTrack" aria-hidden="true"><span /></span>
                         {t("admin.forceApply")}
                       </button>
                     ) : null}
                   </div>
+                ) : null}
+                {scheduleGeneratorDryRun && scheduleGeneratorCapability?.forceApplySupported ? (
+                  <p className="adminDisabledHint">{t("admin.forceApplyDisabledHint")}</p>
                 ) : null}
 
                 {scheduleGeneratorCapability?.supportedSeedModes.length ? (
@@ -529,7 +588,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                       <h5>{t("admin.seedMode")}</h5>
                       <p>{t("admin.seedModeDescription")}</p>
                     </div>
-                    <div className="adminChipRow">
+                    <div className="adminChipRow" role="radiogroup" aria-label={t("admin.seedMode")}>
                       {scheduleGeneratorCapability.supportedSeedModes.map((seedMode) => (
                         <button
                           key={seedMode}
@@ -541,6 +600,8 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                               setScheduleGeneratorSeedSalt("");
                             }
                           }}
+                          role="radio"
+                          aria-checked={normalizedScheduleSeedMode === seedMode}
                         >
                           {toSeedModeLabel(seedMode, t)}
                         </button>
@@ -619,7 +680,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                   className="authSubmitButton adminPrimaryButton"
                   type="button"
                   onClick={() => void runScheduleGenerator()}
-                  disabled={!selectedStationId || isLoadingCapabilities || Boolean(submittingOperation) || isPollingJob}
+                  disabled={!scheduleGeneratorStationId || isCustomSeedMissing || isLoadingCapabilities || Boolean(submittingOperation) || isPollingJob}
                 >
                   {submittingOperation === HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR
                     ? t("common.submitting")
@@ -627,9 +688,11 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                       ? t("admin.jobRunning")
                       : t("admin.runScheduleGenerator")}
                 </button>
-              </section>
-            ) : null}
-          </section>
+                {!scheduleGeneratorStationId ? <p className="adminDisabledHint">{t("admin.selectStationHint")}</p> : null}
+                {isCustomSeedMissing ? <p className="adminDisabledHint">{t("admin.enterCustomSeed")}</p> : null}
+              </div>
+            </section>
+          ) : null}
 
           {message ? (
             <p className={`playerError ${isAdminErrorMessage(message) ? "" : "adminMessageSuccess"}`}>

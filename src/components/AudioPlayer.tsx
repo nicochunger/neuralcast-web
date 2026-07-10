@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
-import { DEFAULT_STATION_ID, STATIONS } from "@/lib/stations";
+import { STATIONS } from "@/lib/stations";
 import { MiniPlayer } from "@/components/MiniPlayer";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StationCard } from "@/components/StationCard";
@@ -32,6 +32,11 @@ interface AdminSessionResponse {
   };
 }
 
+type ActiveOverlay =
+  | { type: "schedule"; stationId: StationId }
+  | { type: "requests"; stationId: StationId }
+  | null;
+
 const SchedulePreview = dynamic(
   () => import("@/components/SchedulePreview").then((mod) => mod.SchedulePreview),
   { ssr: false }
@@ -57,8 +62,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   } = useAudioPlayer();
 
   const [showAdminControls, setShowAdminControls] = useState(isAdmin);
-  const [scheduleStationId, setScheduleStationId] = useState<StationId>(DEFAULT_STATION_ID);
-  const [isScheduleOpen, setIsScheduleOpen] = useState(false);
+  const [activeOverlay, setActiveOverlay] = useState<ActiveOverlay>(null);
   const [adminMessage, setAdminMessage] = useState<string | undefined>();
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isAndroid, setIsAndroid] = useState(false);
@@ -66,6 +70,8 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   const [skippingStationId, setSkippingStationId] = useState<StationId | null>(null);
   const [skippedStationId, setSkippedStationId] = useState<StationId | null>(null);
   const skipConfirmationTimerRef = useRef<number | undefined>(undefined);
+  const requestConfirmationTimerRef = useRef<number | undefined>(undefined);
+  const overlayTriggerRef = useRef<HTMLElement | null>(null);
   const [songRequestState, setSongRequestState] = useState<SongRequestState>({
     stationName: "",
     isLoading: false,
@@ -73,18 +79,13 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   });
 
   const scheduleStation = useMemo(
-    () => STATIONS.find((station) => station.id === scheduleStationId) ?? STATIONS[0],
-    [scheduleStationId]
+    () => STATIONS.find((station) => station.id === activeOverlay?.stationId) ?? STATIONS[0],
+    [activeOverlay?.stationId]
   );
   const songRequestStation = useMemo(
     () => STATIONS.find((station) => station.id === songRequestState.stationId),
     [songRequestState.stationId]
   );
-
-  // Sync the local schedule display selection with the active station ID
-  useEffect(() => {
-    setScheduleStationId(activeStationId);
-  }, [activeStationId]);
 
   useEffect(() => {
     if (isAdmin) {
@@ -120,34 +121,57 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   }, [isAdmin]);
 
   useEffect(() => {
-    if (!isScheduleOpen) {
+    if (!activeOverlay) {
       return;
     }
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setIsScheduleOpen(false);
+        setActiveOverlay(null);
+        return;
+      }
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const dialog = document.querySelector<HTMLElement>("[role='dialog'][aria-modal='true']");
+      const focusable = dialog ? getFocusableElements(dialog) : [];
+
+      if (focusable.length === 0) {
+        event.preventDefault();
+        dialog?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isScheduleOpen]);
+    const focusTimer = window.setTimeout(() => {
+      const dialog = document.querySelector<HTMLElement>("[role='dialog'][aria-modal='true']");
+      const initialFocus = dialog?.querySelector<HTMLElement>("[data-modal-autofocus]") ??
+        (dialog ? getFocusableElements(dialog)[0] : undefined);
+      initialFocus?.focus();
+    });
 
-  useEffect(() => {
-    if (!songRequestState.stationId) {
-      return;
-    }
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        closeSongRequests();
-      }
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleEscape);
+      overlayTriggerRef.current?.focus();
     };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [songRequestState.stationId]);
+  }, [activeOverlay]);
 
   useEffect(() => {
     if (!("serviceWorker" in navigator)) {
@@ -186,6 +210,9 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     return () => {
       if (skipConfirmationTimerRef.current !== undefined) {
         window.clearTimeout(skipConfirmationTimerRef.current);
+      }
+      if (requestConfirmationTimerRef.current !== undefined) {
+        window.clearTimeout(requestConfirmationTimerRef.current);
       }
     };
   }, []);
@@ -244,6 +271,12 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
 
   const openSongRequests = useCallback(
     async (station: Station) => {
+      overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+      if (requestConfirmationTimerRef.current !== undefined) {
+        window.clearTimeout(requestConfirmationTimerRef.current);
+        requestConfirmationTimerRef.current = undefined;
+      }
+      setActiveOverlay({ type: "requests", stationId: station.id });
       setSongRequestState({
         stationId: station.id,
         stationName: station.name,
@@ -305,8 +338,23 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
           throw new Error(result.error || t("request.submitError"));
         }
 
-        setAdminMessage(result.message || t("request.success"));
-        closeSongRequests();
+        setSongRequestState((current) => ({
+          ...current,
+          submittingRequestId: undefined,
+          successfulRequestId: song.requestId,
+          error: undefined
+        }));
+        if (requestConfirmationTimerRef.current !== undefined) {
+          window.clearTimeout(requestConfirmationTimerRef.current);
+        }
+        requestConfirmationTimerRef.current = window.setTimeout(() => {
+          setSongRequestState((current) => ({
+            ...current,
+            successfulRequestId:
+              current.successfulRequestId === song.requestId ? undefined : current.successfulRequestId
+          }));
+          requestConfirmationTimerRef.current = undefined;
+        }, 3200);
       } catch (error) {
         setSongRequestState((current) => ({
           ...current,
@@ -319,6 +367,11 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   );
 
   const closeSongRequests = () => {
+    if (requestConfirmationTimerRef.current !== undefined) {
+      window.clearTimeout(requestConfirmationTimerRef.current);
+      requestConfirmationTimerRef.current = undefined;
+    }
+    setActiveOverlay(null);
     setSongRequestState({
       stationName: "",
       isLoading: false,
@@ -347,12 +400,13 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
             playbackState={playbackState}
             nowPlaying={nowPlaying[station.id]}
             schedule={schedules[station.id]}
-            isScheduleSelected={isScheduleOpen && station.id === scheduleStationId}
+            isScheduleSelected={activeOverlay?.type === "schedule" && station.id === activeOverlay.stationId}
+            isRequestSelected={activeOverlay?.type === "requests" && station.id === activeOverlay.stationId}
             onPlay={playStation}
             onStop={stopPlayback}
             onSelectSchedule={(selectedStation) => {
-              setScheduleStationId(selectedStation.id);
-              setIsScheduleOpen(true);
+              overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+              setActiveOverlay({ type: "schedule", stationId: selectedStation.id });
               void refreshSchedules([selectedStation.id]);
             }}
             onRequestSong={openSongRequests}
@@ -367,31 +421,32 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       {playbackError ? <p className="playerError">{playbackError}</p> : null}
       {adminMessage ? <p className="playerError">{adminMessage}</p> : null}
 
-      {isScheduleOpen ? (
+      {activeOverlay?.type === "schedule" ? (
         <div
           className="scheduleModalBackdrop"
           role="presentation"
           onClick={(event) => {
             if (event.target === event.currentTarget) {
-              setIsScheduleOpen(false);
+              setActiveOverlay(null);
             }
           }}
         >
-          <div className="scheduleModal" role="dialog" aria-modal="true" aria-labelledby="schedule-title">
+          <div className="scheduleModal" role="dialog" aria-modal="true" aria-labelledby="schedule-title" tabIndex={-1}>
             <button
               className="scheduleModalClose"
               type="button"
-              onClick={() => setIsScheduleOpen(false)}
-              aria-label="Close schedule"
+              onClick={() => setActiveOverlay(null)}
+              aria-label={t("schedule.close")}
+              data-modal-autofocus
             >
-              ✕
+              ×
             </button>
             <SchedulePreview station={scheduleStation} schedule={schedules[scheduleStation.id]} />
           </div>
         </div>
       ) : null}
 
-      {songRequestStation ? (
+      {activeOverlay?.type === "requests" && songRequestStation ? (
         <SongRequestModal
           station={songRequestStation}
           requestState={songRequestState}
@@ -447,4 +502,12 @@ async function readJsonResponse(response: Response): Promise<{ message?: string;
 
   const text = body.trim();
   return text ? { error: text } : { error: "Unable to skip the current track." };
+}
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(
+      "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])"
+    )
+  ).filter((element) => !element.hasAttribute("hidden") && element.getAttribute("aria-hidden") !== "true");
 }

@@ -1160,7 +1160,7 @@ img {
   stroke-width: 1.85;
 }
 
-.skipSuccessIcon {
+.successCheckIcon {
   display: inline-grid;
   width: 16px;
   height: 16px;
@@ -1171,7 +1171,7 @@ img {
   animation: skipSuccessPop 340ms cubic-bezier(0.2, 1.4, 0.35, 1) both;
 }
 
-.skipSuccessIcon svg {
+.successCheckIcon svg {
   display: block;
   width: 17px;
   height: 17px;
@@ -1236,6 +1236,11 @@ img {
 .requestActionButton {
   border-color: var(--station-card-action-border);
   background: var(--station-card-action-bg);
+}
+
+.requestActionButton.actionButtonActive {
+  border-color: var(--station-card-accent-border);
+  background: var(--station-card-active-action-bg);
 }
 
 .playButton:hover,
@@ -1522,6 +1527,10 @@ img {
 }
 
 .requestSongButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   min-height: 38px;
   min-width: 96px;
   border: 1px solid color-mix(in srgb, var(--station-accent), #ffffff 18%);
@@ -1535,8 +1544,18 @@ img {
 }
 
 .requestSongButton:disabled {
-  cursor: wait;
+  cursor: not-allowed;
   opacity: 0.72;
+}
+
+.requestSongButtonSubmitting:disabled {
+  cursor: wait;
+}
+
+.requestSongButtonSuccess {
+  border-color: color-mix(in srgb, var(--lime), white 18%);
+  background: color-mix(in srgb, var(--lime), #111827 18%);
+  opacity: 1;
 }
 
 .requestModalClose:focus-visible,
@@ -1557,14 +1576,42 @@ img {
   text-align: center;
 }
 
-.requestMessage span {
-  display: block;
+.requestMessageIcon {
+  display: grid;
   width: 44px;
   height: 44px;
+  place-items: center;
+  border: 2px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 1.35rem;
+  font-weight: 840;
+}
+
+.requestMessage-loading .requestMessageIcon {
   border: 3px solid color-mix(in srgb, var(--station-accent), transparent 72%);
   border-top-color: color-mix(in srgb, var(--station-accent), white 12%);
-  border-radius: 999px;
   animation: requestSpinner 900ms linear infinite;
+}
+
+.requestMessage-error .requestMessageIcon {
+  border-color: color-mix(in srgb, var(--red), transparent 42%);
+  color: var(--red);
+  background: var(--error-bg);
+}
+
+.requestMessage-empty .requestMessageIcon,
+.requestMessage-search .requestMessageIcon {
+  background: var(--surface-soft);
+}
+
+.requestInlineError {
+  margin: 0 10px 10px 0;
+  border-left: 4px solid var(--red);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: var(--error-bg);
 }
 
 .requestMessage p {
@@ -1580,7 +1627,7 @@ img {
 
 .authShell,
 .adminShell {
-  padding-bottom: max(42px, env(safe-area-inset-bottom));
+  padding-bottom: calc(104px + env(safe-area-inset-bottom));
 }
 
 .authCard,
@@ -1739,6 +1786,48 @@ img {
   padding: 22px;
 }
 
+.adminOperationPanel {
+  gap: 0;
+  overflow: hidden;
+  padding: 0;
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-soft), var(--panel-inset);
+}
+
+.adminOperationHeader {
+  display: grid;
+  gap: 7px;
+  border-bottom: 1px solid var(--line);
+  padding: 20px 22px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--focus), transparent 91%), transparent 60%),
+    var(--surface-soft);
+}
+
+.adminOperationHeader h3,
+.adminOperationHeader p {
+  margin: 0;
+}
+
+.adminOperationHeader h3 {
+  font-size: 1.24rem;
+}
+
+.adminOperationPanel > .adminSection,
+.adminOperationBody {
+  padding: 20px 22px;
+}
+
+.adminOperationPanel > .adminSection {
+  border-bottom: 1px solid var(--line);
+  background: var(--summary-bg);
+}
+
+.adminOperationBody {
+  display: grid;
+  gap: 16px;
+}
+
 .adminPanel p {
   margin: 0;
 }
@@ -1787,6 +1876,64 @@ img {
   gap: 8px;
 }
 
+.adminToggleRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.adminToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 0 14px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 720;
+}
+
+.adminToggleTrack {
+  position: relative;
+  display: block;
+  width: 34px;
+  height: 20px;
+  flex: 0 0 34px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.adminToggleTrack span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--muted);
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.adminToggleActive {
+  border-color: color-mix(in srgb, var(--focus), var(--line) 38%);
+  background: color-mix(in srgb, var(--focus), transparent 84%);
+}
+
+.adminToggleActive .adminToggleTrack {
+  border-color: var(--focus);
+  background: var(--focus);
+}
+
+.adminToggleActive .adminToggleTrack span {
+  background: white;
+  transform: translateX(14px);
+}
+
 .adminChip,
 .adminTextButton {
   display: inline-flex;
@@ -1803,13 +1950,14 @@ img {
 }
 
 .adminChipActive {
-  border-color: color-mix(in srgb, var(--focus), white 26%);
-  background: color-mix(in srgb, var(--focus), white 84%);
-  color: color-mix(in srgb, var(--focus), #17212f 26%);
+  border-color: color-mix(in srgb, var(--focus), var(--line) 38%);
+  background: color-mix(in srgb, var(--focus), transparent 84%);
+  color: var(--ink);
 }
 
 .adminChip:disabled,
 .adminTextButton:disabled,
+.adminToggle:disabled,
 .adminPrimaryButton:disabled {
   cursor: not-allowed;
   opacity: 0.68;
@@ -1837,6 +1985,7 @@ img {
 .adminField select:focus-visible,
 .adminChip:focus-visible,
 .adminTextButton:focus-visible,
+.adminToggle:focus-visible,
 .adminPrimaryButton:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
@@ -1850,6 +1999,12 @@ img {
 
 .adminPrimaryButton {
   width: 100%;
+}
+
+.adminDisabledHint {
+  color: var(--dim) !important;
+  font-size: 0.84rem;
+  line-height: 1.4 !important;
 }
 
 .adminStatusNotice {
@@ -1917,7 +2072,7 @@ img {
 }
 
 .aboutShell {
-  padding-bottom: max(42px, env(safe-area-inset-bottom));
+  padding-bottom: calc(104px + env(safe-area-inset-bottom));
 }
 
 .aboutHero,
@@ -2198,7 +2353,7 @@ img {
 .scheduleModalBackdrop {
   position: fixed;
   inset: 0;
-  z-index: 30;
+  z-index: 40;
   display: grid;
   place-items: center;
   padding: 18px;
@@ -2217,14 +2372,14 @@ img {
 }
 
 .scheduleModalClose {
-  position: sticky;
-  top: 10px;
+  position: absolute;
+  top: 12px;
+  right: 12px;
   z-index: 2;
-  float: right;
   display: grid;
   width: 40px;
   height: 40px;
-  margin: 12px 12px -52px 0;
+  margin: 0;
   place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 999px;
@@ -2628,10 +2783,10 @@ img {
   align-items: center;
   gap: 5px;
   min-height: 30px;
-  border: 1px solid color-mix(in srgb, var(--border), var(--text) 16%);
+  border: 1px solid var(--line);
   border-radius: 999px;
   padding: 5px 10px;
-  color: color-mix(in srgb, var(--muted), var(--text) 18%);
+  color: var(--muted);
   text-decoration: none;
   white-space: nowrap;
   background: color-mix(in srgb, var(--surface-raised), transparent 54%);
@@ -2640,10 +2795,15 @@ img {
 
 .footerAdminLink:hover,
 .footerAdminLink:focus-visible {
-  border-color: color-mix(in srgb, var(--accent), var(--border) 46%);
-  color: var(--text);
-  background: color-mix(in srgb, var(--surface-raised), var(--accent-soft) 28%);
+  border-color: color-mix(in srgb, var(--focus), var(--line) 46%);
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface-raised), var(--focus) 8%);
   text-decoration: none;
+}
+
+.footerAdminLink:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
 }
 
 .footerAdminIcon {
@@ -3087,6 +3247,17 @@ img {
   .adminHero,
   .adminPanel {
     padding: 22px 18px;
+  }
+
+  .adminOperationPanel {
+    padding: 0;
+  }
+
+  .adminOperationHeader,
+  .adminOperationPanel > .adminSection,
+  .adminOperationBody {
+    padding-right: 18px;
+    padding-left: 18px;
   }
 
   .aboutLead,

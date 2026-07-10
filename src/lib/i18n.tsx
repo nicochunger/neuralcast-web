@@ -63,6 +63,7 @@ type TranslationKey =
   | "admin.trackFocusDescription"
   | "admin.useServerDefault"
   | "admin.runForceArchetype"
+  | "admin.selectStationAndArchetypeHint"
   | "admin.jobRunning"
   | "admin.forceArchetypeAccepted"
   | "admin.forceArchetypeError"
@@ -87,6 +88,8 @@ type TranslationKey =
   | "admin.invalidNumber"
   | "admin.invalidInteger"
   | "admin.runScheduleGenerator"
+  | "admin.selectStationHint"
+  | "admin.forceApplyDisabledHint"
   | "admin.latestHostJob"
   | "admin.polling"
   | "admin.archetypeLine"
@@ -131,6 +134,7 @@ type TranslationKey =
   | "schedule.toolbar"
   | "schedule.now"
   | "schedule.ariaLabel"
+  | "schedule.close"
   | "stations.ariaLabel"
   | "station.nowPlaying"
   | "station.liveNow"
@@ -152,6 +156,7 @@ type TranslationKey =
   | "request.noMatches"
   | "request.submit"
   | "request.submitting"
+  | "request.requested"
   | "request.success"
   | "request.loadError"
   | "request.submitError"
@@ -262,6 +267,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "admin.trackFocusDescription": "Optional. Leave it unset to let the server pick the focus automatically.",
     "admin.useServerDefault": "Use server default",
     "admin.runForceArchetype": "Run Force Archetype",
+    "admin.selectStationAndArchetypeHint": "Select a station and archetype to continue.",
     "admin.jobRunning": "Job Running...",
     "admin.forceArchetypeAccepted": "Force archetype request accepted.",
     "admin.forceArchetypeError": "Unable to start a forced host run.",
@@ -286,6 +292,8 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "admin.invalidNumber": "{label} must be a valid number.",
     "admin.invalidInteger": "{label} must be a whole number.",
     "admin.runScheduleGenerator": "Run Schedule Generator",
+    "admin.selectStationHint": "Select a station to continue.",
+    "admin.forceApplyDisabledHint": "Turn off Dry run to enable Force apply.",
     "admin.latestHostJob": "Latest Host Job",
     "admin.polling": "Polling...",
     "admin.archetypeLine": "Archetype: {value}",
@@ -332,6 +340,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "schedule.toolbar": "24-hour view · Zurich time (CET/CEST)",
     "schedule.now": "Now {time}",
     "schedule.ariaLabel": "{station} 24 hour schedule for {date}",
+    "schedule.close": "Close schedule",
     "stations.ariaLabel": "Stations",
     "station.nowPlaying": "Now playing",
     "station.liveNow": "Live now",
@@ -353,6 +362,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "request.noMatches": "No songs matched your search.",
     "request.submit": "Request",
     "request.submitting": "Sending...",
+    "request.requested": "Requested",
     "request.success": "Your request has been submitted.",
     "request.loadError": "Unable to load requestable songs.",
     "request.submitError": "Unable to submit song request.",
@@ -470,6 +480,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "admin.trackFocusDescription": "Opcional. Dejalo sin configurar para que el servidor elija el foco automáticamente.",
     "admin.useServerDefault": "Usar valor del servidor",
     "admin.runForceArchetype": "Ejecutar arquetipo forzado",
+    "admin.selectStationAndArchetypeHint": "Seleccioná una emisora y un arquetipo para continuar.",
     "admin.jobRunning": "Tarea en ejecución...",
     "admin.forceArchetypeAccepted": "Solicitud de arquetipo forzado aceptada.",
     "admin.forceArchetypeError": "No se pudo iniciar una ejecución forzada del host.",
@@ -494,6 +505,8 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "admin.invalidNumber": "{label} debe ser un número válido.",
     "admin.invalidInteger": "{label} debe ser un número entero.",
     "admin.runScheduleGenerator": "Ejecutar generador",
+    "admin.selectStationHint": "Seleccioná una emisora para continuar.",
+    "admin.forceApplyDisabledHint": "Desactivá Simulación para habilitar Aplicación forzada.",
     "admin.latestHostJob": "Última tarea del host",
     "admin.polling": "Consultando...",
     "admin.archetypeLine": "Arquetipo: {value}",
@@ -540,6 +553,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "schedule.toolbar": "Vista de 24 horas · hora de Zúrich (CET/CEST)",
     "schedule.now": "Ahora {time}",
     "schedule.ariaLabel": "Programación de 24 horas de {station} para {date}",
+    "schedule.close": "Cerrar programación",
     "stations.ariaLabel": "Emisoras",
     "station.nowPlaying": "Sonando ahora",
     "station.liveNow": "En vivo",
@@ -561,6 +575,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "request.noMatches": "No hay canciones que coincidan con tu búsqueda.",
     "request.submit": "Pedir",
     "request.submitting": "Enviando...",
+    "request.requested": "Pedida",
     "request.success": "Tu pedido fue enviado.",
     "request.loadError": "No se pudieron cargar las canciones disponibles.",
     "request.submitError": "No se pudo enviar el pedido.",

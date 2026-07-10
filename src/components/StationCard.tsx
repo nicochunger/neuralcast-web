@@ -1,6 +1,7 @@
 "use client";
 
 import { getSegmentTitle, getStationDescription, useI18n } from "@/lib/i18n";
+import { AnimatedSuccessIcon } from "@/components/AnimatedSuccessIcon";
 import type { CSSProperties } from "react";
 import type {
   PlaybackState,
@@ -16,6 +17,7 @@ interface StationCardProps {
   nowPlaying: StationNowPlayingState;
   schedule: StationScheduleState;
   isScheduleSelected: boolean;
+  isRequestSelected: boolean;
   onPlay: (station: Station) => void;
   onStop: () => void;
   onSelectSchedule: (station: Station) => void;
@@ -33,6 +35,7 @@ export function StationCard({
   nowPlaying,
   schedule,
   isScheduleSelected,
+  isRequestSelected,
   onPlay,
   onStop,
   onSelectSchedule,
@@ -121,11 +124,17 @@ export function StationCard({
               className={`actionButton stationCommandButton ${isScheduleSelected ? "actionButtonActive" : ""}`}
               type="button"
               onClick={() => onSelectSchedule(station)}
+              aria-expanded={isScheduleSelected}
             >
               <StationActionIcon icon="schedule" />
               {t("station.schedule")}
             </button>
-            <button className="actionButton stationCommandButton requestActionButton" type="button" onClick={() => onRequestSong(station)}>
+            <button
+              className={`actionButton stationCommandButton requestActionButton ${isRequestSelected ? "actionButtonActive" : ""}`}
+              type="button"
+              onClick={() => onRequestSong(station)}
+              aria-expanded={isRequestSelected}
+            >
               <StationActionIcon icon="request" />
               {t("station.requestSong")}
             </button>
@@ -137,7 +146,7 @@ export function StationCard({
                 disabled={isSkippingTrack}
                 aria-live="polite"
               >
-                {hasSkippedTrack ? <SkipSuccessIcon /> : <StationActionIcon icon="skip" />}
+                {hasSkippedTrack ? <AnimatedSuccessIcon /> : <StationActionIcon icon="skip" />}
                 {hasSkippedTrack ? t("station.skippedSong") : isSkippingTrack ? t("station.skippingSong") : t("station.skipSong")}
               </button>
             ) : null}
@@ -162,16 +171,6 @@ function getActivePlaylistText(segment: StationScheduleState["liveSegment"], loc
   }
 
   return getSegmentTitle(segment, locale);
-}
-
-function SkipSuccessIcon() {
-  return (
-    <span className="skipSuccessIcon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" focusable="false">
-        <path d="M5 12.5 9.5 17 19 7" />
-      </svg>
-    </span>
-  );
 }
 
 function StationActionIcon({ icon }: { icon: "schedule" | "request" | "skip" }) {
