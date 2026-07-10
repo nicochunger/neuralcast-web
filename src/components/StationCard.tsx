@@ -55,7 +55,7 @@ export function StationCard({
     nowPlaying.listeners === undefined
       ? t("common.listenersUnknown")
       : t("common.listeners", { count: nowPlaying.listeners });
-  const activePlaylistText = schedule.error ? t("common.unavailable") : getActivePlaylistText(schedule.liveSegment, locale);
+  const activePlaylistText = schedule.error ? t("common.unavailable") : getActivePlaylistText(schedule.liveSegment, locale, t);
 
   return (
     <article
@@ -157,9 +157,13 @@ export function StationCard({
   );
 }
 
-function getActivePlaylistText(segment: StationScheduleState["liveSegment"], locale: ReturnType<typeof useI18n>["locale"]): string {
+function getActivePlaylistText(
+  segment: StationScheduleState["liveSegment"],
+  locale: ReturnType<typeof useI18n>["locale"],
+  t: ReturnType<typeof useI18n>["t"]
+): string {
   if (!segment) {
-    return locale === "es" ? "Esperando la programación." : "Waiting for schedule.";
+    return t("station.scheduleWaiting");
   }
 
   if (segment.kind === "open-rotation") {

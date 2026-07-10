@@ -246,10 +246,11 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
           method: "POST",
           cache: "no-store"
         });
-        const payload = await readJsonResponse(response);
+        const skipError = t("station.skipError");
+        const payload = await readJsonResponse(response, skipError);
 
         if (!response.ok) {
-          throw new Error(payload.error || "Unable to skip the current track.");
+          throw new Error(payload.error || skipError);
         }
 
         setSkippedStationId(station.id);
@@ -261,12 +262,12 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
           void refreshNowPlaying([station.id]);
         }, 1200);
       } catch (error) {
-        setAdminMessage(error instanceof Error ? error.message : "Unable to skip the current track.");
+        setAdminMessage(error instanceof Error ? error.message : t("station.skipError"));
       } finally {
         setSkippingStationId(null);
       }
     },
-    [refreshNowPlaying, showAdminControls, skippingStationId]
+    [refreshNowPlaying, showAdminControls, skippingStationId, t]
   );
 
   const openSongRequests = useCallback(
@@ -482,7 +483,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   );
 }
 
-async function readJsonResponse(response: Response): Promise<{ message?: string; error?: string }> {
+async function readJsonResponse(response: Response, fallbackError: string): Promise<{ message?: string; error?: string }> {
   const body = await response.text();
 
   try {
@@ -496,12 +497,12 @@ async function readJsonResponse(response: Response): Promise<{ message?: string;
 
   if (body.includes("<!DOCTYPE") || body.includes("<html")) {
     return {
-      error: "Unexpected HTML response while skipping the current track."
+      error: fallbackError
     };
   }
 
   const text = body.trim();
-  return text ? { error: text } : { error: "Unable to skip the current track." };
+  return text ? { error: text } : { error: fallbackError };
 }
 
 function getFocusableElements(container: HTMLElement): HTMLElement[] {

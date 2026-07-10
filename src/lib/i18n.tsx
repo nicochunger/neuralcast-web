@@ -144,6 +144,8 @@ type TranslationKey =
   | "station.skipSong"
   | "station.skippingSong"
   | "station.skippedSong"
+  | "station.skipError"
+  | "station.scheduleWaiting"
   | "station.description.neuralcast"
   | "station.description.neuralforge"
   | "request.title"
@@ -350,6 +352,8 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "station.skipSong": "Skip song",
     "station.skippingSong": "Skipping...",
     "station.skippedSong": "Skipped",
+    "station.skipError": "Unable to skip the current track.",
+    "station.scheduleWaiting": "Waiting for schedule.",
     "station.description.neuralcast": "Mixed AI radio selection",
     "station.description.neuralforge": "Heavy variant with an AI host",
     "request.title": "Request a song",
@@ -563,6 +567,8 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "station.skipSong": "Saltar canción",
     "station.skippingSong": "Saltando...",
     "station.skippedSong": "Saltada",
+    "station.skipError": "No se pudo saltar la canción actual.",
+    "station.scheduleWaiting": "Esperando la programación.",
     "station.description.neuralcast": "Selección mixta de radio con IA",
     "station.description.neuralforge": "Variante pesada con un locutor de IA",
     "request.title": "Pedir una canción",

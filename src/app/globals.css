@@ -95,6 +95,10 @@
   --error-bg: color-mix(in srgb, var(--red), white 88%);
   --mini-bg: rgba(255, 255, 255, 0.94);
   --theme-icon-cutout: var(--surface-soft);
+  --control-compact: 40px;
+  --control-standard: 44px;
+  --control-icon: 40px;
+  --control-radius: 8px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -416,7 +420,7 @@ img {
 .headerContextLink {
   display: inline-flex;
   align-items: center;
-  min-height: 34px;
+  min-height: var(--control-compact);
   padding: 0 2px;
   border-bottom: 1px solid transparent;
   color: var(--muted);
@@ -427,10 +431,10 @@ img {
 .headerContextButton {
   display: inline-flex;
   align-items: center;
-  min-height: 34px;
+  min-height: var(--control-compact);
   padding: 0 10px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--control-radius);
   background: var(--surface-soft);
   color: var(--ink);
   cursor: pointer;
@@ -460,10 +464,10 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 34px;
+  min-height: var(--control-compact);
   padding: 0 10px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--control-radius);
   background: transparent;
   color: var(--ink);
   cursor: pointer;
@@ -774,8 +778,8 @@ img {
 .installButton,
 .miniButton,
 .themeButton {
-  min-height: 42px;
-  border-radius: 8px;
+  min-height: var(--control-standard);
+  border-radius: var(--control-radius);
   cursor: pointer;
   font-weight: 780;
 }
@@ -1045,13 +1049,13 @@ img {
 }
 
 .installButton {
-  min-height: 34px;
+  min-height: var(--control-compact);
 }
 
 .themeButton {
   display: grid;
-  width: 34px;
-  min-height: 34px;
+  width: var(--control-icon);
+  min-height: var(--control-icon);
   aspect-ratio: 1;
   place-items: center;
   padding: 0;
@@ -1133,8 +1137,8 @@ img {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  min-height: 38px;
-  border-radius: 10px;
+  min-height: var(--control-standard);
+  border-radius: var(--control-radius);
   padding: 0 12px;
   font-size: 0.88rem;
   white-space: nowrap;
@@ -1531,7 +1535,7 @@ img {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  min-height: 38px;
+  min-height: var(--control-standard);
   min-width: 96px;
   border: 1px solid color-mix(in srgb, var(--station-accent), #ffffff 18%);
   border-radius: 999px;
@@ -1707,8 +1711,8 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  border-radius: 8px;
+  min-height: var(--control-standard);
+  border-radius: var(--control-radius);
   font-weight: 780;
 }
 
@@ -1886,10 +1890,10 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  min-height: 42px;
+  min-height: var(--control-standard);
   padding: 0 14px 0 10px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--control-radius);
   background: var(--surface-soft);
   color: var(--ink);
   cursor: pointer;
@@ -1939,7 +1943,7 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 38px;
+  min-height: var(--control-compact);
   padding: 0 14px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -2150,7 +2154,7 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  min-height: var(--control-standard);
   padding: 0 16px;
   border-radius: 8px;
   font-weight: 780;
@@ -2782,7 +2786,7 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  min-height: 30px;
+  min-height: var(--control-compact);
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 5px 10px;
@@ -3155,19 +3159,29 @@ img {
   }
 
   .headerActions {
+    display: grid;
+    grid-template-columns: 1fr;
     width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    row-gap: 10px;
+    align-items: stretch;
+    gap: 8px;
   }
 
   .headerActions > nav {
+    display: flex;
+    min-height: var(--control-compact);
     margin-right: 0;
+    align-items: center;
   }
 
   .headerUtilityRow {
-    justify-content: flex-end;
-    flex-wrap: wrap;
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .headerUtilityRow > * {
+    flex: 0 0 auto;
   }
 
   .headerContextButton {
@@ -3188,7 +3202,7 @@ img {
   }
 
   .installButton {
-    min-height: 38px;
+    min-height: var(--control-compact);
     padding: 0 12px;
   }
 
@@ -3234,8 +3248,8 @@ img {
   }
 
   .themeButton {
-    width: 38px;
-    min-height: 38px;
+    width: var(--control-icon);
+    min-height: var(--control-icon);
   }
 
   .aboutHero h2 {

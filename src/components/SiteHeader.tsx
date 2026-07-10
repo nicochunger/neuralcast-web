@@ -49,6 +49,11 @@ export function SiteHeader({ extraActions }: { extraActions?: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    themeColor?.setAttribute("content", resolvedTheme === "dark" ? "#101317" : "#f4f7fa");
+  }, [resolvedTheme]);
+
+  useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
       if (!languageMenuRef.current?.contains(event.target as Node)) {
         setLanguageMenuOpen(false);
@@ -157,7 +162,7 @@ export function SiteHeader({ extraActions }: { extraActions?: ReactNode }) {
 function FlagIcon({ country }: { country: "us" | "ar" }) {
   if (country === "ar") {
     return (
-      <svg className="languageFlag" viewBox="0 0 28 20" role="img" aria-label="Argentina flag">
+      <svg className="languageFlag" viewBox="0 0 28 20" aria-hidden="true">
         <rect width="28" height="20" fill="#75aadb" />
         <rect y="6.67" width="28" height="6.66" fill="#ffffff" />
         <circle cx="14" cy="10" r="2.1" fill="#f6b40e" />
@@ -167,7 +172,7 @@ function FlagIcon({ country }: { country: "us" | "ar" }) {
   }
 
   return (
-    <svg className="languageFlag" viewBox="0 0 28 20" role="img" aria-label="United States flag">
+    <svg className="languageFlag" viewBox="0 0 28 20" aria-hidden="true">
       <rect width="28" height="20" fill="#b22234" />
       {Array.from({ length: 6 }, (_, index) => (
         <rect key={index} y={1.54 + index * 3.08} width="28" height="1.54" fill="#ffffff" />

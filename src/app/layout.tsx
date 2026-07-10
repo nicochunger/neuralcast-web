@@ -12,6 +12,13 @@ try {
   if (theme === "light" || theme === "dark") {
     document.documentElement.dataset.theme = theme;
   }
+  var resolvedTheme = theme === "light" || theme === "dark"
+    ? theme
+    : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  var themeColor = document.querySelector('meta[name="theme-color"]');
+  if (themeColor) {
+    themeColor.setAttribute("content", resolvedTheme === "dark" ? "#101317" : "#f4f7fa");
+  }
 } catch (_) {}
 `;
 
