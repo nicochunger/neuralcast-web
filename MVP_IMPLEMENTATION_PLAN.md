@@ -104,14 +104,14 @@ The same endpoint may also expose now-playing metadata, depending on the AzuraCa
 Schedule endpoint pattern:
 
 ```text
-https://neuralcast.duckdns.org/api/station/{stationId}/schedule?rows=300&now={urlEncodedIsoOffsetDateTime}
+https://neuralcast.duckdns.org/api/station/{stationId}/schedule?rows=1000&now={urlEncodedIsoOffsetDateTime}
 ```
 
 Examples:
 
 ```text
-https://neuralcast.duckdns.org/api/station/neuralcast/schedule?rows=300&now=2026-04-19T00%3A00%3A00%2B02%3A00
-https://neuralcast.duckdns.org/api/station/neuralforge/schedule?rows=300&now=2026-04-19T00%3A00%3A00%2B02%3A00
+https://neuralcast.duckdns.org/api/station/neuralcast/schedule?rows=1000&now=2026-04-19T00%3A00%3A00%2B02%3A00
+https://neuralcast.duckdns.org/api/station/neuralforge/schedule?rows=1000&now=2026-04-19T00%3A00%3A00%2B02%3A00
 ```
 
 The `now` value should be the start of the selected day in `Europe/Zurich`, encoded as ISO offset datetime.
@@ -296,7 +296,7 @@ Minimum schedule behavior:
 
 Schedule parsing should follow the Android app's behavior:
 
-- Query the schedule endpoint with `rows=300`.
+- Query the schedule endpoint with `rows=1000`.
 - Use the selected date's start-of-day in `Europe/Zurich` as the `now` parameter.
 - Keep only entries that overlap the selected day.
 - Build time segments from entry start/end boundaries.
@@ -457,4 +457,3 @@ The MVP is ready when:
 Prioritize a working public listener:
 
 > Open the site, tap Play on NeuralCast or NeuralForge, hear the stream, see what is playing, and install the site to the home screen.
-

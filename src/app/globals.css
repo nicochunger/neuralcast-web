@@ -2782,6 +2782,10 @@ img {
   gap: 8px;
 }
 
+.footerAdminAction {
+  display: inline-flex;
+}
+
 .footerAdminLink {
   display: inline-flex;
   align-items: center;
@@ -3204,6 +3208,32 @@ img {
   .installButton {
     min-height: var(--control-compact);
     padding: 0 12px;
+  }
+
+  .appFooter {
+    gap: 8px;
+  }
+
+  .appFooterUtility {
+    width: 100%;
+    justify-items: start;
+  }
+
+  .footerAdminAction {
+    width: 100%;
+    margin-top: 4px;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+  }
+
+  .footerAdminLink {
+    justify-content: center;
+    width: 100%;
+    min-height: var(--control-standard);
+    border-radius: var(--control-radius);
+    background: var(--surface-raised);
+    box-shadow: none;
+    font-weight: 740;
   }
 
   .requestModalBackdrop {

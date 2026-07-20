@@ -65,6 +65,6 @@ HTTPS is required for PWA installation and browser media behavior; Vercel provid
 - `https://neuralcast.duckdns.org/listen/neuralcast/radio.mp3`
 - `https://neuralcast.duckdns.org/listen/neuralforge/radio.mp3`
 - `https://neuralcast.duckdns.org/api/nowplaying/{stationId}`
-- `https://neuralcast.duckdns.org/api/station/{stationId}/schedule?rows=300&now={isoOffsetDateTime}`
+- `https://neuralcast.duckdns.org/api/station/{stationId}/schedule?rows=1000&now={isoOffsetDateTime}`
 
 Song requests are intentionally left for a later phase.

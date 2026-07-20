@@ -14,6 +14,9 @@ interface RawScheduleEntry {
   endMillis: number;
 }
 
+// A daily schedule can contain more than 300 overlapping playlist entries.
+const SCHEDULE_API_ROWS = 1000;
+
 export async function fetchScheduleForDay(
   station: Station,
   requestedDate?: string
@@ -24,7 +27,7 @@ export async function fetchScheduleForDay(
     throw new Error("Schedule date must be YYYY-MM-DD.");
   }
 
-  const endpoint = `${AZURACAST_BASE_URL}/api/station/${station.id}/schedule?rows=300&now=${encodeURIComponent(
+  const endpoint = `${AZURACAST_BASE_URL}/api/station/${station.id}/schedule?rows=${SCHEDULE_API_ROWS}&now=${encodeURIComponent(
     startOfDayIsoOffset(date, station.timeZone)
   )}`;
 

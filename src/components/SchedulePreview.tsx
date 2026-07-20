@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { getSegmentDetail, getSegmentTitle, useI18n } from "@/lib/i18n";
 import { addDaysToDateString, getZonedDateString, zonedDateTimeToUtcMillis } from "@/lib/dateTime";
+import type { Locale } from "@/lib/locale";
 import type { ScheduleSegment, Station, StationScheduleState } from "@/types/radio";
 
 interface SchedulePreviewProps {
@@ -112,23 +113,12 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
                 )}
 
                 {timelineBlocks.map((block) => (
-                  <article
+                  <TimelineBlockItem
                     key={`${block.segment.startTime}-${block.segment.endTime}`}
-                    className={`timelineBlock ${block.segment.kind} ${
-                      block.durationMinutes < 75 ? "timelineBlockShort" : ""
-                    }`}
-                    style={
-                      {
-                        top: `${block.topPercent}%`,
-                        height: `${block.heightPercent}%`
-                      } as CSSProperties
-                    }
-                    role="listitem"
-                  >
-                    <time>{formatRange(block.segment, station.timeZone, locale)}</time>
-                    <strong>{getSegmentTitle(block.segment, locale)}</strong>
-                    <span className="timelineDetail">{getSegmentDetail(block.segment, locale)}</span>
-                  </article>
+                    block={block}
+                    locale={locale}
+                    timeZone={station.timeZone}
+                  />
                 ))}
               </div>
             </div>
@@ -136,6 +126,34 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
         </div>
       )}
     </section>
+  );
+}
+
+interface TimelineBlockItemProps {
+  block: TimelineBlock;
+  locale: Locale;
+  timeZone: string;
+}
+
+function TimelineBlockItem({ block, locale, timeZone }: TimelineBlockItemProps) {
+  const { segment } = block;
+  const isSingleGenre = segment.kind === "scheduled" && segment.playlistNames.length === 1;
+
+  return (
+    <article
+      className={`timelineBlock ${segment.kind} ${block.durationMinutes < 75 ? "timelineBlockShort" : ""}`}
+      style={
+        {
+          top: `${block.topPercent}%`,
+          height: `${block.heightPercent}%`
+        } as CSSProperties
+      }
+      role="listitem"
+    >
+      <time>{formatRange(segment, timeZone, locale)}</time>
+      <strong>{getSegmentTitle(segment, locale)}</strong>
+      {!isSingleGenre ? <span className="timelineDetail">{getSegmentDetail(segment, locale)}</span> : null}
+    </article>
   );
 }
 
