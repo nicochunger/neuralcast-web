@@ -2549,8 +2549,8 @@ img {
 }
 
 .scheduleTimeline {
-  --timeline-height: 1296px;
-  --hour-height: 54px;
+  --timeline-height: 2304px;
+  --hour-height: 96px;
   display: grid;
   grid-template-columns: 64px minmax(0, 1fr);
   min-width: 0;
@@ -2586,7 +2586,12 @@ img {
   overflow: hidden;
   background-image:
     linear-gradient(to bottom, var(--timeline-hour-line) 0 1px, transparent 1px),
-    linear-gradient(to bottom, transparent 0 26px, var(--timeline-half-line) 26px 27px, transparent 27px);
+    linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--hour-height) / 2 - 1px),
+      var(--timeline-half-line) calc(var(--hour-height) / 2 - 1px) calc(var(--hour-height) / 2),
+      transparent calc(var(--hour-height) / 2)
+    );
   background-size: 100% var(--hour-height), 100% var(--hour-height);
 }
 
@@ -2988,8 +2993,8 @@ img {
   }
 
   .scheduleTimeline {
-    --timeline-height: 1152px;
-    --hour-height: 48px;
+    --timeline-height: 2304px;
+    --hour-height: 96px;
     grid-template-columns: 58px minmax(0, 1fr);
     min-width: 560px;
   }
@@ -3137,8 +3142,8 @@ img {
   }
 
   .scheduleTimeline {
-    --timeline-height: 1056px;
-    --hour-height: 44px;
+    --timeline-height: 2304px;
+    --hour-height: 96px;
     grid-template-columns: 52px minmax(0, 1fr);
     min-width: 0;
   }
