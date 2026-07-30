@@ -2608,6 +2608,11 @@ img {
   border: 1px solid var(--timeline-block-border);
   border-radius: 14px;
   padding: 9px 12px;
+  width: auto;
+  appearance: none;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
   background: var(--timeline-block-bg);
   box-shadow: var(--timeline-block-shadow);
   transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
@@ -2617,6 +2622,11 @@ img {
   border-color: color-mix(in srgb, var(--station-accent), white 16%);
   box-shadow: 0 12px 28px color-mix(in srgb, var(--station-accent), transparent 86%);
   transform: translateY(-1px);
+}
+
+.timelineBlock:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--station-accent), white 20%);
+  outline-offset: 2px;
 }
 
 .timelineBlock.scheduled {
@@ -2654,6 +2664,10 @@ img {
   -webkit-line-clamp: 2;
 }
 
+.timelineBlockMedium .timelineDetail {
+  -webkit-line-clamp: 1;
+}
+
 .timelineBlockShort {
   align-content: center;
   gap: 0;
@@ -2678,6 +2692,62 @@ img {
   color: var(--ink);
   font-size: 0.94rem;
   line-height: 1.1;
+}
+
+.scheduleBlockDetailsBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  align-items: end;
+  padding: 16px;
+  background: rgba(10, 14, 20, 0.48);
+}
+
+.scheduleBlockDetails {
+  position: relative;
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.scheduleBlockDetails time,
+.scheduleBlockDetails small {
+  display: block;
+  color: var(--dim);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.scheduleBlockDetails h3 {
+  margin: 8px 36px 6px 0;
+  color: var(--ink);
+}
+
+.scheduleBlockDetails p {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.scheduleBlockDetailsClose {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--line);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 1.35rem;
+  line-height: 1;
 }
 
 .timelineBlock.open-slot {

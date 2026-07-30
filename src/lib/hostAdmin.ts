@@ -1,4 +1,5 @@
 import type { HostAdminCapabilities, HostAdminJob, HostAdminOperationCapability, HostAdminScheduleOptions } from "@/types/hostAdmin";
+import type { SchedulePresentationTranslations, StationId, StationSchedulePresentation } from "@/types/radio";
 
 const NETWORK_TIMEOUT_MS = 15_000;
 
@@ -95,6 +96,29 @@ export async function getHostAdminJobStatus(jobId: string): Promise<HostAdminJob
     finishedAt: readString(payload.finished_at),
     exitCode: typeof payload.exit_code === "number" ? payload.exit_code : undefined,
     logTail: readString(payload.log_tail)
+  };
+}
+
+export async function getSchedulePresentation(station: StationId): Promise<StationSchedulePresentation> {
+  const payload = await requestHostAdminJson("GET", `/admin/stations/${encodeURIComponent(station)}/schedule-presentation`);
+  const rawBlocks = Array.isArray(payload.blocks) ? payload.blocks : [];
+
+  return {
+    station,
+    version: typeof payload.version === "number" ? payload.version : 1,
+    planHash: readString(payload.plan_hash) ?? "",
+    generatedAt: readString(payload.generated_at_utc) ?? "",
+    blocks: rawBlocks.flatMap((value) => {
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        return [];
+      }
+      const block = value as Record<string, unknown>;
+      const playlistNames = readStringArray(block.playlist_names);
+      const translations = readPresentationTranslations(block.translations);
+      return playlistNames.length > 0 && Object.keys(translations).length > 0
+        ? [{ playlistNames, translations }]
+        : [];
+    })
   };
 }
 
@@ -244,4 +268,25 @@ function readStringArray(value: unknown) {
 
 function readString(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function readPresentationTranslations(value: unknown): SchedulePresentationTranslations {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+  const entries = ["en", "es"].flatMap((locale) => {
+    const copy = (value as Record<string, unknown>)[locale];
+    if (!copy || typeof copy !== "object" || Array.isArray(copy)) {
+      return [];
+    }
+    const record = copy as Record<string, unknown>;
+    const description = readString(record.description);
+    if (!description) {
+      return [];
+    }
+    const title = readString(record.title);
+    return [[locale, { description, ...(title ? { title } : {}) }]];
+  });
+
+  return Object.fromEntries(entries) as SchedulePresentationTranslations;
 }

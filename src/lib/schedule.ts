@@ -6,7 +6,7 @@ import {
   zonedDateTimeToUtcMillis
 } from "@/lib/dateTime";
 import { AZURACAST_BASE_URL } from "@/lib/stations";
-import type { ScheduleSegment, ScheduleSegmentKind, Station, StationScheduleDay } from "@/types/radio";
+import type { ScheduleSegment, ScheduleSegmentKind, Station, StationScheduleDay, StationSchedulePresentation } from "@/types/radio";
 
 interface RawScheduleEntry {
   title: string;
@@ -108,6 +108,29 @@ export function segmentDetail(segment?: ScheduleSegment): string {
   }
 
   return segment.playlistNames.join(", ");
+}
+
+export function enrichScheduleWithPresentation(
+  schedule: StationScheduleDay,
+  presentation?: StationSchedulePresentation
+): StationScheduleDay {
+  if (!presentation) {
+    return schedule;
+  }
+  const copyByPlaylistSet = new Map(
+    presentation.blocks.map((block) => [playlistSetKey(block.playlistNames), block.translations])
+  );
+  const enrich = (segment?: ScheduleSegment) =>
+    segment
+      ? { ...segment, presentation: copyByPlaylistSet.get(playlistSetKey(segment.playlistNames)) }
+      : undefined;
+
+  return {
+    ...schedule,
+    segments: schedule.segments.map((segment) => enrich(segment) as ScheduleSegment),
+    liveSegment: enrich(schedule.liveSegment),
+    upNextSegment: enrich(schedule.upNextSegment)
+  };
 }
 
 function parseScheduleEntries(payload: unknown): RawScheduleEntry[] {
@@ -230,6 +253,10 @@ function getSegmentKind(station: Station, playlistNames: string[]): ScheduleSegm
 
 function uniqueSorted(values: string[]): string[] {
   return [...new Set(values)].sort((left, right) => left.localeCompare(right));
+}
+
+function playlistSetKey(values: string[]): string {
+  return values.map((value) => value.trim().toLocaleLowerCase()).sort().join("\n");
 }
 
 function firstNonEmpty(...values: unknown[]): string | undefined {

@@ -1,4 +1,5 @@
-import { fetchScheduleForDay } from "@/lib/schedule";
+import { getSchedulePresentation, isHostAdminConfigured } from "@/lib/hostAdmin";
+import { enrichScheduleWithPresentation, fetchScheduleForDay } from "@/lib/schedule";
 import { getStation } from "@/lib/stations";
 import { NextResponse } from "next/server";
 
@@ -21,7 +22,10 @@ export async function GET(request: Request, context: RouteContext) {
 
   try {
     const schedule = await fetchScheduleForDay(station, date);
-    return NextResponse.json(schedule, {
+    const presentation = isHostAdminConfigured()
+      ? await getSchedulePresentation(station.id).catch(() => undefined)
+      : undefined;
+    return NextResponse.json(enrichScheduleWithPresentation(schedule, presentation), {
       headers: {
         "Cache-Control": "no-store"
       }

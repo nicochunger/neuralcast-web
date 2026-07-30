@@ -727,6 +727,11 @@ export function getSegmentTitle(
     return locale === "es" ? "Rotación abierta" : "Open rotation";
   }
 
+  const presentation = segment.presentation?.[locale];
+  if (presentation?.title) {
+    return presentation.title;
+  }
+
   if (segment.playlistNames.length === 1) {
     return segment.playlistNames[0];
   }
@@ -750,6 +755,11 @@ export function getSegmentDetail(
 
   if (segment.kind === "open-rotation") {
     return locale === "es" ? "Mezcla amplia de la rotación activa." : "Broad mix from the active rotation.";
+  }
+
+  const presentation = segment.presentation?.[locale];
+  if (presentation?.description) {
+    return presentation.description;
   }
 
   return segment.playlistNames.join(", ");

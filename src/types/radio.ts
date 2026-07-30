@@ -40,6 +40,28 @@ export interface ScheduleSegment {
   endTime: string;
   kind: ScheduleSegmentKind;
   playlistNames: string[];
+  presentation?: SchedulePresentationTranslations;
+}
+
+export interface SchedulePresentationCopy {
+  title?: string;
+  description: string;
+}
+
+export interface SchedulePresentationTranslations {
+  en?: SchedulePresentationCopy;
+  es?: SchedulePresentationCopy;
+}
+
+export interface StationSchedulePresentation {
+  station: StationId;
+  version: number;
+  planHash: string;
+  generatedAt: string;
+  blocks: Array<{
+    playlistNames: string[];
+    translations: SchedulePresentationTranslations;
+  }>;
 }
 
 export interface StationScheduleDay {

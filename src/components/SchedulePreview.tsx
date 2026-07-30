@@ -18,6 +18,7 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
   const { locale, t } = useI18n();
   const segments = schedule.segments ?? [];
   const [now, setNow] = useState(() => new Date());
+  const [selectedBlock, setSelectedBlock] = useState<TimelineBlock | undefined>(undefined);
   const timelineRef = useRef<HTMLDivElement | null>(null);
   const lastScrollKeyRef = useRef<string | undefined>(undefined);
   const scheduleDate = schedule.date ?? getZonedDateString(now, station.timeZone);
@@ -118,6 +119,7 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
                     block={block}
                     locale={locale}
                     timeZone={station.timeZone}
+                    onSelect={setSelectedBlock}
                   />
                 ))}
               </div>
@@ -125,6 +127,15 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
           </div>
         </div>
       )}
+
+      {selectedBlock ? (
+        <ScheduleBlockDetails
+          block={selectedBlock}
+          locale={locale}
+          timeZone={station.timeZone}
+          onClose={() => setSelectedBlock(undefined)}
+        />
+      ) : null}
     </section>
   );
 }
@@ -133,15 +144,19 @@ interface TimelineBlockItemProps {
   block: TimelineBlock;
   locale: Locale;
   timeZone: string;
+  onSelect: (block: TimelineBlock) => void;
 }
 
-function TimelineBlockItem({ block, locale, timeZone }: TimelineBlockItemProps) {
+function TimelineBlockItem({ block, locale, timeZone, onSelect }: TimelineBlockItemProps) {
   const { segment } = block;
-  const isSingleGenre = segment.kind === "scheduled" && segment.playlistNames.length === 1;
+  const isShort = block.durationMinutes < 75;
+  const isMedium = block.durationMinutes >= 75 && block.durationMinutes < 105;
+  const detail = getSegmentDetail(segment, locale);
 
   return (
-    <article
-      className={`timelineBlock ${segment.kind} ${block.durationMinutes < 75 ? "timelineBlockShort" : ""}`}
+    <button
+      type="button"
+      className={`timelineBlock ${segment.kind} ${isShort ? "timelineBlockShort" : ""} ${isMedium ? "timelineBlockMedium" : ""}`}
       style={
         {
           top: `${block.topPercent}%`,
@@ -149,11 +164,44 @@ function TimelineBlockItem({ block, locale, timeZone }: TimelineBlockItemProps) 
         } as CSSProperties
       }
       role="listitem"
+      onClick={() => onSelect(block)}
+      title={detail}
     >
       <time>{formatRange(segment, timeZone, locale)}</time>
       <strong>{getSegmentTitle(segment, locale)}</strong>
-      {!isSingleGenre ? <span className="timelineDetail">{getSegmentDetail(segment, locale)}</span> : null}
-    </article>
+      {!isShort ? <span className="timelineDetail">{detail}</span> : null}
+    </button>
+  );
+}
+
+function ScheduleBlockDetails({
+  block,
+  locale,
+  timeZone,
+  onClose
+}: {
+  block: TimelineBlock;
+  locale: Locale;
+  timeZone: string;
+  onClose: () => void;
+}) {
+  const { segment } = block;
+  return (
+    <div className="scheduleBlockDetailsBackdrop" role="presentation" onClick={onClose}>
+      <section
+        className="scheduleBlockDetails"
+        role="dialog"
+        aria-modal="true"
+        aria-label={getSegmentTitle(segment, locale)}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button type="button" className="scheduleBlockDetailsClose" onClick={onClose} aria-label="Close schedule details">×</button>
+        <time>{formatRange(segment, timeZone, locale)}</time>
+        <h3>{getSegmentTitle(segment, locale)}</h3>
+        <p>{getSegmentDetail(segment, locale)}</p>
+        {segment.playlistNames.length > 1 ? <small>{segment.playlistNames.join(" · ")}</small> : null}
+      </section>
+    </div>
   );
 }
 
