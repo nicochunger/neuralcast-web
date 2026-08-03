@@ -3238,23 +3238,26 @@ img {
   }
 
   .headerActions {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
     width: 100%;
-    align-items: stretch;
-    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: nowrap;
   }
 
   .headerActions > nav {
     display: flex;
+    flex: 0 0 auto;
     min-height: var(--control-compact);
     margin-right: 0;
     align-items: center;
   }
 
   .headerUtilityRow {
-    width: 100%;
-    justify-content: flex-start;
+    width: auto;
+    margin-left: auto;
+    justify-content: flex-end;
     flex-wrap: nowrap;
     gap: 6px;
   }
