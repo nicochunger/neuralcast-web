@@ -457,9 +457,8 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       ) : null}
 
       <footer className="appFooter">
-        <span>{t("footer.connection")}</span>
         <span className="appFooterUtility">
-          <span>{t("footer.iosInstall")}</span>
+          <span className="footerInstallHint">{t("footer.iosInstall")}</span>
           <span className="footerAdminAction">
             <Link className="footerAdminLink" href="/admin">
               <span className="footerAdminIcon" aria-hidden="true">

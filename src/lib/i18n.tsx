@@ -27,7 +27,6 @@ type TranslationKey =
   | "nav.live"
   | "nav.about"
   | "nav.backToRadio"
-  | "footer.connection"
   | "footer.iosInstall"
   | "footer.admin"
   | "auth.eyebrow"
@@ -233,7 +232,6 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "nav.live": "Listen",
     "nav.about": "About",
     "nav.backToRadio": "Back to radio",
-    "footer.connection": "Live streams require a network connection.",
     "footer.iosInstall": "Add to Home Screen on iOS from the Share menu.",
     "footer.admin": "Admin Console",
     "auth.eyebrow": "Admin access",
@@ -448,7 +446,6 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "nav.live": "Escuchar",
     "nav.about": "Sobre",
     "nav.backToRadio": "Volver a la radio",
-    "footer.connection": "Los streams en vivo requieren conexión de red.",
     "footer.iosInstall": "En iOS, usá el menú Compartir para agregarla a la pantalla de inicio.",
     "footer.admin": "Consola de administración",
     "auth.eyebrow": "Acceso de administración",
