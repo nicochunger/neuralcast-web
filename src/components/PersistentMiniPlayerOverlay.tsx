@@ -7,7 +7,17 @@ import { STATIONS } from "@/lib/stations";
 
 export function PersistentMiniPlayerOverlay() {
   const pathname = usePathname();
-  const { activeStationId, activeStation, playbackState, nowPlaying, playStation, stopPlayback } = useAudioPlayer();
+  const {
+    activeStationId,
+    activeStation,
+    playbackState,
+    nowPlaying,
+    volume,
+    playStation,
+    stopPlayback,
+    setVolume,
+    toggleMute
+  } = useAudioPlayer();
 
   if (pathname === "/" || !activeStationId) {
     return null;
@@ -20,8 +30,11 @@ export function PersistentMiniPlayerOverlay() {
       station={station}
       playbackState={playbackState}
       nowPlaying={nowPlaying[activeStationId] ?? { stationId: activeStationId, isLoading: false }}
+      volume={volume}
       onPlay={playStation}
       onStop={stopPlayback}
+      onVolumeChange={setVolume}
+      onToggleMute={toggleMute}
     />
   );
 }

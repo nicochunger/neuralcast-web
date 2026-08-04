@@ -53,10 +53,13 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     activeStation,
     playbackState,
     playbackError,
+    volume,
     nowPlaying,
     schedules,
     playStation,
     stopPlayback,
+    setVolume,
+    toggleMute,
     refreshNowPlaying,
     refreshSchedules
   } = useAudioPlayer();
@@ -477,8 +480,11 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
         station={activeStation}
         playbackState={playbackState}
         nowPlaying={nowPlaying[activeStation.id]}
+        volume={volume}
         onPlay={playStation}
         onStop={stopPlayback}
+        onVolumeChange={setVolume}
+        onToggleMute={toggleMute}
       />
     </main>
   );

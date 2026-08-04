@@ -123,6 +123,10 @@ type TranslationKey =
   | "player.playbackBlocked"
   | "player.streamLoadError"
   | "player.installFallbackAndroid"
+  | "player.volume"
+  | "player.volumeValue"
+  | "player.mute"
+  | "player.unmute"
   | "schedule.title"
   | "schedule.description"
   | "schedule.error"
@@ -330,6 +334,10 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "player.streamLoadError": "The stream could not be loaded.",
     "player.installFallbackAndroid":
       "To install on Android, open your browser menu and tap Install app or Add to Home screen.",
+    "player.volume": "Volume",
+    "player.volumeValue": "Volume: {value}%",
+    "player.mute": "Mute",
+    "player.unmute": "Unmute",
     "schedule.title": "{station} schedule",
     "schedule.description": "See what is playing now and what is coming up through the day.",
     "schedule.error": "Schedule unavailable.",
@@ -544,6 +552,10 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "player.streamLoadError": "No se pudo cargar el stream.",
     "player.installFallbackAndroid":
       "Para instalar en Android, abrí el menú del navegador y tocá Instalar aplicación o Agregar a la pantalla de inicio.",
+    "player.volume": "Volumen",
+    "player.volumeValue": "Volumen: {value}%",
+    "player.mute": "Silenciar",
+    "player.unmute": "Activar sonido",
     "schedule.title": "Programación de {station}",
     "schedule.description": "Mirá lo que suena ahora y lo que viene después durante el día.",
     "schedule.error": "Programación no disponible.",

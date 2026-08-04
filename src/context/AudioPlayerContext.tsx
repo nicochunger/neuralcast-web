@@ -20,26 +20,34 @@ interface AudioPlayerContextValue {
   activeStation: Station;
   playbackState: PlaybackState;
   playbackError: string | undefined;
+  volume: number;
   nowPlaying: Record<StationId, StationNowPlayingState>;
   schedules: Record<StationId, StationScheduleState>;
   playStation: (station: Station) => Promise<void>;
   stopPlayback: () => void;
+  setVolume: (volume: number) => void;
+  toggleMute: () => void;
   refreshNowPlaying: (stationIds?: StationId[]) => Promise<void>;
   refreshSchedules: (stationIds?: StationId[]) => Promise<void>;
 }
 
 const AudioPlayerContext = createContext<AudioPlayerContextValue | undefined>(undefined);
 let sharedAudioElement: HTMLAudioElement | null = null;
+const VOLUME_STORAGE_KEY = "neuralcast:volume";
+const LAST_AUDIBLE_VOLUME_STORAGE_KEY = "neuralcast:last-audible-volume";
+const DEFAULT_VOLUME = 1;
 
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const pathname = usePathname();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const manualStopRef = useRef(false);
+  const lastAudibleVolumeRef = useRef(DEFAULT_VOLUME);
 
   const [activeStationId, setActiveStationId] = useState<StationId>(DEFAULT_STATION_ID);
   const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
   const [playbackError, setPlaybackError] = useState<string | undefined>();
+  const [volume, setVolumeState] = useState(DEFAULT_VOLUME);
 
   const [nowPlaying, setNowPlaying] = useState<Record<StationId, StationNowPlayingState>>(
     createInitialNowPlayingState
@@ -62,6 +70,24 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     audioRef.current = sharedAudioElement;
     return audioRef.current;
   }, []);
+
+  const setVolume = useCallback((nextVolume: number) => {
+    const normalizedVolume = Math.min(1, Math.max(0, nextVolume));
+    const audio = getAudioElement();
+
+    audio.volume = normalizedVolume;
+    setVolumeState(normalizedVolume);
+
+    if (normalizedVolume > 0) {
+      lastAudibleVolumeRef.current = normalizedVolume;
+      window.localStorage.setItem(LAST_AUDIBLE_VOLUME_STORAGE_KEY, String(normalizedVolume));
+    }
+    window.localStorage.setItem(VOLUME_STORAGE_KEY, String(normalizedVolume));
+  }, [getAudioElement]);
+
+  const toggleMute = useCallback(() => {
+    setVolume(volume > 0 ? 0 : lastAudibleVolumeRef.current);
+  }, [setVolume, volume]);
 
   const refreshNowPlaying = useCallback(async (stationIds: StationId[] = STATIONS.map((station) => station.id)) => {
     setNowPlaying((current) => markNowPlayingLoading(current, stationIds));
@@ -187,6 +213,18 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     }
 
     const audio = getAudioElement();
+    const storedVolume = readStoredVolume(window.localStorage.getItem(VOLUME_STORAGE_KEY));
+    const storedAudibleVolume = readStoredVolume(window.localStorage.getItem(LAST_AUDIBLE_VOLUME_STORAGE_KEY));
+    const initialVolume = storedVolume ?? DEFAULT_VOLUME;
+
+    if (storedAudibleVolume !== undefined && storedAudibleVolume > 0) {
+      lastAudibleVolumeRef.current = storedAudibleVolume;
+    } else if (initialVolume > 0) {
+      lastAudibleVolumeRef.current = initialVolume;
+    }
+    audio.volume = initialVolume;
+    setVolumeState(initialVolume);
+
     if (!audio.paused && audio.src) {
       setPlaybackState("playing");
     }
@@ -317,10 +355,13 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
         activeStation,
         playbackState,
         playbackError,
+        volume,
         nowPlaying,
         schedules,
         playStation,
         stopPlayback,
+        setVolume,
+        toggleMute,
         refreshNowPlaying,
         refreshSchedules
       }}
@@ -328,6 +369,15 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       {children}
     </AudioPlayerContext.Provider>
   );
+}
+
+function readStoredVolume(value: string | null): number | undefined {
+  if (value === null) {
+    return undefined;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 && parsed <= 1 ? parsed : undefined;
 }
 
 export function useAudioPlayer() {

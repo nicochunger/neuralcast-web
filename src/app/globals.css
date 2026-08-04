@@ -2923,10 +2923,10 @@ img {
   left: max(14px, env(safe-area-inset-left));
   z-index: 10;
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto;
+  grid-template-columns: 44px minmax(110px, 1fr) auto auto;
   align-items: center;
   gap: 12px;
-  max-width: 680px;
+  max-width: 760px;
   margin: 0 auto;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -2954,21 +2954,117 @@ img {
   object-fit: cover;
 }
 
-.miniPlayer div {
+.miniTrack {
   display: grid;
   gap: 3px;
   min-width: 0;
 }
 
-.miniPlayer span {
+.miniTrack span {
   color: var(--muted);
   font-size: 0.82rem;
 }
 
-.miniPlayer strong {
+.miniTrack strong {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.volumeControl {
+  display: grid;
+  grid-template-columns: 36px 92px 2.1em;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.volumeButton {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0;
+  place-items: center;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.volumeButton:hover {
+  border-color: var(--line);
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.volumeButton:focus-visible,
+.volumeSlider:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.volumeIcon {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.volumeSlider {
+  width: 92px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.volumeSlider::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--ink) var(--volume-level), var(--line-strong) var(--volume-level));
+}
+
+.volumeSlider::-moz-range-track {
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--ink) var(--volume-level), var(--line-strong) var(--volume-level));
+}
+
+.volumeSlider::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  margin-top: -5.5px;
+  border: 2px solid var(--mini-bg);
+  border-radius: 50%;
+  appearance: none;
+  background: var(--ink);
+  box-shadow: 0 1px 5px rgba(17, 28, 42, 0.28);
+}
+
+.volumeSlider::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--mini-bg);
+  border-radius: 50%;
+  background: var(--ink);
+  box-shadow: 0 1px 5px rgba(17, 28, 42, 0.28);
+}
+
+.volumeValue {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.volumeValue::after {
+  content: "%";
 }
 
 @media (min-width: 1020px) {
@@ -3078,7 +3174,7 @@ img {
   }
 
   .miniPlayer {
-    grid-template-columns: 38px minmax(0, 1fr) auto;
+    grid-template-columns: 38px minmax(110px, 1fr) auto auto;
   }
 
   .miniArtwork {
@@ -3120,6 +3216,37 @@ img {
 }
 
 @media (max-width: 560px) {
+  .miniPlayer {
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "artwork track action"
+      "volume volume volume";
+    gap: 7px 10px;
+    padding: 9px 10px 8px;
+  }
+
+  .miniArtwork {
+    grid-area: artwork;
+  }
+
+  .miniTrack {
+    grid-area: track;
+  }
+
+  .miniButton {
+    grid-area: action;
+  }
+
+  .volumeControl {
+    grid-area: volume;
+    grid-template-columns: 36px minmax(0, 1fr) 2.1em;
+    gap: 8px;
+  }
+
+  .volumeSlider {
+    width: 100%;
+  }
+
   .appHeader {
     display: grid;
     grid-template-columns: 1fr;
