@@ -26,6 +26,7 @@ export interface StationNowPlaying {
   genre?: string;
   art?: string;
   listeners?: number;
+  history: PlayedTrack[];
   fetchedAt: string;
 }
 
@@ -33,6 +34,17 @@ export interface StationNowPlayingState extends Partial<StationNowPlaying> {
   stationId: StationId;
   isLoading: boolean;
   error?: string;
+}
+
+export interface PlayedTrack {
+  id: string;
+  playedAt?: number;
+  text?: string;
+  artist?: string;
+  title?: string;
+  album?: string;
+  genre?: string;
+  art?: string;
 }
 
 export interface ScheduleSegment {

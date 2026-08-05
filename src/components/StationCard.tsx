@@ -16,10 +16,12 @@ interface StationCardProps {
   playbackState: PlaybackState;
   nowPlaying: StationNowPlayingState;
   schedule: StationScheduleState;
+  isHistorySelected: boolean;
   isScheduleSelected: boolean;
   isRequestSelected: boolean;
   onPlay: (station: Station) => void;
   onStop: () => void;
+  onSelectHistory: (station: Station) => void;
   onSelectSchedule: (station: Station) => void;
   onRequestSong: (station: Station) => void;
   showAdminSkip: boolean;
@@ -34,10 +36,12 @@ export function StationCard({
   playbackState,
   nowPlaying,
   schedule,
+  isHistorySelected,
   isScheduleSelected,
   isRequestSelected,
   onPlay,
   onStop,
+  onSelectHistory,
   onSelectSchedule,
   onRequestSong,
   showAdminSkip,
@@ -121,6 +125,15 @@ export function StationCard({
 
           <div className="stationActions">
             <button
+              className={`actionButton stationCommandButton ${isHistorySelected ? "actionButtonActive" : ""}`}
+              type="button"
+              onClick={() => onSelectHistory(station)}
+              aria-expanded={isHistorySelected}
+            >
+              <StationActionIcon icon="history" />
+              {t("station.recentlyPlayed")}
+            </button>
+            <button
               className={`actionButton stationCommandButton ${isScheduleSelected ? "actionButtonActive" : ""}`}
               type="button"
               onClick={() => onSelectSchedule(station)}
@@ -177,7 +190,19 @@ function getActivePlaylistText(
   return getSegmentTitle(segment, locale);
 }
 
-function StationActionIcon({ icon }: { icon: "schedule" | "request" | "skip" }) {
+function StationActionIcon({ icon }: { icon: "history" | "schedule" | "request" | "skip" }) {
+  if (icon === "history") {
+    return (
+      <span className="stationActionIcon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M3 12a9 9 0 1 0 3-6.7" />
+          <path d="M3 4v5h5" />
+          <path d="M12 7v5l3 2" />
+        </svg>
+      </span>
+    );
+  }
+
   if (icon === "request") {
     return (
       <span className="stationActionIcon" aria-hidden="true">

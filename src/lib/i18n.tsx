@@ -142,6 +142,7 @@ type TranslationKey =
   | "station.nowPlaying"
   | "station.liveNow"
   | "station.activePlaylists"
+  | "station.recentlyPlayed"
   | "station.schedule"
   | "station.requestSong"
   | "station.skipSong"
@@ -165,6 +166,13 @@ type TranslationKey =
   | "request.success"
   | "request.loadError"
   | "request.submitError"
+  | "history.title"
+  | "history.description"
+  | "history.close"
+  | "history.empty"
+  | "history.unavailable"
+  | "history.playedAt"
+  | "history.timeUnknown"
   | "track.waiting"
   | "track.unavailable"
   | "status.ready"
@@ -353,6 +361,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "station.nowPlaying": "Now playing",
     "station.liveNow": "Live now",
     "station.activePlaylists": "Active playlists",
+    "station.recentlyPlayed": "Recently played",
     "station.schedule": "Schedule",
     "station.requestSong": "Request song",
     "station.skipSong": "Skip song",
@@ -376,6 +385,13 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "request.success": "Your request has been submitted.",
     "request.loadError": "Unable to load requestable songs.",
     "request.submitError": "Unable to submit song request.",
+    "history.title": "Recently played",
+    "history.description": "Tracks AzuraCast recently played on {station}.",
+    "history.close": "Close recently played",
+    "history.empty": "No recent tracks are available yet.",
+    "history.unavailable": "Recent history is unavailable.",
+    "history.playedAt": "Played at {time}",
+    "history.timeUnknown": "Time unavailable",
     "track.waiting": "Waiting for live metadata.",
     "track.unavailable": "Metadata unavailable.",
     "status.ready": "Ready",
@@ -571,6 +587,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "station.nowPlaying": "Sonando ahora",
     "station.liveNow": "En vivo",
     "station.activePlaylists": "Listas activas",
+    "station.recentlyPlayed": "Sonaron antes",
     "station.schedule": "Programación",
     "station.requestSong": "Pedir canción",
     "station.skipSong": "Saltar canción",
@@ -594,6 +611,13 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "request.success": "Tu pedido fue enviado.",
     "request.loadError": "No se pudieron cargar las canciones disponibles.",
     "request.submitError": "No se pudo enviar el pedido.",
+    "history.title": "Sonaron antes",
+    "history.description": "Canciones que AzuraCast reprodujo recientemente en {station}.",
+    "history.close": "Cerrar canciones anteriores",
+    "history.empty": "Todavía no hay canciones recientes disponibles.",
+    "history.unavailable": "No se puede consultar el historial reciente.",
+    "history.playedAt": "Sonó a las {time}",
+    "history.timeUnknown": "Hora no disponible",
     "track.waiting": "Esperando los metadatos en vivo.",
     "track.unavailable": "Metadatos no disponibles.",
     "status.ready": "Listo",

@@ -1,5 +1,5 @@
 import { AZURACAST_BASE_URL } from "@/lib/stations";
-import type { Station, StationNowPlaying } from "@/types/radio";
+import type { PlayedTrack, Station, StationNowPlaying } from "@/types/radio";
 
 type JsonObject = Record<string, unknown>;
 
@@ -25,6 +25,7 @@ function normalizeNowPlaying(station: Station, payload: unknown): StationNowPlay
   const song = asObject(nowPlaying.song);
   const stationPayload = asObject(root.station);
   const listeners = asObject(root.listeners);
+  const history = parseSongHistory(root.song_history ?? nowPlaying.song_history);
 
   const artist = readString(song.artist);
   const title = readString(song.title);
@@ -43,8 +44,45 @@ function normalizeNowPlaying(station: Station, payload: unknown): StationNowPlay
     genre: readString(song.genre),
     art: readString(song.art),
     listeners: listenerCount,
+    history,
     fetchedAt: new Date().toISOString()
   };
+}
+
+function parseSongHistory(value: unknown): PlayedTrack[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((entry, index) => {
+    const historyEntry = asObject(entry);
+    const song = asObject(historyEntry.song);
+    const artist = readString(song.artist);
+    const title = readString(song.title);
+    const album = readString(song.album);
+    const text = readString(song.text) ?? formatTrack(artist, title);
+    const playedAt = parseNumber(historyEntry.played_at);
+
+    if (!text && !artist && !title) {
+      return [];
+    }
+
+    return [
+      {
+        id:
+          readIdentifier(historyEntry.sh_id) ??
+          readIdentifier(historyEntry.id) ??
+          `${playedAt ?? "unknown"}-${artist ?? ""}-${title ?? text ?? index}`,
+        playedAt,
+        text,
+        artist,
+        title,
+        album,
+        genre: readString(song.genre),
+        art: readString(song.art)
+      }
+    ];
+  });
 }
 
 function parseListenerCount(listeners: JsonObject): number | undefined {
@@ -77,6 +115,14 @@ function parseNumber(value: unknown): number | undefined {
 
 function readString(value: unknown): string | undefined {
   return typeof value === "string" && value.trim().length > 0 ? value.trim() : undefined;
+}
+
+function readIdentifier(value: unknown): string | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(Math.trunc(value));
+  }
+
+  return readString(value);
 }
 
 function asObject(value: unknown): JsonObject {

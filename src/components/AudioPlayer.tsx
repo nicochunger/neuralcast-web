@@ -10,6 +10,7 @@ import { MiniPlayer } from "@/components/MiniPlayer";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StationCard } from "@/components/StationCard";
 import { submitSongRequestAction } from "@/lib/actions";
+import { RecentlyPlayedModal } from "@/components/RecentlyPlayedModal";
 import type {
   RequestableSong,
   SongRequestState,
@@ -33,6 +34,7 @@ interface AdminSessionResponse {
 }
 
 type ActiveOverlay =
+  | { type: "history"; stationId: StationId }
   | { type: "schedule"; stationId: StationId }
   | { type: "requests"; stationId: StationId }
   | null;
@@ -82,6 +84,10 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   });
 
   const scheduleStation = useMemo(
+    () => STATIONS.find((station) => station.id === activeOverlay?.stationId) ?? STATIONS[0],
+    [activeOverlay?.stationId]
+  );
+  const historyStation = useMemo(
     () => STATIONS.find((station) => station.id === activeOverlay?.stationId) ?? STATIONS[0],
     [activeOverlay?.stationId]
   );
@@ -404,10 +410,16 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
             playbackState={playbackState}
             nowPlaying={nowPlaying[station.id]}
             schedule={schedules[station.id]}
+            isHistorySelected={activeOverlay?.type === "history" && station.id === activeOverlay.stationId}
             isScheduleSelected={activeOverlay?.type === "schedule" && station.id === activeOverlay.stationId}
             isRequestSelected={activeOverlay?.type === "requests" && station.id === activeOverlay.stationId}
             onPlay={playStation}
             onStop={stopPlayback}
+            onSelectHistory={(selectedStation) => {
+              overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+              setActiveOverlay({ type: "history", stationId: selectedStation.id });
+              void refreshNowPlaying([selectedStation.id]);
+            }}
             onSelectSchedule={(selectedStation) => {
               overlayTriggerRef.current = document.activeElement as HTMLElement | null;
               setActiveOverlay({ type: "schedule", stationId: selectedStation.id });
@@ -424,6 +436,14 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
 
       {playbackError ? <p className="playerError">{playbackError}</p> : null}
       {adminMessage ? <p className="playerError">{adminMessage}</p> : null}
+
+      {activeOverlay?.type === "history" ? (
+        <RecentlyPlayedModal
+          station={historyStation}
+          nowPlaying={nowPlaying[historyStation.id]}
+          onDismiss={() => setActiveOverlay(null)}
+        />
+      ) : null}
 
       {activeOverlay?.type === "schedule" ? (
         <div
