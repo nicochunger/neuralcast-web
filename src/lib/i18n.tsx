@@ -27,8 +27,7 @@ type TranslationKey =
   | "nav.live"
   | "nav.about"
   | "nav.backToRadio"
-  | "footer.iosInstall"
-  | "footer.admin"
+  | "nav.admin"
   | "auth.eyebrow"
   | "auth.title"
   | "auth.lead"
@@ -250,8 +249,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "nav.live": "Listen",
     "nav.about": "About",
     "nav.backToRadio": "Back to radio",
-    "footer.iosInstall": "Add to Home Screen on iOS from the Share menu.",
-    "footer.admin": "Admin Console",
+    "nav.admin": "Admin Console",
     "auth.eyebrow": "Admin access",
     "auth.title": "Sign in to manage NeuralCast",
     "auth.lead": "This private area will be used for live controls like skipping songs and triggering host snippets.",
@@ -482,8 +480,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "nav.live": "Escuchar",
     "nav.about": "Sobre",
     "nav.backToRadio": "Volver a la radio",
-    "footer.iosInstall": "En iOS, usá el menú Compartir para agregarla a la pantalla de inicio.",
-    "footer.admin": "Consola de administración",
+    "nav.admin": "Consola de administración",
     "auth.eyebrow": "Acceso de administración",
     "auth.title": "Iniciá sesión para administrar NeuralCast",
     "auth.lead": "Esta zona privada se usa para controles en vivo, como saltar canciones y activar intervenciones del host.",

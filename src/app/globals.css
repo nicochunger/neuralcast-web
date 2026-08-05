@@ -455,6 +455,45 @@ img {
   outline-offset: 4px;
 }
 
+.headerAdminLink {
+  display: grid;
+  width: var(--control-icon);
+  min-height: var(--control-icon);
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--control-radius);
+  background: var(--surface-soft);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.headerAdminLink:hover {
+  border-color: color-mix(in srgb, var(--focus), var(--line) 46%);
+  background: color-mix(in srgb, var(--surface-raised), var(--focus) 8%);
+  color: var(--ink);
+}
+
+.headerAdminLink:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.headerAdminIcon,
+.headerAdminIcon svg {
+  display: block;
+  width: 17px;
+  height: 17px;
+}
+
+.headerAdminIcon svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
 .languageMenu {
   position: relative;
 }
@@ -2468,8 +2507,7 @@ img {
   backdrop-filter: blur(12px);
 }
 
-.scheduleHeader,
-.appFooter {
+.scheduleHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -2916,78 +2954,6 @@ img {
   text-align: center;
 }
 
-.appFooter {
-  width: 100%;
-  margin-top: 22px;
-  padding-bottom: 8px;
-  color: var(--dim);
-  font-size: 0.9rem;
-}
-
-.appFooterUtility {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  justify-items: end;
-  gap: 8px;
-  width: 100%;
-}
-
-.footerInstallHint {
-  min-width: 0;
-}
-
-.footerAdminAction {
-  display: inline-flex;
-}
-
-.footerAdminLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-height: var(--control-compact);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 5px 10px;
-  color: var(--muted);
-  text-decoration: none;
-  white-space: nowrap;
-  background: color-mix(in srgb, var(--surface-raised), transparent 54%);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
-}
-
-.footerAdminLink:hover,
-.footerAdminLink:focus-visible {
-  border-color: color-mix(in srgb, var(--focus), var(--line) 46%);
-  color: var(--ink);
-  background: color-mix(in srgb, var(--surface-raised), var(--focus) 8%);
-  text-decoration: none;
-}
-
-.footerAdminLink:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 3px;
-}
-
-.footerAdminIcon {
-  display: inline-grid;
-  width: 15px;
-  height: 15px;
-  place-items: center;
-  color: currentColor;
-}
-
-.footerAdminIcon svg {
-  display: block;
-  width: 15px;
-  height: 15px;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.8;
-}
-
 .miniPlayer {
   position: fixed;
   right: max(14px, env(safe-area-inset-right));
@@ -3228,8 +3194,7 @@ img {
     border-radius: 15px;
   }
 
-  .scheduleHeader,
-  .appFooter {
+  .scheduleHeader {
     display: grid;
   }
 
@@ -3309,6 +3274,10 @@ img {
 }
 
 @media (max-width: 560px) {
+  .appShell {
+    padding-bottom: calc(180px + env(safe-area-inset-bottom));
+  }
+
   .playerError {
     display: grid;
     justify-items: start;
@@ -3521,35 +3490,6 @@ img {
   .installButton {
     min-height: var(--control-compact);
     padding: 0 12px;
-  }
-
-  .appFooter {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 8px;
-    width: 100%;
-    border-top: 1px solid var(--line);
-    padding-top: 14px;
-  }
-
-  .appFooterUtility {
-    grid-template-columns: 1fr;
-    width: 100%;
-    justify-items: stretch;
-    gap: 10px;
-  }
-
-  .footerAdminAction {
-    width: 100%;
-  }
-
-  .footerAdminLink {
-    justify-content: center;
-    width: 100%;
-    min-height: var(--control-standard);
-    border-radius: var(--control-radius);
-    background: var(--surface-raised);
-    box-shadow: none;
-    font-weight: 740;
   }
 
   .requestModalBackdrop {
