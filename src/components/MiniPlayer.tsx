@@ -3,6 +3,7 @@
 import { type CSSProperties } from "react";
 import { useI18n } from "@/lib/i18n";
 import { TrackProgressBar } from "@/components/TrackProgressBar";
+import type { ArtworkLightboxData } from "@/components/ArtworkLightbox";
 import type { PlaybackState, Station, StationNowPlayingState } from "@/types/radio";
 
 interface MiniPlayerProps {
@@ -15,6 +16,7 @@ interface MiniPlayerProps {
   onStop: () => void;
   onVolumeChange: (volume: number) => void;
   onToggleMute: () => void;
+  onOpenArtwork: (artwork: ArtworkLightboxData) => void;
 }
 
 export function MiniPlayer({
@@ -26,7 +28,8 @@ export function MiniPlayer({
   onPlay,
   onStop,
   onVolumeChange,
-  onToggleMute
+  onToggleMute,
+  onOpenArtwork
 }: MiniPlayerProps) {
   const { t } = useI18n();
   const isPlaying = playbackState === "playing" || playbackState === "buffering";
@@ -39,7 +42,19 @@ export function MiniPlayer({
       aria-live="polite"
       style={{ "--station-accent": station.accentColor } as CSSProperties}
     >
-      <img src={artwork} alt="" className="miniArtwork" />
+      {nowPlaying.art ? (
+        <button
+          className="miniArtworkButton"
+          type="button"
+          onClick={() => onOpenArtwork({ imageUrl: nowPlaying.art as string, title: track.title, artist: track.artist })}
+          aria-label={t("artwork.view")}
+          title={t("artwork.view")}
+        >
+          <img src={artwork} alt="" className="miniArtwork" />
+        </button>
+      ) : (
+        <img src={artwork} alt="" className="miniArtwork" />
+      )}
       <div className="miniTrack">
         <strong>{track.title}</strong>
         {track.artist ? <span>{track.artist}</span> : null}

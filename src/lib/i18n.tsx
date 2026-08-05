@@ -23,6 +23,8 @@ type TranslationKey =
   | "common.listenersUnknown"
   | "common.refreshing"
   | "common.submitting"
+  | "artwork.view"
+  | "artwork.close"
   | "nav.label"
   | "nav.live"
   | "nav.about"
@@ -245,6 +247,8 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "common.listenersUnknown": "Listeners: --",
     "common.refreshing": "Refreshing...",
     "common.submitting": "Submitting...",
+    "artwork.view": "View album cover",
+    "artwork.close": "Close album cover",
     "nav.label": "Primary navigation",
     "nav.live": "Listen",
     "nav.about": "About",
@@ -476,6 +480,8 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "common.listenersUnknown": "Oyentes: --",
     "common.refreshing": "Actualizando...",
     "common.submitting": "Enviando...",
+    "artwork.view": "Ver portada del álbum",
+    "artwork.close": "Cerrar portada del álbum",
     "nav.label": "Navegación principal",
     "nav.live": "Escuchar",
     "nav.about": "Sobre",

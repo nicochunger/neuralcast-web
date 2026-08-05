@@ -11,6 +11,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { StationCard } from "@/components/StationCard";
 import { submitSongRequestAction } from "@/lib/actions";
 import { RecentlyPlayedModal } from "@/components/RecentlyPlayedModal";
+import { ArtworkLightbox, type ArtworkLightboxData } from "@/components/ArtworkLightbox";
 import type {
   RequestableSong,
   SongRequestState,
@@ -37,6 +38,7 @@ type ActiveOverlay =
   | { type: "history"; stationId: StationId }
   | { type: "schedule"; stationId: StationId }
   | { type: "requests"; stationId: StationId }
+  | ({ type: "artwork"; stationId: StationId } & ArtworkLightboxData)
   | null;
 
 const SchedulePreview = dynamic(
@@ -444,6 +446,10 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
               void refreshSchedules([selectedStation.id]);
             }}
             onRequestSong={openSongRequests}
+            onOpenArtwork={(artwork) => {
+              overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+              setActiveOverlay({ type: "artwork", stationId: station.id, ...artwork });
+            }}
             showAdminSkip={showAdminControls}
             isSkippingTrack={skippingStationId === station.id}
             hasSkippedTrack={skippedStationId === station.id}
@@ -506,6 +512,16 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
         />
       ) : null}
 
+      {activeOverlay?.type === "artwork" ? (
+        <ArtworkLightbox
+          imageUrl={activeOverlay.imageUrl}
+          title={activeOverlay.title}
+          artist={activeOverlay.artist}
+          album={activeOverlay.album}
+          onDismiss={() => setActiveOverlay(null)}
+        />
+      ) : null}
+
       <MiniPlayer
         station={activeStation}
         playbackState={playbackState}
@@ -516,6 +532,10 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
         onStop={stopPlayback}
         onVolumeChange={setVolume}
         onToggleMute={toggleMute}
+        onOpenArtwork={(artwork) => {
+          overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+          setActiveOverlay({ type: "artwork", stationId: activeStation.id, ...artwork });
+        }}
       />
     </main>
   );

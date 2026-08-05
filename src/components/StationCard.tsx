@@ -3,6 +3,7 @@
 import { getSegmentTitle, getStationDescription, useI18n } from "@/lib/i18n";
 import { AnimatedSuccessIcon } from "@/components/AnimatedSuccessIcon";
 import { TrackProgressBar } from "@/components/TrackProgressBar";
+import type { ArtworkLightboxData } from "@/components/ArtworkLightbox";
 import type { CSSProperties } from "react";
 import type {
   PlaybackState,
@@ -26,6 +27,7 @@ interface StationCardProps {
   onSelectHistory: (station: Station) => void;
   onSelectSchedule: (station: Station) => void;
   onRequestSong: (station: Station) => void;
+  onOpenArtwork: (artwork: ArtworkLightboxData) => void;
   showAdminSkip: boolean;
   isSkippingTrack: boolean;
   hasSkippedTrack: boolean;
@@ -47,6 +49,7 @@ export function StationCard({
   onSelectHistory,
   onSelectSchedule,
   onRequestSong,
+  onOpenArtwork,
   showAdminSkip,
   isSkippingTrack,
   hasSkippedTrack,
@@ -111,9 +114,26 @@ export function StationCard({
           </div>
 
           <div className="trackNowPlaying">
-            <div className={`trackArtwork ${nowPlaying.art ? "trackArtworkLoaded" : ""}`} aria-hidden="true">
-              {nowPlaying.art ? <img src={nowPlaying.art} alt="" loading="lazy" /> : <span>{getArtworkInitial(track)}</span>}
-            </div>
+            {nowPlaying.art ? (
+              <button
+                className="trackArtwork trackArtworkLoaded trackArtworkButton"
+                type="button"
+                onClick={() => onOpenArtwork({
+                  imageUrl: nowPlaying.art as string,
+                  title: track.title,
+                  artist: track.artist,
+                  album: track.album
+                })}
+                aria-label={t("artwork.view")}
+                title={t("artwork.view")}
+              >
+                <img src={nowPlaying.art} alt="" loading="lazy" />
+              </button>
+            ) : (
+              <div className="trackArtwork" aria-hidden="true">
+                <span>{getArtworkInitial(track)}</span>
+              </div>
+            )}
             <div className="trackTitle" aria-label={track.label}>
               <strong className="trackTitleText">{track.title}</strong>
               {track.artist ? (

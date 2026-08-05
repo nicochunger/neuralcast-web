@@ -1000,6 +1000,16 @@ img {
   background: var(--station-card-art-loaded-bg);
 }
 
+.trackArtworkButton {
+  padding: 0;
+  cursor: zoom-in;
+}
+
+.trackArtworkButton:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
 .trackTitle {
   display: grid;
   width: min(40vw, 380px);
@@ -2994,6 +3004,21 @@ img {
   object-fit: cover;
 }
 
+.miniArtworkButton {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.miniArtworkButton:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
 .miniTrack {
   display: grid;
   gap: 3px;
@@ -3124,6 +3149,90 @@ img {
 
 .volumeValue::after {
   content: "%";
+}
+
+.artworkLightboxBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(4, 8, 14, 0.78);
+  backdrop-filter: blur(12px) saturate(1.1);
+}
+
+.artworkLightbox {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  width: min(92vw, 680px);
+  max-height: calc(100dvh - 40px);
+  overflow: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: 22px;
+  padding: 20px;
+  background: var(--surface-raised);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.48);
+  animation: requestModalIn 180ms ease-out both;
+}
+
+.artworkLightboxClose {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 1.45rem;
+  font-weight: 760;
+  line-height: 1;
+}
+
+.artworkLightboxClose:hover {
+  background: var(--surface);
+}
+
+.artworkLightboxClose:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.artworkLightboxImage {
+  width: min(72vw, 560px);
+  max-height: calc(100dvh - 150px);
+  aspect-ratio: 1;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  object-fit: contain;
+}
+
+.artworkLightboxCaption {
+  width: min(100%, 560px);
+  text-align: center;
+}
+
+.artworkLightboxCaption h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.2rem;
+  line-height: 1.15;
+}
+
+.artworkLightboxCaption p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
 }
 
 @media (min-width: 1020px) {
@@ -3297,6 +3406,10 @@ img {
     grid-area: artwork;
     width: 54px;
     min-width: 54px;
+  }
+
+  .miniArtworkButton {
+    grid-area: artwork;
   }
 
   .miniTrack {
