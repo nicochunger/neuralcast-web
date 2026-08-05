@@ -62,11 +62,7 @@ export function StationCard({
     nowPlaying.listeners === undefined
       ? t("common.listenersUnknown")
       : t("common.listeners", { count: nowPlaying.listeners });
-  const activePlaylistText = schedule.error ? t("common.unavailable") : getActivePlaylistText(schedule.liveSegment, locale, t);
-  const nextSegmentText = getNextSegmentText(schedule, locale, t);
-  const nextSegmentTime = schedule.upNextSegment
-    ? formatScheduleTime(schedule.upNextSegment.startTime, station.timeZone, locale)
-    : undefined;
+  const activeBlockText = schedule.error ? t("common.unavailable") : getSegmentTitle(schedule.liveSegment, locale);
 
   return (
     <article
@@ -108,9 +104,9 @@ export function StationCard({
         <div className="stationInfoSurface">
           <div className="stationMetaTopline">
             <span>{t("station.nowPlaying")}</span>
-            <span className="stationActivePlaylists">
-              <span>{t("station.activePlaylists")}</span>
-              <strong>{activePlaylistText}</strong>
+            <span className="stationActiveBlock">
+              <span>{t("station.activeBlock")}</span>
+              <strong>{activeBlockText}</strong>
             </span>
           </div>
 
@@ -130,12 +126,6 @@ export function StationCard({
             </div>
           </div>
           {nowPlaying.error && !nowPlaying.text ? <em>{nowPlaying.error}</em> : null}
-
-          <div className="stationScheduleLine">
-            <span>{t("schedule.summary.upNext")}</span>
-            <strong>{nextSegmentText}</strong>
-            {nextSegmentTime ? <time>{nextSegmentTime}</time> : null}
-          </div>
 
           <div className="stationActions">
             <button
@@ -182,51 +172,6 @@ export function StationCard({
       </div>
     </article>
   );
-}
-
-function getActivePlaylistText(
-  segment: StationScheduleState["liveSegment"],
-  locale: ReturnType<typeof useI18n>["locale"],
-  t: ReturnType<typeof useI18n>["t"]
-): string {
-  if (!segment) {
-    return t("station.scheduleWaiting");
-  }
-
-  if (segment.kind === "open-rotation") {
-    return getSegmentTitle(segment, locale);
-  }
-
-  if (segment.playlistNames.length > 0) {
-    return segment.playlistNames.join(", ");
-  }
-
-  return getSegmentTitle(segment, locale);
-}
-
-function getNextSegmentText(
-  schedule: StationScheduleState,
-  locale: ReturnType<typeof useI18n>["locale"],
-  t: ReturnType<typeof useI18n>["t"]
-): string {
-  if (schedule.error) {
-    return t("common.unavailable");
-  }
-
-  if (schedule.upNextSegment) {
-    return getSegmentTitle(schedule.upNextSegment, locale);
-  }
-
-  return schedule.isLoading ? t("schedule.upNextWaiting") : t("schedule.upNextNone");
-}
-
-function formatScheduleTime(isoTime: string, timeZone: string, locale: string): string {
-  return new Intl.DateTimeFormat(locale, {
-    timeZone,
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23"
-  }).format(new Date(isoTime));
 }
 
 function StationActionIcon({ icon }: { icon: "history" | "schedule" | "request" | "skip" }) {

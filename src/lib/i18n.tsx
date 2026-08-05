@@ -138,9 +138,6 @@ type TranslationKey =
   | "schedule.blocks"
   | "schedule.summary.liveNow"
   | "schedule.summary.upNext"
-  | "schedule.upNextWaiting"
-  | "schedule.upNextNone"
-  | "schedule.weeklyNote"
   | "schedule.empty"
   | "schedule.toolbar"
   | "schedule.now"
@@ -149,7 +146,7 @@ type TranslationKey =
   | "stations.ariaLabel"
   | "station.nowPlaying"
   | "station.liveNow"
-  | "station.activePlaylists"
+  | "station.activeBlock"
   | "station.recentlyPlayed"
   | "station.schedule"
   | "station.requestSong"
@@ -365,9 +362,6 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "schedule.blocks": "{count} blocks",
     "schedule.summary.liveNow": "Live now",
     "schedule.summary.upNext": "Up next",
-    "schedule.upNextWaiting": "Waiting for the next segment.",
-    "schedule.upNextNone": "No later segment today.",
-    "schedule.weeklyNote": "The current weekly schedule repeats each day. A new schedule is generated overnight between Sunday and Monday.",
     "schedule.empty": "Schedule unavailable.",
     "schedule.toolbar": "24-hour view · Zurich time (CET/CEST)",
     "schedule.now": "Now {time}",
@@ -376,7 +370,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "stations.ariaLabel": "Stations",
     "station.nowPlaying": "Now playing",
     "station.liveNow": "Live now",
-    "station.activePlaylists": "Active playlists",
+    "station.activeBlock": "Active block",
     "station.recentlyPlayed": "Recently played",
     "station.schedule": "Schedule",
     "station.requestSong": "Request song",
@@ -599,9 +593,6 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "schedule.blocks": "{count} bloques",
     "schedule.summary.liveNow": "En vivo",
     "schedule.summary.upNext": "Sigue",
-    "schedule.upNextWaiting": "Esperando el próximo bloque.",
-    "schedule.upNextNone": "No hay más bloques hoy.",
-    "schedule.weeklyNote": "La programación semanal actual se repite todos los días. Se genera una nueva durante la noche entre el domingo y el lunes.",
     "schedule.empty": "Programación no disponible.",
     "schedule.toolbar": "Vista de 24 horas · hora de Zúrich (CET/CEST)",
     "schedule.now": "Ahora {time}",
@@ -610,7 +601,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "stations.ariaLabel": "Emisoras",
     "station.nowPlaying": "Sonando ahora",
     "station.liveNow": "En vivo",
-    "station.activePlaylists": "Listas activas",
+    "station.activeBlock": "Bloque activo",
     "station.recentlyPlayed": "Sonaron antes",
     "station.schedule": "Programación",
     "station.requestSong": "Pedir canción",

@@ -687,7 +687,7 @@ img {
 .stateChip,
 .listenerChip,
 .stationMetaTopline span,
-.stationActivePlaylists span,
+.stationActiveBlock span,
 .scheduleSummaryItem span,
 .scheduleHeader > span {
   color: var(--muted);
@@ -817,7 +817,6 @@ img {
   grid-template-areas:
     "meta meta"
     "now now"
-    "live live"
     "actions actions";
   gap: 9px 18px;
   border: 0;
@@ -838,7 +837,7 @@ img {
   min-width: 0;
 }
 
-.stationActivePlaylists {
+.stationActiveBlock {
   display: inline-flex;
   position: relative;
   align-items: baseline;
@@ -848,7 +847,7 @@ img {
   white-space: nowrap;
 }
 
-.stationActivePlaylists::before {
+.stationActiveBlock::before {
   position: absolute;
   top: 50%;
   left: -18px;
@@ -861,15 +860,15 @@ img {
   transform: translate(-50%, -50%);
 }
 
-.stationActivePlaylists span {
+.stationActiveBlock span {
   flex: 0 0 auto;
 }
 
-.stationActivePlaylists span::after {
+.stationActiveBlock span::after {
   content: ":";
 }
 
-.stationActivePlaylists strong {
+.stationActiveBlock strong {
   flex: 1 1 auto;
   overflow: hidden;
   min-width: 0;
@@ -883,7 +882,7 @@ img {
 }
 
 .stationInfoSurface .stationMetaTopline span,
-.stationInfoSurface .stationActivePlaylists span {
+.stationInfoSurface .stationActiveBlock span {
   color: var(--station-card-muted);
   text-shadow: var(--station-card-text-shadow);
 }
@@ -1043,42 +1042,6 @@ img {
 .stationInfoSurface em {
   color: var(--muted);
   font-style: normal;
-}
-
-.stationScheduleLine {
-  grid-area: live;
-  display: grid;
-  align-self: start;
-  min-width: 0;
-  gap: 3px;
-  border-top: 0;
-  border-left: 2px solid color-mix(in srgb, var(--station-accent), white 18%);
-  padding-left: 9px;
-}
-
-.stationScheduleLine span,
-.stationScheduleLine time {
-  color: var(--station-card-muted);
-  font-size: 0.78rem;
-  font-variant-numeric: tabular-nums;
-  text-shadow: var(--station-card-text-shadow);
-}
-
-.stationScheduleLine time {
-  width: fit-content;
-  border-radius: 999px;
-  padding: 2px 7px;
-  background: var(--station-card-chip-bg);
-}
-
-.stationScheduleLine strong {
-  overflow: hidden;
-  color: var(--station-card-title);
-  font-size: 0.94rem;
-  font-weight: 650;
-  text-shadow: var(--station-card-text-shadow);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .stationActions {
@@ -2568,12 +2531,6 @@ img {
   line-height: 1.45;
 }
 
-.scheduleHeader .scheduleWeeklyNote {
-  margin-top: 8px;
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 0.82rem;
-}
-
 .scheduleHeader > span {
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -3244,7 +3201,6 @@ img {
     grid-template-areas:
       "meta meta"
       "now now"
-      "live live"
       "actions actions";
     gap: 9px 14px;
   }
@@ -3418,7 +3374,6 @@ img {
     grid-template-areas:
       "meta"
       "now"
-      "live"
       "actions";
   }
 
@@ -3436,11 +3391,11 @@ img {
     gap: 24px;
   }
 
-  .stationActivePlaylists::before {
+  .stationActiveBlock::before {
     left: -13px;
   }
 
-  .stationActivePlaylists {
+  .stationActiveBlock {
     min-width: 0;
   }
 
