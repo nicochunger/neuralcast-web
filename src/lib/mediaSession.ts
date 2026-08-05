@@ -1,4 +1,4 @@
-import type { Station, StationNowPlayingState } from "@/types/radio";
+import type { PlaybackState, Station, StationNowPlayingState } from "@/types/radio";
 
 interface MediaSessionHandlers {
   onPlay: () => void;
@@ -9,25 +9,29 @@ interface MediaSessionHandlers {
 export function updateMediaSession(
   station: Station,
   status: StationNowPlayingState | undefined,
-  isPlaying: boolean
+  playbackState: PlaybackState
 ): void {
   if (!supportsMediaSession()) {
     return;
   }
 
-  const title = status?.text ?? station.name;
+  const title = status?.title ?? status?.text ?? station.name;
   const artist = status?.artist ?? station.name;
+  const album = status?.album ?? station.name;
+  const artwork = status?.art
+    ? [
+        { src: status.art },
+        { src: station.artworkImage, sizes: "1024x1024", type: "image/webp" }
+      ]
+    : [{ src: station.artworkImage, sizes: "1024x1024", type: "image/webp" }];
 
   navigator.mediaSession.metadata = new MediaMetadata({
     title,
     artist,
-    album: "NeuralCast",
-    artwork: [
-      { src: station.artworkImage, sizes: "1024x1024", type: "image/webp" },
-      { src: "/icons/neuralcast-icon-512.png", sizes: "512x512", type: "image/png" }
-    ]
+    album,
+    artwork
   });
-  navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
+  navigator.mediaSession.playbackState = playbackState === "playing" ? "playing" : playbackState === "idle" ? "none" : "paused";
 }
 
 export function registerMediaSessionHandlers(handlers: MediaSessionHandlers): void {

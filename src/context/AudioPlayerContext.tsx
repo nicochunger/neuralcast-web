@@ -117,6 +117,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     () => STATIONS.find((station) => station.id === activeStationId) ?? STATIONS[0],
     [activeStationId]
   );
+  const activeNowPlaying = nowPlaying[activeStationId];
 
   const getAudioElement = useCallback(() => {
     if (!sharedAudioElement) {
@@ -509,6 +510,40 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     };
   }, [activeStationId, pathname, playbackState, refreshNowPlaying, refreshSchedules]);
 
+  // Refresh shortly after the predicted end of the active track so metadata and history
+  // update promptly while retaining the regular polling fallback for incomplete metadata.
+  useEffect(() => {
+    const shouldSyncNowPlaying = pathname === "/" || playbackState !== "idle";
+
+    if (!shouldSyncNowPlaying) {
+      return;
+    }
+
+    const playedAt = activeNowPlaying?.playedAt;
+    const duration = activeNowPlaying?.duration;
+
+    if (playedAt === undefined || duration === undefined || !Number.isFinite(playedAt) || !Number.isFinite(duration) || duration <= 0) {
+      return;
+    }
+
+    const expectedEnd = playedAt * 1000 + duration * 1000;
+    const now = Date.now() + serverTimeOffset;
+    const delay = expectedEnd > now ? expectedEnd - now + 1000 : 10000;
+    const refreshTimer = window.setTimeout(() => {
+      void refreshNowPlaying([activeStationId]);
+    }, Math.max(1000, delay));
+
+    return () => window.clearTimeout(refreshTimer);
+  }, [
+    activeNowPlaying?.duration,
+    activeNowPlaying?.playedAt,
+    activeStationId,
+    pathname,
+    playbackState,
+    refreshNowPlaying,
+    serverTimeOffset
+  ]);
+
   // Media Session handlers & metadata synchronization
   useEffect(() => {
     registerMediaSessionHandlers({
@@ -521,8 +556,8 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   }, [activeStation, playStation, stopPlayback]);
 
   useEffect(() => {
-    updateMediaSession(activeStation, nowPlaying[activeStation.id], playbackState === "playing");
-  }, [activeStation, nowPlaying, playbackState]);
+    updateMediaSession(activeStation, activeNowPlaying, playbackState);
+  }, [activeNowPlaying, activeStation, playbackState]);
 
   return (
     <AudioPlayerContext.Provider
