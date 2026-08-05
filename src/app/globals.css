@@ -2991,7 +2991,7 @@ img {
   left: max(14px, env(safe-area-inset-left));
   z-index: 10;
   display: grid;
-  grid-template-columns: 44px minmax(110px, 1fr) auto auto;
+  grid-template-columns: 50px minmax(110px, 1fr) auto auto;
   align-items: center;
   gap: 12px;
   max-width: 760px;
@@ -3015,9 +3015,10 @@ img {
 }
 
 .miniArtwork {
-  width: 44px;
+  width: 50px;
+  min-width: 50px;
   aspect-ratio: 1;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--line);
   object-fit: cover;
 }
@@ -3261,11 +3262,12 @@ img {
   }
 
   .miniPlayer {
-    grid-template-columns: 38px minmax(110px, 1fr) auto auto;
+    grid-template-columns: 46px minmax(110px, 1fr) auto auto;
   }
 
   .miniArtwork {
-    width: 38px;
+    width: 46px;
+    min-width: 46px;
   }
 
   .aboutHero {
@@ -3304,7 +3306,7 @@ img {
 
 @media (max-width: 560px) {
   .miniPlayer {
-    grid-template-columns: 38px minmax(0, 1fr) auto;
+    grid-template-columns: 54px minmax(0, 1fr) auto;
     grid-template-areas:
       "artwork track action"
       "volume volume volume";
@@ -3314,6 +3316,8 @@ img {
 
   .miniArtwork {
     grid-area: artwork;
+    width: 54px;
+    min-width: 54px;
   }
 
   .miniTrack {
