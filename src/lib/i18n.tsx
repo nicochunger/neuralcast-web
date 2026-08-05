@@ -122,6 +122,9 @@ type TranslationKey =
   | "admin.statusFailed"
   | "player.playbackBlocked"
   | "player.streamLoadError"
+  | "player.reconnecting"
+  | "player.reconnectFailed"
+  | "player.reconnect"
   | "player.installFallbackAndroid"
   | "player.volume"
   | "player.volumeValue"
@@ -342,6 +345,9 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "player.playbackBlocked":
       "Playback was blocked or the stream could not be reached. Tap Play again after checking the network.",
     "player.streamLoadError": "The stream could not be loaded.",
+    "player.reconnecting": "Connection lost. Reconnecting...",
+    "player.reconnectFailed": "The stream could not be reconnected.",
+    "player.reconnect": "Reconnect",
     "player.installFallbackAndroid":
       "To install on Android, open your browser menu and tap Install app or Add to Home screen.",
     "player.volume": "Volume",
@@ -570,6 +576,9 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "player.playbackBlocked":
       "La reproducción se bloqueó o no se pudo acceder al stream. Tocá Reproducir de nuevo después de comprobar la red.",
     "player.streamLoadError": "No se pudo cargar el stream.",
+    "player.reconnecting": "Se perdió la conexión. Reconectando...",
+    "player.reconnectFailed": "No se pudo reconectar al stream.",
+    "player.reconnect": "Reconectar",
     "player.installFallbackAndroid":
       "Para instalar en Android, abrí el menú del navegador y tocá Instalar aplicación o Agregar a la pantalla de inicio.",
     "player.volume": "Volumen",

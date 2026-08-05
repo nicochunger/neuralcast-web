@@ -56,6 +56,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     playbackState,
     playbackError,
     currentTime,
+    reconnectPlayback,
     volume,
     nowPlaying,
     schedules,
@@ -436,7 +437,16 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
         ))}
       </section>
 
-      {playbackError ? <p className="playerError">{playbackError}</p> : null}
+      {playbackError ? (
+        <div className="playerError" role="alert">
+          <span>{playbackError}</span>
+          {playbackState === "error" ? (
+            <button className="playerRecoveryButton" type="button" onClick={() => void reconnectPlayback()}>
+              {t("player.reconnect")}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       {adminMessage ? <p className="playerError">{adminMessage}</p> : null}
 
       {activeOverlay?.type === "history" ? (

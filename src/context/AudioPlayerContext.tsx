@@ -26,6 +26,7 @@ interface AudioPlayerContextValue {
   schedules: Record<StationId, StationScheduleState>;
   playStation: (station: Station) => Promise<void>;
   stopPlayback: () => void;
+  reconnectPlayback: () => Promise<void>;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
   refreshNowPlaying: (stationIds?: StationId[]) => Promise<void>;
@@ -37,6 +38,9 @@ let sharedAudioElement: HTMLAudioElement | null = null;
 const VOLUME_STORAGE_KEY = "neuralcast:volume";
 const LAST_AUDIBLE_VOLUME_STORAGE_KEY = "neuralcast:last-audible-volume";
 const DEFAULT_VOLUME = 1;
+const RECOVERY_RETRY_DELAYS = [2000, 5000, 10000] as const;
+const STALL_RECOVERY_DELAY = 8000;
+const RECOVERY_WATCHDOG_DELAY = 12000;
 
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const { t } = useI18n();
@@ -44,6 +48,11 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const manualStopRef = useRef(false);
   const lastAudibleVolumeRef = useRef(DEFAULT_VOLUME);
+  const recoveryAttemptRef = useRef(0);
+  const recoveryTimerRef = useRef<number | undefined>(undefined);
+  const stallTimerRef = useRef<number | undefined>(undefined);
+  const recoveryInFlightRef = useRef(false);
+  const retryPlaybackRef = useRef<(() => Promise<void>) | undefined>(undefined);
 
   const [activeStationId, setActiveStationId] = useState<StationId>(DEFAULT_STATION_ID);
   const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
@@ -137,6 +146,105 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     setVolume(volume > 0 ? 0 : lastAudibleVolumeRef.current);
   }, [setVolume, volume]);
 
+  const clearRecoveryTimers = useCallback(() => {
+    if (recoveryTimerRef.current !== undefined) {
+      window.clearTimeout(recoveryTimerRef.current);
+      recoveryTimerRef.current = undefined;
+    }
+
+    if (stallTimerRef.current !== undefined) {
+      window.clearTimeout(stallTimerRef.current);
+      stallTimerRef.current = undefined;
+    }
+  }, []);
+
+  const queueRecovery = useCallback((delay: number, replaceExisting = false) => {
+    if (manualStopRef.current || recoveryInFlightRef.current) {
+      return;
+    }
+
+    if (recoveryTimerRef.current !== undefined) {
+      if (!replaceExisting) {
+        return;
+      }
+
+      window.clearTimeout(recoveryTimerRef.current);
+      recoveryTimerRef.current = undefined;
+    }
+
+    recoveryTimerRef.current = window.setTimeout(() => {
+      recoveryTimerRef.current = undefined;
+      void retryPlaybackRef.current?.();
+    }, delay);
+  }, []);
+
+  const retryPlayback = useCallback(async () => {
+    if (manualStopRef.current || recoveryInFlightRef.current) {
+      return;
+    }
+
+    const nextAttempt = recoveryAttemptRef.current + 1;
+
+    if (nextAttempt > RECOVERY_RETRY_DELAYS.length) {
+      setPlaybackState("error");
+      setPlaybackError(t("player.reconnectFailed"));
+      return;
+    }
+
+    recoveryAttemptRef.current = nextAttempt;
+    recoveryInFlightRef.current = true;
+    setPlaybackState("buffering");
+    setPlaybackError(t("player.reconnecting"));
+
+    const audio = getAudioElement();
+    let retryDelay: number | undefined;
+    let recoveryFailed = false;
+
+    audio.pause();
+    if (audio.src !== activeStation.streamUrl) {
+      audio.src = activeStation.streamUrl;
+    }
+    audio.load();
+
+    try {
+      await audio.play();
+    } catch {
+      if (!manualStopRef.current) {
+        if (nextAttempt < RECOVERY_RETRY_DELAYS.length) {
+          retryDelay = RECOVERY_RETRY_DELAYS[nextAttempt];
+        } else {
+          recoveryFailed = true;
+          setPlaybackState("error");
+          setPlaybackError(t("player.reconnectFailed"));
+        }
+      }
+    } finally {
+      recoveryInFlightRef.current = false;
+
+      if (!manualStopRef.current && !recoveryFailed && recoveryAttemptRef.current === nextAttempt) {
+        queueRecovery(retryDelay ?? RECOVERY_WATCHDOG_DELAY);
+      } else if (manualStopRef.current) {
+        clearRecoveryTimers();
+      }
+    }
+  }, [activeStation.streamUrl, clearRecoveryTimers, getAudioElement, queueRecovery, t]);
+
+  useEffect(() => {
+    retryPlaybackRef.current = retryPlayback;
+
+    return () => {
+      retryPlaybackRef.current = undefined;
+    };
+  }, [retryPlayback]);
+
+  const reconnectPlayback = useCallback(async () => {
+    clearRecoveryTimers();
+    recoveryAttemptRef.current = 0;
+    recoveryInFlightRef.current = false;
+    manualStopRef.current = false;
+    await retryPlayback();
+  }, [clearRecoveryTimers, retryPlayback]);
+
   const refreshNowPlaying = useCallback(async (stationIds: StationId[] = STATIONS.map((station) => station.id)) => {
     setNowPlaying((current) => markNowPlayingLoading(current, stationIds));
 
@@ -207,6 +315,9 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
 
   const stopPlayback = useCallback(() => {
     manualStopRef.current = true;
+    clearRecoveryTimers();
+    recoveryAttemptRef.current = 0;
+    recoveryInFlightRef.current = false;
     const audio = getAudioElement();
 
     audio.pause();
@@ -216,13 +327,16 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     setPlaybackState("idle");
     setPlaybackError(undefined);
     clearMediaSessionPlaybackState();
-  }, [getAudioElement]);
+  }, [clearRecoveryTimers, getAudioElement]);
 
   const playStation = useCallback(
     async (station: Station) => {
       const audio = getAudioElement();
 
       manualStopRef.current = false;
+      clearRecoveryTimers();
+      recoveryAttemptRef.current = 0;
+      recoveryInFlightRef.current = false;
       setActiveStationId(station.id);
       setPlaybackState("buffering");
       setPlaybackError(undefined);
@@ -246,7 +360,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
 
       void refreshNowPlaying([station.id]);
     },
-    [refreshNowPlaying, t]
+    [clearRecoveryTimers, getAudioElement, refreshNowPlaying, t]
   );
 
   // Initialize station and audio element listeners
@@ -285,18 +399,32 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     const handleWaiting = () => {
       if (!manualStopRef.current) {
         setPlaybackState("buffering");
+
+        if (stallTimerRef.current === undefined) {
+          stallTimerRef.current = window.setTimeout(() => {
+            stallTimerRef.current = undefined;
+            queueRecovery(0, true);
+          }, STALL_RECOVERY_DELAY);
+        }
       }
     };
-    const handlePlaying = () => setPlaybackState("playing");
+    const handlePlaying = () => {
+      clearRecoveryTimers();
+      recoveryAttemptRef.current = 0;
+      recoveryInFlightRef.current = false;
+      setPlaybackState("playing");
+      setPlaybackError(undefined);
+    };
     const handlePause = () => {
-      if (!manualStopRef.current && audio.src) {
+      if (!manualStopRef.current && audio.src && !recoveryInFlightRef.current) {
         setPlaybackState("paused");
       }
     };
     const handleError = () => {
       if (!manualStopRef.current) {
-        setPlaybackState("error");
-        setPlaybackError(t("player.streamLoadError"));
+        setPlaybackState("buffering");
+        setPlaybackError(t("player.reconnecting"));
+        queueRecovery(RECOVERY_RETRY_DELAYS[recoveryAttemptRef.current] ?? RECOVERY_RETRY_DELAYS[0]);
       }
     };
 
@@ -315,7 +443,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       audio.removeEventListener("pause", handlePause);
       audio.removeEventListener("error", handleError);
     };
-  }, [getAudioElement, t]);
+  }, [clearRecoveryTimers, getAudioElement, queueRecovery, t]);
 
   // Handle Polling Intervals & Visibility Changes
   useEffect(() => {
@@ -409,6 +537,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
         schedules,
         playStation,
         stopPlayback,
+        reconnectPlayback,
         setVolume,
         toggleMute,
         refreshNowPlaying,

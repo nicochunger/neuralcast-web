@@ -1303,12 +1303,37 @@ img {
 }
 
 .playerError {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin: 16px 0 0;
   border-left: 4px solid var(--red);
   border-radius: 8px;
   padding: 10px 12px;
   color: var(--ink);
   background: var(--error-bg);
+}
+
+.playerRecoveryButton {
+  flex: 0 0 auto;
+  min-height: var(--control-compact);
+  border: 1px solid color-mix(in srgb, var(--red), var(--line) 42%);
+  border-radius: var(--control-radius);
+  padding: 0 12px;
+  background: var(--surface-raised);
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 780;
+}
+
+.playerRecoveryButton:hover {
+  border-color: var(--red);
+}
+
+.playerRecoveryButton:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
 }
 
 .requestModalBackdrop {
@@ -3305,6 +3330,11 @@ img {
 }
 
 @media (max-width: 560px) {
+  .playerError {
+    display: grid;
+    justify-items: start;
+  }
+
   .miniPlayer {
     grid-template-columns: 54px minmax(0, 1fr) auto;
     grid-template-areas:
