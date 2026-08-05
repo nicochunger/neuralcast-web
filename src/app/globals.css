@@ -601,6 +601,7 @@ img {
 
 .stationCard-neuralforge {
   --station-card-image-filter: saturate(1) contrast(1.04) brightness(1.02);
+  --station-card-image-position: 40% center;
   --station-card-overlay:
     linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0, rgba(255, 255, 255, 0.18) 44%, rgba(255, 255, 255, 0.44) 100%),
     linear-gradient(90deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.04) 62%);
@@ -649,7 +650,7 @@ img {
   inset: 0;
   z-index: -2;
   background-image: var(--station-bg);
-  background-position: center;
+  background-position: var(--station-card-image-position, center);
   background-size: cover;
   content: "";
   filter: var(--station-card-image-filter);
