@@ -69,6 +69,7 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
           <span className="scheduleKicker">{station.name}</span>
           <h2 id="schedule-title">{t("schedule.title", { station: station.name })}</h2>
           <p>{schedule.error ? schedule.error : t("schedule.description")}</p>
+          <p>{t("schedule.weeklyNote")}</p>
         </div>
       </div>
 

@@ -138,6 +138,7 @@ type TranslationKey =
   | "schedule.blocks"
   | "schedule.summary.liveNow"
   | "schedule.summary.upNext"
+  | "schedule.weeklyNote"
   | "schedule.empty"
   | "schedule.toolbar"
   | "schedule.now"
@@ -362,6 +363,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "schedule.blocks": "{count} blocks",
     "schedule.summary.liveNow": "Live now",
     "schedule.summary.upNext": "Up next",
+    "schedule.weeklyNote": "The current weekly schedule repeats each day. A new schedule is generated overnight between Sunday and Monday.",
     "schedule.empty": "Schedule unavailable.",
     "schedule.toolbar": "24-hour view · Zurich time (CET/CEST)",
     "schedule.now": "Now {time}",
@@ -593,6 +595,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "schedule.blocks": "{count} bloques",
     "schedule.summary.liveNow": "En vivo",
     "schedule.summary.upNext": "Sigue",
+    "schedule.weeklyNote": "La programación semanal actual se repite todos los días. Se genera una nueva durante la noche entre el domingo y el lunes.",
     "schedule.empty": "Programación no disponible.",
     "schedule.toolbar": "Vista de 24 horas · hora de Zúrich (CET/CEST)",
     "schedule.now": "Ahora {time}",
