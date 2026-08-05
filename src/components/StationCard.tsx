@@ -2,6 +2,7 @@
 
 import { getSegmentTitle, getStationDescription, useI18n } from "@/lib/i18n";
 import { AnimatedSuccessIcon } from "@/components/AnimatedSuccessIcon";
+import { TrackProgressBar } from "@/components/TrackProgressBar";
 import type { CSSProperties } from "react";
 import type {
   PlaybackState,
@@ -14,6 +15,7 @@ interface StationCardProps {
   station: Station;
   isActive: boolean;
   playbackState: PlaybackState;
+  currentTime: number;
   nowPlaying: StationNowPlayingState;
   schedule: StationScheduleState;
   isHistorySelected: boolean;
@@ -34,6 +36,7 @@ export function StationCard({
   station,
   isActive,
   playbackState,
+  currentTime,
   nowPlaying,
   schedule,
   isHistorySelected,
@@ -119,6 +122,7 @@ export function StationCard({
               {track.album ? (
                 <span className="trackAlbum">{track.album}</span>
               ) : null}
+              <TrackProgressBar nowPlaying={nowPlaying} currentTime={currentTime} />
             </div>
           </div>
           {nowPlaying.error && !nowPlaying.text ? <em>{nowPlaying.error}</em> : null}

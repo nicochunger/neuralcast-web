@@ -20,6 +20,7 @@ interface AudioPlayerContextValue {
   activeStation: Station;
   playbackState: PlaybackState;
   playbackError: string | undefined;
+  currentTime: number;
   volume: number;
   nowPlaying: Record<StationId, StationNowPlayingState>;
   schedules: Record<StationId, StationScheduleState>;
@@ -47,6 +48,8 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const [activeStationId, setActiveStationId] = useState<StationId>(DEFAULT_STATION_ID);
   const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
   const [playbackError, setPlaybackError] = useState<string | undefined>();
+  const [localTime, setLocalTime] = useState(0);
+  const [serverTimeOffset, setServerTimeOffset] = useState(0);
   const [volume, setVolumeState] = useState(DEFAULT_VOLUME);
 
   const [nowPlaying, setNowPlaying] = useState<Record<StationId, StationNowPlayingState>>(
@@ -55,6 +58,51 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const [schedules, setSchedules] = useState<Record<StationId, StationScheduleState>>(
     createInitialScheduleState
   );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const synchronizeServerTime = async () => {
+      const requestStartedAt = Date.now();
+
+      try {
+        const response = await fetch("/api/time", { cache: "no-store" });
+        const receivedAt = Date.now();
+
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as { timestamp?: unknown };
+        const timestamp = typeof payload.timestamp === "number" ? payload.timestamp : Number(payload.timestamp);
+
+        if (isMounted && Number.isFinite(timestamp)) {
+          const requestMidpoint = requestStartedAt + (receivedAt - requestStartedAt) / 2;
+          setServerTimeOffset(timestamp * 1000 - requestMidpoint);
+        }
+      } catch {
+        // Track progress falls back to the browser clock if server time is unavailable.
+      }
+    };
+
+    void synchronizeServerTime();
+    const syncInterval = window.setInterval(synchronizeServerTime, 600000);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(syncInterval);
+    };
+  }, []);
+
+  useEffect(() => {
+    const updateLocalTime = () => setLocalTime(Date.now());
+    updateLocalTime();
+    const clockInterval = window.setInterval(updateLocalTime, 1000);
+
+    return () => window.clearInterval(clockInterval);
+  }, []);
+
+  const currentTime = localTime + serverTimeOffset;
 
   const activeStation = useMemo(
     () => STATIONS.find((station) => station.id === activeStationId) ?? STATIONS[0],
@@ -355,6 +403,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
         activeStation,
         playbackState,
         playbackError,
+        currentTime,
         volume,
         nowPlaying,
         schedules,

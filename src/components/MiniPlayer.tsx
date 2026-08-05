@@ -2,11 +2,13 @@
 
 import { type CSSProperties } from "react";
 import { useI18n } from "@/lib/i18n";
+import { TrackProgressBar } from "@/components/TrackProgressBar";
 import type { PlaybackState, Station, StationNowPlayingState } from "@/types/radio";
 
 interface MiniPlayerProps {
   station: Station;
   playbackState: PlaybackState;
+  currentTime: number;
   nowPlaying: StationNowPlayingState;
   volume: number;
   onPlay: (station: Station) => void;
@@ -18,6 +20,7 @@ interface MiniPlayerProps {
 export function MiniPlayer({
   station,
   playbackState,
+  currentTime,
   nowPlaying,
   volume,
   onPlay,
@@ -31,11 +34,16 @@ export function MiniPlayer({
   const artwork = nowPlaying.art ?? station.artworkImage;
 
   return (
-    <aside className={`miniPlayer ${isPlaying ? "miniPlayerVisible" : ""}`} aria-live="polite">
+    <aside
+      className={`miniPlayer ${isPlaying ? "miniPlayerVisible" : ""}`}
+      aria-live="polite"
+      style={{ "--station-accent": station.accentColor } as CSSProperties}
+    >
       <img src={artwork} alt="" className="miniArtwork" />
       <div className="miniTrack">
         <strong>{track.title}</strong>
         {track.artist ? <span>{track.artist}</span> : null}
+        <TrackProgressBar nowPlaying={nowPlaying} currentTime={currentTime} />
       </div>
       <div
         className="volumeControl"

@@ -44,6 +44,8 @@ function normalizeNowPlaying(station: Station, payload: unknown): StationNowPlay
     genre: readString(song.genre),
     art: readString(song.art),
     listeners: listenerCount,
+    playedAt: parseNumber(nowPlaying.played_at),
+    duration: parsePositiveNumber(nowPlaying.duration),
     history,
     fetchedAt: new Date().toISOString()
   };
@@ -90,6 +92,11 @@ function parseListenerCount(listeners: JsonObject): number | undefined {
   const total = parseNumber(listeners.total);
   const value = current ?? total;
   return value === undefined ? undefined : Math.max(0, value);
+}
+
+function parsePositiveNumber(value: unknown): number | undefined {
+  const parsed = parseNumber(value);
+  return parsed !== undefined && parsed > 0 ? parsed : undefined;
 }
 
 function formatTrack(artist?: string, title?: string): string | undefined {

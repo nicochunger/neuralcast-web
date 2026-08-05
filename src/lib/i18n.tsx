@@ -127,6 +127,8 @@ type TranslationKey =
   | "player.volumeValue"
   | "player.mute"
   | "player.unmute"
+  | "player.trackProgress"
+  | "player.trackProgressValue"
   | "schedule.title"
   | "schedule.description"
   | "schedule.error"
@@ -346,6 +348,8 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "player.volumeValue": "Volume: {value}%",
     "player.mute": "Mute",
     "player.unmute": "Unmute",
+    "player.trackProgress": "Track progress",
+    "player.trackProgressValue": "{elapsed} of {duration}",
     "schedule.title": "{station} schedule",
     "schedule.description": "See what is playing now and what is coming up through the day.",
     "schedule.error": "Schedule unavailable.",
@@ -572,6 +576,8 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "player.volumeValue": "Volumen: {value}%",
     "player.mute": "Silenciar",
     "player.unmute": "Activar sonido",
+    "player.trackProgress": "Progreso de la canción",
+    "player.trackProgressValue": "{elapsed} de {duration}",
     "schedule.title": "Programación de {station}",
     "schedule.description": "Mirá lo que suena ahora y lo que viene después durante el día.",
     "schedule.error": "Programación no disponible.",

@@ -26,6 +26,8 @@ export interface StationNowPlaying {
   genre?: string;
   art?: string;
   listeners?: number;
+  playedAt?: number;
+  duration?: number;
   history: PlayedTrack[];
   fetchedAt: string;
 }

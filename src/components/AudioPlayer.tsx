@@ -55,6 +55,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     activeStation,
     playbackState,
     playbackError,
+    currentTime,
     volume,
     nowPlaying,
     schedules,
@@ -408,6 +409,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
             station={station}
             isActive={station.id === activeStationId}
             playbackState={playbackState}
+            currentTime={currentTime}
             nowPlaying={nowPlaying[station.id]}
             schedule={schedules[station.id]}
             isHistorySelected={activeOverlay?.type === "history" && station.id === activeOverlay.stationId}
@@ -499,6 +501,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       <MiniPlayer
         station={activeStation}
         playbackState={playbackState}
+        currentTime={currentTime}
         nowPlaying={nowPlaying[activeStation.id]}
         volume={volume}
         onPlay={playStation}

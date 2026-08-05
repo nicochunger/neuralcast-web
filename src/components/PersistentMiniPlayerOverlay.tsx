@@ -11,6 +11,7 @@ export function PersistentMiniPlayerOverlay() {
     activeStationId,
     activeStation,
     playbackState,
+    currentTime,
     nowPlaying,
     volume,
     playStation,
@@ -29,6 +30,7 @@ export function PersistentMiniPlayerOverlay() {
     <MiniPlayer
       station={station}
       playbackState={playbackState}
+      currentTime={currentTime}
       nowPlaying={nowPlaying[activeStationId] ?? { stationId: activeStationId, isLoading: false }}
       volume={volume}
       onPlay={playStation}

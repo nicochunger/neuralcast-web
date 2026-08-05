@@ -1003,6 +1003,42 @@ img {
   line-height: 1.14;
 }
 
+.trackProgress {
+  display: grid;
+  width: 100%;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.trackProgressBar {
+  width: 100%;
+  height: 5px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--station-accent, var(--focus)), transparent 38%);
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--station-accent, var(--focus)), white 12%) var(--track-progress),
+      color-mix(in srgb, var(--station-card-title, var(--ink)), transparent 72%) var(--track-progress)
+    );
+}
+
+.trackProgressTimes {
+  display: flex;
+  justify-content: space-between;
+  color: var(--station-card-muted, var(--muted));
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.trackProgressTimes span {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
 .stationInfoSurface em {
   color: var(--muted);
   font-style: normal;
@@ -3001,6 +3037,25 @@ img {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.miniTrack .trackProgress {
+  gap: 3px;
+  margin-top: 3px;
+}
+
+.miniTrack .trackProgressBar {
+  height: 4px;
+}
+
+.miniTrack .trackProgressTimes {
+  color: var(--muted);
+  font-size: 0.66rem;
+}
+
+.miniTrack .trackProgressTimes span {
+  color: inherit;
+  font-size: inherit;
 }
 
 .volumeControl {
