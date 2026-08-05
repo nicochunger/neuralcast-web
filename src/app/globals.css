@@ -817,6 +817,7 @@ img {
   grid-template-areas:
     "meta meta"
     "now now"
+    "live live"
     "actions actions";
   gap: 9px 18px;
   border: 0;
@@ -1053,6 +1054,21 @@ img {
   border-top: 0;
   border-left: 2px solid color-mix(in srgb, var(--station-accent), white 18%);
   padding-left: 9px;
+}
+
+.stationScheduleLine span,
+.stationScheduleLine time {
+  color: var(--station-card-muted);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  text-shadow: var(--station-card-text-shadow);
+}
+
+.stationScheduleLine time {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: var(--station-card-chip-bg);
 }
 
 .stationScheduleLine strong {
@@ -2552,6 +2568,12 @@ img {
   line-height: 1.45;
 }
 
+.scheduleHeader .scheduleWeeklyNote {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.82rem;
+}
+
 .scheduleHeader > span {
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -3222,6 +3244,7 @@ img {
     grid-template-areas:
       "meta meta"
       "now now"
+      "live live"
       "actions actions";
     gap: 9px 14px;
   }
@@ -3395,6 +3418,7 @@ img {
     grid-template-areas:
       "meta"
       "now"
+      "live"
       "actions";
   }
 
