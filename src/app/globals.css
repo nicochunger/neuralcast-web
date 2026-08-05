@@ -1398,14 +1398,6 @@ img {
   grid-template-rows: auto minmax(260px, 1fr);
 }
 
-.historyListShell {
-  padding-top: 0;
-}
-
-.historyList {
-  padding: 16px 10px 0 0;
-}
-
 .historySongItem {
   grid-template-columns: 64px minmax(0, 1fr) auto;
   gap: 10px 12px;
@@ -1570,6 +1562,14 @@ img {
   margin: 0;
   padding: 0 10px 0 0;
   list-style: none;
+}
+
+.requestListShell.historyListShell {
+  padding-top: 16px;
+}
+
+.requestSongList.historyList {
+  padding-bottom: 0;
 }
 
 .requestSongItem {
@@ -3632,11 +3632,11 @@ img {
     padding: 0 10px 14px 18px;
   }
 
-  .historyListShell {
-    padding: 0 8px 12px 14px;
+  .requestListShell.historyListShell {
+    padding: 10px 8px 12px 14px;
   }
 
-  .historyList {
+  .requestSongList.historyList {
     gap: 8px;
     padding-right: 4px;
   }
