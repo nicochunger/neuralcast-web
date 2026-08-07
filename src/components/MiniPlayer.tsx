@@ -46,7 +46,12 @@ export function MiniPlayer({
         <button
           className="miniArtworkButton"
           type="button"
-          onClick={() => onOpenArtwork({ imageUrl: nowPlaying.art as string, title: track.title, artist: track.artist })}
+          onClick={() => onOpenArtwork({
+            imageUrl: nowPlaying.art as string,
+            title: track.title,
+            artist: track.artist,
+            album: track.album
+          })}
           aria-label={t("artwork.view")}
           title={t("artwork.view")}
         >
@@ -115,13 +120,15 @@ function VolumeIcon({ volume }: { volume: number }) {
 interface MiniTrackDetails {
   title: string;
   artist?: string;
+  album?: string;
 }
 
 function getMiniTrackDetails(nowPlaying: StationNowPlayingState, fallbackTitle: string): MiniTrackDetails {
   if (nowPlaying.title) {
     return {
       title: nowPlaying.title,
-      artist: nowPlaying.artist
+      artist: nowPlaying.artist,
+      album: nowPlaying.album
     };
   }
 
@@ -129,10 +136,11 @@ function getMiniTrackDetails(nowPlaying: StationNowPlayingState, fallbackTitle: 
     const parts = nowPlaying.text.split(" - ").map((part) => part.trim()).filter(Boolean);
 
     if (parts.length >= 3) {
-      const [artist, , ...titleParts] = parts;
+      const [artist, album, ...titleParts] = parts;
       return {
         title: titleParts.join(" - "),
-        artist
+        artist,
+        album
       };
     }
 

@@ -3222,17 +3222,18 @@ img {
   text-align: center;
 }
 
-.artworkLightboxCaption h2 {
+.artworkLightboxAlbum {
   margin: 0;
   color: var(--ink);
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  font-weight: 800;
   line-height: 1.15;
 }
 
-.artworkLightboxCaption p {
+.artworkLightboxArtist {
   margin: 5px 0 0;
   color: var(--muted);
-  font-size: 0.92rem;
+  font-size: 0.96rem;
 }
 
 @media (min-width: 1020px) {

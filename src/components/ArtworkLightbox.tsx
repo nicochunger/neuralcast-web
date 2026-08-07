@@ -15,7 +15,8 @@ interface ArtworkLightboxProps extends ArtworkLightboxData {
 
 export function ArtworkLightbox({ imageUrl, title, artist, album, onDismiss }: ArtworkLightboxProps) {
   const { t } = useI18n();
-  const subtitle = [artist, album].filter(Boolean).join(" · ");
+  const captionTitle = album ?? artist ?? title;
+  const captionArtist = album && artist ? artist : undefined;
 
   return (
     <div
@@ -46,11 +47,11 @@ export function ArtworkLightbox({ imageUrl, title, artist, album, onDismiss }: A
         <img
           className="artworkLightboxImage"
           src={imageUrl}
-          alt={[title, artist].filter(Boolean).join(" — ")}
+          alt={[artist, album].filter(Boolean).join(" — ") || title}
         />
         <div className="artworkLightboxCaption">
-          <h2 id="artwork-lightbox-title">{title}</h2>
-          {subtitle ? <p>{subtitle}</p> : null}
+          <h2 id="artwork-lightbox-title" className="artworkLightboxAlbum">{captionTitle}</h2>
+          {captionArtist ? <p className="artworkLightboxArtist">{captionArtist}</p> : null}
         </div>
       </section>
     </div>
