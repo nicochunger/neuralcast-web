@@ -34,7 +34,6 @@ interface AudioPlayerContextValue {
 }
 
 const AudioPlayerContext = createContext<AudioPlayerContextValue | undefined>(undefined);
-let sharedAudioElement: HTMLAudioElement | null = null;
 const VOLUME_STORAGE_KEY = "neuralcast:volume";
 const LAST_AUDIBLE_VOLUME_STORAGE_KEY = "neuralcast:last-audible-volume";
 const DEFAULT_VOLUME = 1;
@@ -42,10 +41,17 @@ const RECOVERY_RETRY_DELAYS = [2000, 5000, 10000] as const;
 const STALL_RECOVERY_DELAY = 8000;
 const RECOVERY_WATCHDOG_DELAY = 12000;
 
+declare global {
+  interface Window {
+    __neuralcastPersistentAudioElement__?: HTMLAudioElement;
+  }
+}
+
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const pathname = usePathname();
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioHostRef = useRef<HTMLDivElement | null>(null);
   const manualStopRef = useRef(false);
   const lastAudibleVolumeRef = useRef(DEFAULT_VOLUME);
   const recoveryAttemptRef = useRef(0);
@@ -120,12 +126,22 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const activeNowPlaying = nowPlaying[activeStationId];
 
   const getAudioElement = useCallback(() => {
-    if (!sharedAudioElement) {
-      sharedAudioElement = new Audio();
-      sharedAudioElement.preload = "none";
+    if (typeof window === "undefined") {
+      throw new Error("Audio playback is only available in the browser.");
     }
 
-    audioRef.current = sharedAudioElement;
+    if (!window.__neuralcastPersistentAudioElement__) {
+      const audio = new Audio();
+      audio.preload = "none";
+      window.__neuralcastPersistentAudioElement__ = audio;
+    }
+
+    audioRef.current = window.__neuralcastPersistentAudioElement__;
+
+    if (audioHostRef.current && audioRef.current.parentElement !== audioHostRef.current) {
+      audioHostRef.current.appendChild(audioRef.current);
+    }
+
     return audioRef.current;
   }, []);
 
@@ -580,6 +596,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
+      <div ref={audioHostRef} className="persistentAudioHost" aria-hidden="true" />
     </AudioPlayerContext.Provider>
   );
 }

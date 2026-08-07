@@ -338,6 +338,15 @@ img {
   height: auto;
 }
 
+.persistentAudioHost {
+  position: fixed;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
 .appShell {
   width: min(1120px, calc(100% - 28px));
   min-height: 100dvh;
