@@ -3652,7 +3652,7 @@ img {
   }
 
   .requestSongItem {
-    grid-template-columns: 48px minmax(0, 1fr);
+    grid-template-columns: 48px minmax(0, 1fr) auto;
   }
 
   .historySongItem {
@@ -3676,8 +3676,8 @@ img {
   }
 
   .requestSongButton {
-    grid-column: 1 / -1;
-    width: 100%;
+    min-width: 88px;
+    padding: 0 12px;
   }
 
   .historySongTime {
