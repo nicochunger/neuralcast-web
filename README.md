@@ -42,6 +42,9 @@ On Vercel, add the same four environment variables in the project settings befor
 
 `AZURACAST_ADMIN_API_KEY` is used server-side for protected control-room actions like skipping the current track, and is never exposed to the browser.
 `HOST_ADMIN_BASE_URL` and `HOST_ADMIN_TOKEN` are used server-side for the host orchestrator console, including force-archetype and schedule-generator jobs.
+They also power the authenticated favorites sync: the PWA route `/api/favorites` forwards admin requests to the VPS route `/admin/favorites`.
+
+Favorites for public listeners are stored in browser local storage. Favorites for the admin account are mirrored through the VPS admin service and persisted at `/root/projects/NeuralCast/runtime/admin_http/favorites.json` on the NeuralCast host. The VPS service writes that file atomically under a lock; Vercel does not write favorites to its own filesystem.
 
 ## Build
 

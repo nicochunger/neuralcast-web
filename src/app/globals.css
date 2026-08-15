@@ -488,6 +488,37 @@ img {
   outline-offset: 3px;
 }
 
+.headerFavoritesButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: var(--control-icon);
+  border: 1px solid var(--line);
+  border-radius: var(--control-radius);
+  padding: 0 10px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 760;
+}
+
+.headerFavoritesButton:hover {
+  border-color: color-mix(in srgb, var(--red), var(--line) 46%);
+  background: color-mix(in srgb, var(--surface-raised), var(--red) 8%);
+  color: var(--red);
+  transform: translateY(-1px);
+}
+
+.headerFavoritesButton:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.headerFavoritesIcon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
 .headerAdminIcon,
 .headerAdminIcon svg {
   display: block;
@@ -939,7 +970,7 @@ img {
 .trackNowPlaying {
   grid-area: now;
   display: inline-grid;
-  grid-template-columns: 100px minmax(0, 1fr);
+  grid-template-columns: 100px minmax(0, 1fr) 40px;
   align-items: center;
   gap: 16px;
   justify-self: start;
@@ -1029,6 +1060,55 @@ img {
   overflow: hidden;
   color: var(--station-card-title);
   text-shadow: var(--station-card-text-shadow);
+}
+
+.favoriteButton {
+  display: grid;
+  width: 40px;
+  min-height: 40px;
+  aspect-ratio: 1;
+  place-items: center;
+  align-self: start;
+  border: 1px solid var(--station-card-action-border);
+  border-radius: 999px;
+  padding: 0;
+  background: var(--station-card-action-bg);
+  color: var(--station-card-muted);
+  cursor: pointer;
+  box-shadow: var(--station-card-action-shadow);
+  backdrop-filter: blur(12px);
+}
+
+.favoriteButton svg {
+  display: block;
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.favoriteButton:hover {
+  border-color: color-mix(in srgb, var(--red), var(--station-card-action-border) 44%);
+  color: var(--red);
+  transform: translateY(-1px);
+}
+
+.favoriteButtonActive {
+  border-color: color-mix(in srgb, var(--red), white 20%);
+  background: color-mix(in srgb, var(--red), transparent 84%);
+  color: var(--red);
+}
+
+.favoriteButtonActive svg {
+  fill: currentColor;
+}
+
+.favoriteButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .trackTitleText,
@@ -1340,6 +1420,12 @@ img {
   outline-offset: 3px;
 }
 
+.favoriteButton:focus-visible,
+.favoriteRemoveButton:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
 .playerError {
   display: flex;
   align-items: center;
@@ -1405,6 +1491,103 @@ img {
 
 .historyModal {
   grid-template-rows: auto minmax(260px, 1fr);
+}
+
+.favoritesModal {
+  --station-accent: #1f8a78;
+  --station-bg: url("/images/neuralcast-bg.webp");
+  grid-template-rows: auto minmax(260px, 1fr);
+}
+
+.favoritesListShell {
+  padding-top: 16px;
+}
+
+.favoritesStationGroups {
+  display: grid;
+  gap: 22px;
+  padding: 0 10px 0 0;
+}
+
+.favoritesStationGroup {
+  display: grid;
+  gap: 10px;
+}
+
+.favoritesStationHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px;
+}
+
+.favoritesStationHeading h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.08rem;
+}
+
+.favoritesStationHeading span,
+.favoritesStationEmpty,
+.favoriteSongItem time {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.favoritesStationEmpty {
+  margin: 0;
+  border: 1px dashed color-mix(in srgb, var(--station-accent), var(--line) 68%);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.favoriteSongItem {
+  grid-template-columns: 58px minmax(0, 1fr) 40px;
+}
+
+.favoriteSongItem time {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.favoriteRemoveButton {
+  display: grid;
+  width: 40px;
+  min-height: 40px;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--red), var(--line) 55%);
+  border-radius: 999px;
+  padding: 0;
+  background: color-mix(in srgb, var(--red), transparent 90%);
+  color: var(--red);
+  cursor: pointer;
+}
+
+.favoriteRemoveButton svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.favoriteRemoveButton:hover {
+  background: color-mix(in srgb, var(--red), transparent 82%);
+  transform: translateY(-1px);
+}
+
+.favoritesSyncNotice {
+  margin: 0 10px 12px 0;
+  border-left: 4px solid var(--red);
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: var(--ink);
+  background: var(--error-bg);
+  font-size: 0.86rem;
 }
 
 .historySongItem {
@@ -3296,7 +3479,7 @@ img {
   }
 
   .trackNowPlaying {
-    grid-template-columns: 88px minmax(0, 1fr);
+    grid-template-columns: 88px minmax(0, 1fr) 38px;
     gap: 14px;
     border-radius: 18px;
     padding: 10px 14px 10px 10px;
@@ -3471,7 +3654,7 @@ img {
   }
 
   .trackNowPlaying {
-    grid-template-columns: 76px minmax(0, 1fr);
+    grid-template-columns: 76px minmax(0, 1fr) 36px;
     gap: 12px;
     border-radius: 16px;
     padding: 9px 10px 9px 9px;
@@ -3494,6 +3677,11 @@ img {
 
   .trackTitle {
     width: auto;
+  }
+
+  .favoriteButton {
+    width: 36px;
+    min-height: 36px;
   }
 
   .trackArtwork {
@@ -3598,6 +3786,16 @@ img {
     padding: 0 8px;
   }
 
+  .headerFavoritesLabel {
+    display: none;
+  }
+
+  .headerFavoritesButton {
+    width: var(--control-icon);
+    justify-content: center;
+    padding: 0;
+  }
+
   .languageMenuTrigger {
     min-width: 58px;
     padding: 0 8px;
@@ -3655,6 +3853,10 @@ img {
     grid-template-columns: 48px minmax(0, 1fr) auto;
   }
 
+  .favoriteSongItem {
+    grid-template-columns: 48px minmax(0, 1fr) 36px;
+  }
+
   .historySongItem {
     grid-template-columns: 64px minmax(0, 1fr);
     grid-template-rows: auto auto;
@@ -3673,6 +3875,11 @@ img {
     width: 48px;
     height: 48px;
     border-radius: 12px;
+  }
+
+  .favoriteRemoveButton {
+    width: 36px;
+    min-height: 36px;
   }
 
   .requestSongButton {

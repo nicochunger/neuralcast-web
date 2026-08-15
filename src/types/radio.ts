@@ -49,6 +49,18 @@ export interface PlayedTrack {
   art?: string;
 }
 
+export interface FavoriteTrack {
+  id: string;
+  stationId: StationId;
+  likedAt: number;
+  text?: string;
+  artist?: string;
+  title?: string;
+  album?: string;
+  genre?: string;
+  art?: string;
+}
+
 export interface ScheduleSegment {
   startTime: string;
   endTime: string;

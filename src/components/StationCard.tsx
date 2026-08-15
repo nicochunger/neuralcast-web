@@ -2,6 +2,7 @@
 
 import { getSegmentTitle, getStationDescription, useI18n } from "@/lib/i18n";
 import { AnimatedSuccessIcon } from "@/components/AnimatedSuccessIcon";
+import { HeartIcon } from "@/components/HeartIcon";
 import { TrackProgressBar } from "@/components/TrackProgressBar";
 import type { ArtworkLightboxData } from "@/components/ArtworkLightbox";
 import type { CSSProperties } from "react";
@@ -28,6 +29,8 @@ interface StationCardProps {
   onSelectSchedule: (station: Station) => void;
   onRequestSong: (station: Station) => void;
   onOpenArtwork: (artwork: ArtworkLightboxData) => void;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
   showAdminSkip: boolean;
   isSkippingTrack: boolean;
   hasSkippedTrack: boolean;
@@ -50,6 +53,8 @@ export function StationCard({
   onSelectSchedule,
   onRequestSong,
   onOpenArtwork,
+  isFavorite,
+  onToggleFavorite,
   showAdminSkip,
   isSkippingTrack,
   hasSkippedTrack,
@@ -61,6 +66,7 @@ export function StationCard({
   const shouldStop = isActive && (playbackState === "playing" || playbackState === "buffering");
   const statusLabel = getStatusLabel(isActive, playbackState, t);
   const track = getTrackDetails(nowPlaying, t);
+  const canFavorite = Boolean(nowPlaying.title || nowPlaying.artist || nowPlaying.text);
   const listenerText =
     nowPlaying.listeners === undefined
       ? t("common.listenersUnknown")
@@ -144,6 +150,17 @@ export function StationCard({
               ) : null}
               <TrackProgressBar nowPlaying={nowPlaying} currentTime={currentTime} />
             </div>
+            <button
+              className={`favoriteButton ${isFavorite ? "favoriteButtonActive" : ""}`}
+              type="button"
+              onClick={onToggleFavorite}
+              disabled={!canFavorite}
+              aria-pressed={isFavorite}
+              aria-label={isFavorite ? t("favorites.unlike") : t("favorites.like")}
+              title={isFavorite ? t("favorites.unlike") : t("favorites.like")}
+            >
+              <HeartIcon filled={isFavorite} />
+            </button>
           </div>
           {nowPlaying.error && !nowPlaying.text ? <em>{nowPlaying.error}</em> : null}
 

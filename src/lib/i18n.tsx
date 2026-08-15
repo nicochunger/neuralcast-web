@@ -30,6 +30,19 @@ type TranslationKey =
   | "nav.about"
   | "nav.backToRadio"
   | "nav.admin"
+  | "favorites.kicker"
+  | "favorites.title"
+  | "favorites.description"
+  | "favorites.close"
+  | "favorites.empty"
+  | "favorites.stationEmpty"
+  | "favorites.count"
+  | "favorites.like"
+  | "favorites.unlike"
+  | "favorites.remove"
+  | "favorites.likedAt"
+  | "favorites.timeUnknown"
+  | "favorites.syncError"
   | "auth.eyebrow"
   | "auth.title"
   | "auth.lead"
@@ -254,6 +267,19 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "nav.about": "About",
     "nav.backToRadio": "Back to radio",
     "nav.admin": "Admin Console",
+    "favorites.kicker": "Your listening shelf",
+    "favorites.title": "Favorites",
+    "favorites.description": "Songs you saved from the live stations, kept separately for each station.",
+    "favorites.close": "Close favorites",
+    "favorites.empty": "Your favorites will appear here when you save a song.",
+    "favorites.stationEmpty": "No songs saved from this station yet.",
+    "favorites.count": "{count} songs",
+    "favorites.like": "Add current song to favorites",
+    "favorites.unlike": "Remove current song from favorites",
+    "favorites.remove": "Remove {title} from favorites",
+    "favorites.likedAt": "Saved {time}",
+    "favorites.timeUnknown": "Saved time unavailable",
+    "favorites.syncError": "Favorites could not be synced; they are still saved on this device.",
     "auth.eyebrow": "Admin access",
     "auth.title": "Sign in to manage NeuralCast",
     "auth.lead": "This private area will be used for live controls like skipping songs and triggering host snippets.",
@@ -487,6 +513,19 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "nav.about": "Sobre",
     "nav.backToRadio": "Volver a la radio",
     "nav.admin": "Consola de administración",
+    "favorites.kicker": "Tu selección",
+    "favorites.title": "Favoritos",
+    "favorites.description": "Las canciones que guardaste de las emisoras en vivo, separadas por emisora.",
+    "favorites.close": "Cerrar favoritos",
+    "favorites.empty": "Tus favoritos van a aparecer acá cuando guardes una canción.",
+    "favorites.stationEmpty": "Todavía no guardaste canciones de esta emisora.",
+    "favorites.count": "{count} canciones",
+    "favorites.like": "Agregar la canción actual a favoritos",
+    "favorites.unlike": "Quitar la canción actual de favoritos",
+    "favorites.remove": "Quitar {title} de favoritos",
+    "favorites.likedAt": "Guardada {time}",
+    "favorites.timeUnknown": "No se conoce cuándo se guardó",
+    "favorites.syncError": "No se pudieron sincronizar los favoritos; igual quedaron guardados en este dispositivo.",
     "auth.eyebrow": "Acceso de administración",
     "auth.title": "Iniciá sesión para administrar NeuralCast",
     "auth.lead": "Esta zona privada se usa para controles en vivo, como saltar canciones y activar intervenciones del host.",

@@ -11,8 +11,15 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { StationCard } from "@/components/StationCard";
 import { submitSongRequestAction } from "@/lib/actions";
 import { RecentlyPlayedModal } from "@/components/RecentlyPlayedModal";
+import { FavoritesModal } from "@/components/FavoritesModal";
 import { ArtworkLightbox, type ArtworkLightboxData } from "@/components/ArtworkLightbox";
+import {
+  FAVORITES_STORAGE_KEY,
+  createFavoriteTrack,
+  normalizeFavorites
+} from "@/lib/favorites";
 import type {
+  FavoriteTrack,
   RequestableSong,
   SongRequestState,
   Station,
@@ -35,6 +42,7 @@ interface AdminSessionResponse {
 }
 
 type ActiveOverlay =
+  | { type: "favorites"; stationId?: never }
   | { type: "history"; stationId: StationId }
   | { type: "schedule"; stationId: StationId }
   | { type: "requests"; stationId: StationId }
@@ -71,6 +79,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   } = useAudioPlayer();
 
   const [showAdminControls, setShowAdminControls] = useState(isAdmin);
+  const [isAdminUser, setIsAdminUser] = useState(isAdmin);
   const [activeOverlay, setActiveOverlay] = useState<ActiveOverlay>(null);
   const [adminMessage, setAdminMessage] = useState<string | undefined>();
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
@@ -78,9 +87,14 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   const [isStandalone, setIsStandalone] = useState(false);
   const [skippingStationId, setSkippingStationId] = useState<StationId | null>(null);
   const [skippedStationId, setSkippedStationId] = useState<StationId | null>(null);
+  const [favorites, setFavorites] = useState<FavoriteTrack[]>([]);
+  const [favoritesReady, setFavoritesReady] = useState(false);
+  const [favoriteSyncError, setFavoriteSyncError] = useState<string | undefined>();
   const skipConfirmationTimerRef = useRef<number | undefined>(undefined);
   const requestConfirmationTimerRef = useRef<number | undefined>(undefined);
   const overlayTriggerRef = useRef<HTMLElement | null>(null);
+  const localFavoritesRef = useRef<FavoriteTrack[]>([]);
+  const favoriteSaveQueueRef = useRef<Promise<void>>(Promise.resolve());
   const [songRequestState, setSongRequestState] = useState<SongRequestState>({
     stationName: "",
     isLoading: false,
@@ -98,6 +112,33 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   const songRequestStation = useMemo(
     () => STATIONS.find((station) => station.id === songRequestState.stationId),
     [songRequestState.stationId]
+  );
+
+  const persistAdminFavorites = useCallback(
+    (nextFavorites: FavoriteTrack[]) => {
+      const queuedSave = favoriteSaveQueueRef.current.then(async () => {
+        try {
+          const response = await fetch("/api/favorites", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ favorites: nextFavorites }),
+            cache: "no-store"
+          });
+
+          if (!response.ok) {
+            throw new Error("Unable to save favorites.");
+          }
+
+          setFavoriteSyncError(undefined);
+        } catch {
+          setFavoriteSyncError(t("favorites.syncError"));
+        }
+      });
+
+      favoriteSaveQueueRef.current = queuedSave;
+      return queuedSave;
+    },
+    [t]
   );
 
   useEffect(() => {
@@ -120,6 +161,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
 
         if (isMounted && session.user?.isAdmin === true) {
           setShowAdminControls(true);
+          setIsAdminUser(true);
         }
       } catch {
         // Public listeners should not block on admin session detection.
@@ -132,6 +174,76 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       isMounted = false;
     };
   }, [isAdmin]);
+
+  useEffect(() => {
+    try {
+      const storedValue = window.localStorage.getItem(FAVORITES_STORAGE_KEY);
+      const storedFavorites = normalizeFavorites(storedValue ? JSON.parse(storedValue) : []);
+      localFavoritesRef.current = storedFavorites;
+      setFavorites(storedFavorites);
+    } catch {
+      localFavoritesRef.current = [];
+      setFavorites([]);
+    } finally {
+      setFavoritesReady(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!favoritesReady) {
+      return;
+    }
+
+    localFavoritesRef.current = favorites;
+    try {
+      window.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+    } catch {
+      // Private browsing or a full storage quota should not block the player.
+    }
+  }, [favorites, favoritesReady]);
+
+  useEffect(() => {
+    if (!isAdminUser || !favoritesReady) {
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadSyncedFavorites = async () => {
+      try {
+        const response = await fetch("/api/favorites", { cache: "no-store" });
+
+        if (!response.ok) {
+          throw new Error("Synced favorites are unavailable.");
+        }
+
+        const payload = (await response.json()) as { favorites?: unknown; exists?: boolean };
+        const syncedFavorites = normalizeFavorites(payload.favorites);
+        const localFavorites = localFavoritesRef.current;
+
+        if (payload.exists === false && localFavorites.length > 0) {
+          await persistAdminFavorites(localFavorites);
+          return;
+        }
+
+        if (isMounted) {
+          setFavorites(syncedFavorites);
+          localFavoritesRef.current = syncedFavorites;
+          setFavoriteSyncError(undefined);
+        }
+      } catch {
+        if (isMounted) {
+          setFavoriteSyncError(t("favorites.syncError"));
+        }
+      }
+    };
+
+    void loadSyncedFavorites();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [favoritesReady, isAdminUser, persistAdminFavorites, t]);
 
   useEffect(() => {
     if (!activeOverlay) {
@@ -229,6 +341,50 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       }
     };
   }, []);
+
+  const toggleFavorite = useCallback(
+    (station: Station, stationNowPlaying: (typeof nowPlaying)[StationId]) => {
+      const favorite = createFavoriteTrack(station.id, stationNowPlaying);
+
+      if (!favorite) {
+        return;
+      }
+
+      setFavorites((current) => {
+        const isAlreadyFavorite = current.some((entry) => entry.id === favorite.id);
+        const nextFavorites = isAlreadyFavorite
+          ? current.filter((entry) => entry.id !== favorite.id)
+          : [favorite, ...current];
+
+        localFavoritesRef.current = nextFavorites;
+        if (isAdminUser) {
+          void persistAdminFavorites(nextFavorites);
+        }
+
+        return nextFavorites;
+      });
+    },
+    [isAdminUser, persistAdminFavorites]
+  );
+
+  const removeFavorite = useCallback(
+    (favorite: FavoriteTrack) => {
+      setFavorites((current) => {
+        const nextFavorites = current.filter((entry) => entry.id !== favorite.id);
+        localFavoritesRef.current = nextFavorites;
+        if (isAdminUser) {
+          void persistAdminFavorites(nextFavorites);
+        }
+        return nextFavorites;
+      });
+    },
+    [isAdminUser, persistAdminFavorites]
+  );
+
+  const openFavorites = () => {
+    overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+    setActiveOverlay({ type: "favorites" });
+  };
 
   const requestInstall = async () => {
     if (!installPrompt) {
@@ -411,6 +567,16 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
                 </svg>
               </span>
             </Link>
+            <button
+              className="headerFavoritesButton"
+              type="button"
+              onClick={openFavorites}
+              aria-label={t("favorites.title")}
+              title={t("favorites.title")}
+            >
+              <span className="headerFavoritesIcon" aria-hidden="true">♡</span>
+              <span className="headerFavoritesLabel">{t("favorites.title")}</span>
+            </button>
             {installPrompt || (isAndroid && !isStandalone) ? (
               <button className="installButton" type="button" onClick={requestInstall}>
                 {t("common.install")}
@@ -421,41 +587,47 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       />
 
       <section className="stationGrid" aria-label={t("stations.ariaLabel")}>
-        {STATIONS.map((station) => (
-          <StationCard
-            key={station.id}
-            station={station}
-            isActive={station.id === activeStationId}
-            playbackState={playbackState}
-            currentTime={currentTime}
-            nowPlaying={nowPlaying[station.id]}
-            schedule={schedules[station.id]}
-            isHistorySelected={activeOverlay?.type === "history" && station.id === activeOverlay.stationId}
-            isScheduleSelected={activeOverlay?.type === "schedule" && station.id === activeOverlay.stationId}
-            isRequestSelected={activeOverlay?.type === "requests" && station.id === activeOverlay.stationId}
-            onPlay={playStation}
-            onStop={stopPlayback}
-            onSelectHistory={(selectedStation) => {
-              overlayTriggerRef.current = document.activeElement as HTMLElement | null;
-              setActiveOverlay({ type: "history", stationId: selectedStation.id });
-              void refreshNowPlaying([selectedStation.id]);
-            }}
-            onSelectSchedule={(selectedStation) => {
-              overlayTriggerRef.current = document.activeElement as HTMLElement | null;
-              setActiveOverlay({ type: "schedule", stationId: selectedStation.id });
-              void refreshSchedules([selectedStation.id]);
-            }}
-            onRequestSong={openSongRequests}
-            onOpenArtwork={(artwork) => {
-              overlayTriggerRef.current = document.activeElement as HTMLElement | null;
-              setActiveOverlay({ type: "artwork", stationId: station.id, ...artwork });
-            }}
-            showAdminSkip={showAdminControls}
-            isSkippingTrack={skippingStationId === station.id}
-            hasSkippedTrack={skippedStationId === station.id}
-            onSkipTrack={skipTrack}
-          />
-        ))}
+        {STATIONS.map((station) => {
+          const currentFavorite = createFavoriteTrack(station.id, nowPlaying[station.id]);
+
+          return (
+            <StationCard
+              key={station.id}
+              station={station}
+              isActive={station.id === activeStationId}
+              playbackState={playbackState}
+              currentTime={currentTime}
+              nowPlaying={nowPlaying[station.id]}
+              schedule={schedules[station.id]}
+              isHistorySelected={activeOverlay?.type === "history" && station.id === activeOverlay.stationId}
+              isScheduleSelected={activeOverlay?.type === "schedule" && station.id === activeOverlay.stationId}
+              isRequestSelected={activeOverlay?.type === "requests" && station.id === activeOverlay.stationId}
+              onPlay={playStation}
+              onStop={stopPlayback}
+              onSelectHistory={(selectedStation) => {
+                overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+                setActiveOverlay({ type: "history", stationId: selectedStation.id });
+                void refreshNowPlaying([selectedStation.id]);
+              }}
+              onSelectSchedule={(selectedStation) => {
+                overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+                setActiveOverlay({ type: "schedule", stationId: selectedStation.id });
+                void refreshSchedules([selectedStation.id]);
+              }}
+              onRequestSong={openSongRequests}
+              isFavorite={Boolean(currentFavorite && favorites.some((favorite) => favorite.id === currentFavorite.id))}
+              onToggleFavorite={() => toggleFavorite(station, nowPlaying[station.id])}
+              onOpenArtwork={(artwork) => {
+                overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+                setActiveOverlay({ type: "artwork", stationId: station.id, ...artwork });
+              }}
+              showAdminSkip={showAdminControls}
+              isSkippingTrack={skippingStationId === station.id}
+              hasSkippedTrack={skippedStationId === station.id}
+              onSkipTrack={skipTrack}
+            />
+          );
+        })}
       </section>
 
       {playbackError ? (
@@ -469,6 +641,15 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
         </div>
       ) : null}
       {adminMessage ? <p className="playerError">{adminMessage}</p> : null}
+
+      {activeOverlay?.type === "favorites" ? (
+        <FavoritesModal
+          favorites={favorites}
+          syncError={favoriteSyncError}
+          onRemove={removeFavorite}
+          onDismiss={() => setActiveOverlay(null)}
+        />
+      ) : null}
 
       {activeOverlay?.type === "history" ? (
         <RecentlyPlayedModal
