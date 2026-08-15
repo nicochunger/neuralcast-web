@@ -1764,6 +1764,10 @@ img {
   background: var(--surface-raised);
 }
 
+.requestListShell.favoritesListShell {
+  padding-top: 16px;
+}
+
 .requestSongList {
   display: grid;
   gap: 10px;
