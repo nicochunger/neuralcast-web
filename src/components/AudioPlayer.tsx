@@ -13,6 +13,7 @@ import { submitSongRequestAction } from "@/lib/actions";
 import { RecentlyPlayedModal } from "@/components/RecentlyPlayedModal";
 import { FavoritesModal } from "@/components/FavoritesModal";
 import { ArtworkLightbox, type ArtworkLightboxData } from "@/components/ArtworkLightbox";
+import { HeartIcon } from "@/components/HeartIcon";
 import {
   FAVORITES_STORAGE_KEY,
   createFavoriteTrack,
@@ -126,12 +127,12 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
           });
 
           if (!response.ok) {
-            throw new Error("Unable to save favorites.");
+            throw await getFavoritesApiError(response, t("favorites.syncError"));
           }
 
           setFavoriteSyncError(undefined);
-        } catch {
-          setFavoriteSyncError(t("favorites.syncError"));
+        } catch (error) {
+          setFavoriteSyncError(getErrorMessage(error, t("favorites.syncError")));
         }
       });
 
@@ -214,7 +215,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
         const response = await fetch("/api/favorites", { cache: "no-store" });
 
         if (!response.ok) {
-          throw new Error("Synced favorites are unavailable.");
+          throw await getFavoritesApiError(response, t("favorites.syncError"));
         }
 
         const payload = (await response.json()) as { favorites?: unknown; exists?: boolean };
@@ -231,9 +232,9 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
           localFavoritesRef.current = syncedFavorites;
           setFavoriteSyncError(undefined);
         }
-      } catch {
+      } catch (error) {
         if (isMounted) {
-          setFavoriteSyncError(t("favorites.syncError"));
+          setFavoriteSyncError(getErrorMessage(error, t("favorites.syncError")));
         }
       }
     };
@@ -574,7 +575,9 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
               aria-label={t("favorites.title")}
               title={t("favorites.title")}
             >
-              <span className="headerFavoritesIcon" aria-hidden="true">♡</span>
+              <span className="headerFavoritesIcon">
+                <HeartIcon />
+              </span>
               <span className="headerFavoritesLabel">{t("favorites.title")}</span>
             </button>
             {installPrompt || (isAndroid && !isStandalone) ? (
@@ -720,6 +723,23 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       />
     </main>
   );
+}
+
+async function getFavoritesApiError(response: Response, fallback: string): Promise<Error> {
+  try {
+    const payload = (await response.json()) as { error?: unknown };
+    if (typeof payload.error === "string" && payload.error.trim()) {
+      return new Error(payload.error);
+    }
+  } catch {
+    // Fall back to the translated message when the response is not JSON.
+  }
+
+  return new Error(fallback);
+}
+
+function getErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error && error.message.trim() ? error.message : fallback;
 }
 
 async function readJsonResponse(response: Response, fallbackError: string): Promise<{ message?: string; error?: string }> {

@@ -515,8 +515,22 @@ img {
 }
 
 .headerFavoritesIcon {
-  font-size: 1.25rem;
-  line-height: 1;
+  display: grid;
+  width: 19px;
+  height: 19px;
+  place-items: center;
+}
+
+.headerFavoritesIcon svg {
+  display: block;
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  transform: translateY(1px);
 }
 
 .headerAdminIcon,
@@ -1088,6 +1102,7 @@ img {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.8;
+  transform: translateY(1px);
 }
 
 .favoriteButton:hover {
@@ -1573,6 +1588,7 @@ img {
   fill: currentColor;
   stroke: currentColor;
   stroke-width: 1.5;
+  transform: translateY(1px);
 }
 
 .favoriteRemoveButton:hover {

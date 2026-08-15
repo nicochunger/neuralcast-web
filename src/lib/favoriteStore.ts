@@ -6,6 +6,13 @@ interface HostAdminConfig {
   token: string;
 }
 
+export class FavoriteStoreError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "FavoriteStoreError";
+  }
+}
+
 export function isFavoriteStoreConfigured(): boolean {
   return getHostAdminConfig() !== null;
 }
@@ -26,30 +33,56 @@ async function requestHostAdmin(method: "GET" | "PUT", body?: Record<string, unk
   const config = getHostAdminConfig();
 
   if (!config) {
-    throw new Error("Host admin API is not configured.");
+    throw new FavoriteStoreError("The VPS favorites store is not configured.");
   }
 
-  const response = await fetch(`${config.baseUrl.replace(/\/+$/, "")}/admin/favorites`, {
-    method,
-    headers: {
-      Authorization: `Bearer ${config.token}`,
-      Accept: "application/json",
-      ...(body ? { "Content-Type": "application/json" } : {})
-    },
-    body: body ? JSON.stringify(body) : undefined,
-    cache: "no-store"
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${config.baseUrl.replace(/\/+$/, "")}/admin/favorites`, {
+      method,
+      headers: {
+        Authorization: `Bearer ${config.token}`,
+        Accept: "application/json",
+        ...(body ? { "Content-Type": "application/json" } : {})
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      cache: "no-store"
+    });
+  } catch {
+    throw new FavoriteStoreError("The VPS favorites store could not be reached.");
+  }
 
   if (!response.ok) {
-    throw new Error(`Favorites store request failed with ${response.status}.`);
+    throw new FavoriteStoreError(getHostAdminFailureMessage(response.status));
   }
 
   const payload = (await response.json()) as unknown;
   if (payload === null || typeof payload !== "object" || Array.isArray(payload)) {
-    throw new Error("Favorites store returned an invalid response.");
+    throw new FavoriteStoreError("The VPS favorites store returned an invalid response.");
   }
 
   return payload as Record<string, unknown>;
+}
+
+function getHostAdminFailureMessage(status: number): string {
+  if (status === 401 || status === 403) {
+    return "The VPS admin token was rejected; check HOST_ADMIN_TOKEN against the VPS token.";
+  }
+
+  if (status === 404) {
+    return "The VPS favorites endpoint was not found; check HOST_ADMIN_BASE_URL and restart the NeuralCast admin API.";
+  }
+
+  if (status === 503) {
+    return "The VPS admin API is not configured; check NEURALCAST_ADMIN_HTTP_TOKEN on the VPS.";
+  }
+
+  if (status >= 500) {
+    return "The VPS favorites file could not be read or written.";
+  }
+
+  return `The VPS favorites endpoint returned HTTP ${status}.`;
 }
 
 function getHostAdminConfig(): HostAdminConfig | null {

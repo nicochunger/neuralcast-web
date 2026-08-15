@@ -1,5 +1,10 @@
 import { getAuthSession } from "@/lib/auth";
-import { isFavoriteStoreConfigured, readAdminFavorites, writeAdminFavorites } from "@/lib/favoriteStore";
+import {
+  FavoriteStoreError,
+  isFavoriteStoreConfigured,
+  readAdminFavorites,
+  writeAdminFavorites
+} from "@/lib/favoriteStore";
 import { normalizeFavorites } from "@/lib/favorites";
 import { NextResponse } from "next/server";
 
@@ -22,8 +27,8 @@ export async function GET() {
       favorites: normalizeFavorites(stored.favorites),
       exists: stored.exists
     }, { headers: { "Cache-Control": "no-store" } });
-  } catch {
-    return NextResponse.json({ error: "Unable to load synced favorites." }, { status: 502 });
+  } catch (error) {
+    return NextResponse.json({ error: getFavoriteStoreError(error, "Unable to load synced favorites.") }, { status: 502 });
   }
 }
 
@@ -48,7 +53,11 @@ export async function PUT(request: Request) {
 
     await writeAdminFavorites(favorites);
     return NextResponse.json({ favorites }, { headers: { "Cache-Control": "no-store" } });
-  } catch {
-    return NextResponse.json({ error: "Unable to save synced favorites." }, { status: 502 });
+  } catch (error) {
+    return NextResponse.json({ error: getFavoriteStoreError(error, "Unable to save synced favorites.") }, { status: 502 });
   }
+}
+
+function getFavoriteStoreError(error: unknown, fallback: string): string {
+  return error instanceof FavoriteStoreError ? error.message : fallback;
 }
