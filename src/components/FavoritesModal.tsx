@@ -61,15 +61,17 @@ export function FavoritesModal({ favorites, syncError, onRemove, onDismiss }: Fa
                 const stationFavorites = favorites.filter((favorite) => favorite.stationId === station.id);
 
                 return (
-                  <section
+                  <details
                     className="favoritesStationGroup"
                     key={station.id}
                     style={{ "--station-accent": station.accentColor } as CSSProperties}
+                    open
                   >
-                    <div className="favoritesStationHeading">
-                      <h3>{station.name}</h3>
-                      <span>{t("favorites.count", { count: stationFavorites.length })}</span>
-                    </div>
+                    <summary className="favoritesStationHeading">
+                      <span className="favoritesStationHeadingName" role="heading" aria-level={3}>{station.name}</span>
+                      <span className="favoritesStationCount">{t("favorites.count", { count: stationFavorites.length })}</span>
+                      <span className="favoritesStationChevron" aria-hidden="true" />
+                    </summary>
                     {stationFavorites.length > 0 ? (
                       <ul className="requestSongList favoritesList">
                         {stationFavorites.map((favorite) => (
@@ -86,7 +88,7 @@ export function FavoritesModal({ favorites, syncError, onRemove, onDismiss }: Fa
                     ) : (
                       <p className="favoritesStationEmpty">{t("favorites.stationEmpty")}</p>
                     )}
-                  </section>
+                  </details>
                 );
               })}
             </div>

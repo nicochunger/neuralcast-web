@@ -1531,23 +1531,52 @@ img {
 
 .favoritesStationHeading {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
   padding: 0 4px;
+  cursor: pointer;
+  list-style: none;
 }
 
-.favoritesStationHeading h3 {
+.favoritesStationHeading::-webkit-details-marker {
+  display: none;
+}
+
+.favoritesStationHeading:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.favoritesStationHeadingName {
+  min-width: 0;
   margin: 0;
+  margin-right: auto;
   color: var(--ink);
   font-size: 1.08rem;
+  font-weight: 760;
 }
 
-.favoritesStationHeading span,
+.favoritesStationCount,
 .favoritesStationEmpty,
 .favoriteSongItem time {
   color: var(--muted);
   font-size: 0.78rem;
+}
+
+.favoritesStationChevron {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 160ms ease;
+}
+
+.favoritesStationGroup[open] .favoritesStationChevron {
+  transform: translateY(2px) rotate(225deg);
 }
 
 .favoritesStationEmpty {
