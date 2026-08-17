@@ -12,6 +12,7 @@ export async function getHostAdminCapabilities(): Promise<HostAdminCapabilities>
 
   return {
     stations: readStringArray(payload.stations),
+    hostChannels: readStringArray(payload.host_channels),
     archetypes: readStringArray(payload.archetypes),
     trackFocusValues: readStringArray(payload.track_focus_values),
     trackFocusArchetypes: readStringArray(payload.track_focus_archetypes),

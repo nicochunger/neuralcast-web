@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { AdminConsole } from "@/components/AdminConsole";
 import { AdminToolbar } from "@/components/AdminToolbar";
+import { AdminTestStreamPlayer } from "@/components/AdminTestStreamPlayer";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SignOutButton } from "@/components/SignOutButton";
 import { getAuthSession } from "@/lib/auth";
@@ -21,6 +22,7 @@ export default async function AdminPage() {
     <main className="appShell adminShell">
       <SiteHeader extraActions={<SignOutButton />} />
       <AdminToolbar email={session.user.email} />
+      <AdminTestStreamPlayer />
       <AdminConsole isHostAdminConfigured={hostAdminConfigured} />
     </main>
   );

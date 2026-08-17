@@ -134,6 +134,12 @@ type TranslationKey =
   | "admin.statusRunning"
   | "admin.statusSucceeded"
   | "admin.statusFailed"
+  | "admin.englishTestStream"
+  | "admin.englishTestStreamDescription"
+  | "admin.playEnglishTest"
+  | "admin.stopEnglishTest"
+  | "admin.openPublicPage"
+  | "admin.testStreamError"
   | "player.playbackBlocked"
   | "player.streamLoadError"
   | "player.reconnecting"
@@ -371,6 +377,12 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "admin.statusRunning": "Running",
     "admin.statusSucceeded": "Succeeded",
     "admin.statusFailed": "Failed",
+    "admin.englishTestStream": "NeuralCast (EN) test stream",
+    "admin.englishTestStreamDescription": "Private shortcut for monitoring the English host rollout.",
+    "admin.playEnglishTest": "Play test stream",
+    "admin.stopEnglishTest": "Stop test stream",
+    "admin.openPublicPage": "Open public page",
+    "admin.testStreamError": "The English test stream could not be played.",
     "player.playbackBlocked":
       "Playback was blocked or the stream could not be reached. Tap Play again after checking the network.",
     "player.streamLoadError": "The stream could not be loaded.",
@@ -617,6 +629,12 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "admin.statusRunning": "En ejecución",
     "admin.statusSucceeded": "Completado",
     "admin.statusFailed": "Fallido",
+    "admin.englishTestStream": "Emisión de prueba NeuralCast (EN)",
+    "admin.englishTestStreamDescription": "Acceso privado para controlar el lanzamiento del host en inglés.",
+    "admin.playEnglishTest": "Reproducir prueba",
+    "admin.stopEnglishTest": "Detener prueba",
+    "admin.openPublicPage": "Abrir página pública",
+    "admin.testStreamError": "No se pudo reproducir la emisión de prueba en inglés.",
     "player.playbackBlocked":
       "La reproducción se bloqueó o no se pudo acceder al stream. Tocá Reproducir de nuevo después de comprobar la red.",
     "player.streamLoadError": "No se pudo cargar el stream.",

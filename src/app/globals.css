@@ -2138,6 +2138,73 @@ img {
   color: var(--muted);
 }
 
+.adminTestStream {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow-soft), var(--panel-inset);
+}
+
+.adminTestStreamCopy {
+  display: grid;
+  gap: 3px;
+}
+
+.adminTestStreamCopy span {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.adminTestStreamActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.adminTestStreamButton,
+.adminTestStreamLink {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--control-radius);
+  padding: 0 13px;
+  font-size: 0.88rem;
+  font-weight: 760;
+}
+
+.adminTestStreamButton {
+  border: 1px solid var(--line-strong);
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+}
+
+.adminTestStreamLink {
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+@media (max-width: 640px) {
+  .adminTestStream {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .adminTestStreamActions {
+    flex-wrap: wrap;
+  }
+}
+
 .adminGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -16,6 +16,7 @@ export interface HostAdminOperationCapability {
 
 export interface HostAdminCapabilities {
   stations: string[];
+  hostChannels: string[];
   archetypes: string[];
   trackFocusValues: string[];
   trackFocusArchetypes: string[];

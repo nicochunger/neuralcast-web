@@ -21,6 +21,7 @@ const POLL_INTERVAL_MS = 4000;
 
 const emptyCapabilities: HostAdminCapabilities = {
   stations: [],
+  hostChannels: [],
   archetypes: [],
   trackFocusValues: [],
   trackFocusArchetypes: [],
@@ -56,6 +57,10 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
 
   const forceArchetypeCapability = capabilities.operations[HOST_ADMIN_OPERATION_FORCE_ARCHETYPE];
   const scheduleGeneratorCapability = capabilities.operations[HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR];
+  const forceArchetypeTargets = useMemo(
+    () => capabilities.hostChannels.length ? capabilities.hostChannels : capabilities.stations,
+    [capabilities.hostChannels, capabilities.stations]
+  );
   const supportsTrackFocus =
     forceArchetypeCapability?.trackFocusSupported === true &&
     Boolean(selectedArchetype && capabilities.trackFocusArchetypes.includes(selectedArchetype));
@@ -112,8 +117,11 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       }
 
       const loaded = payload as HostAdminCapabilities;
+      const loadedForceTargets = loaded.hostChannels?.length
+        ? loaded.hostChannels
+        : loaded.stations;
       setCapabilities(loaded);
-      setForceArchetypeStationId((current) => resolveSelectedStation(loaded.stations, current));
+      setForceArchetypeStationId((current) => resolveSelectedStation(loadedForceTargets, current));
       setScheduleGeneratorStationId((current) => resolveSelectedStation(loaded.stations, current));
       setSelectedArchetype((current) => resolveSelectedArchetype(loaded.archetypes, current));
       setSelectedTrackFocus((current) => (current && loaded.trackFocusValues.includes(current) ? current : null));
@@ -397,11 +405,11 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
               <div className="adminOperationHeader">
                 <h3>{t("admin.forceArchetype")}</h3>
               </div>
-              {capabilities.stations.length ? (
+              {forceArchetypeTargets.length ? (
               <div className="adminSection">
                 <h4>{t("admin.station")}</h4>
                 <div className="adminChipRow" role="radiogroup" aria-label={t("admin.station")}>
-                  {capabilities.stations.map((stationId) => (
+                  {forceArchetypeTargets.map((stationId) => (
                     <button
                       key={stationId}
                       className={`adminChip ${forceArchetypeStationId === stationId ? "adminChipActive" : ""}`}
@@ -798,7 +806,22 @@ function buildJobStatusMessage(job: HostAdminJob, t: ReturnType<typeof useI18n>[
 }
 
 function stationLabel(stationId: string) {
-  return STATIONS.find((station) => station.id === stationId)?.name ?? humanize(stationId);
+  const directStation = STATIONS.find((station) => station.id === stationId);
+  if (directStation) {
+    return directStation.name;
+  }
+
+  const separatorIndex = stationId.lastIndexOf("-");
+  if (separatorIndex > 0) {
+    const brandId = stationId.slice(0, separatorIndex);
+    const locale = stationId.slice(separatorIndex + 1);
+    const brand = STATIONS.find((station) => station.id === brandId);
+    if (brand && locale) {
+      return `${brand.name} (${locale.toUpperCase()})`;
+    }
+  }
+
+  return humanize(stationId);
 }
 
 function toArchetypeLabel(value: string) {
