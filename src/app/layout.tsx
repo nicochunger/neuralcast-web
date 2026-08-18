@@ -4,6 +4,7 @@ import { LanguageProvider } from "@/lib/i18n";
 import { DEFAULT_LOCALE } from "@/lib/locale";
 import { PersistentMiniPlayerOverlay } from "@/components/PersistentMiniPlayerOverlay";
 import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
+import { PERSISTENT_AUDIO_ELEMENT_CLASS, PERSISTENT_AUDIO_ELEMENT_ID } from "@/lib/persistentAudio";
 import "./globals.css";
 
 const themeBootScript = `
@@ -59,6 +60,12 @@ export default function RootLayout({
     <html lang={DEFAULT_LOCALE} suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+        <audio
+          id={PERSISTENT_AUDIO_ELEMENT_ID}
+          className={PERSISTENT_AUDIO_ELEMENT_CLASS}
+          preload="none"
+          aria-hidden="true"
+        />
         <LanguageProvider initialLocale={DEFAULT_LOCALE}>
           <AudioPlayerProvider>
             {children}

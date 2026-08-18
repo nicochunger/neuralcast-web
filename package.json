@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run check:audio-persistence && next build",
+    "check:audio-persistence": "node scripts/check-audio-persistence.mjs",
     "start": "next start",
     "typecheck": "tsc --noEmit"
   },

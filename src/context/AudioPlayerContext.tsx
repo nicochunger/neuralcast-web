@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { createContext, useContext, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "@/lib/i18n";
 import { clearMediaSessionPlaybackState, registerMediaSessionHandlers, updateMediaSession } from "@/lib/mediaSession";
+import { getPersistentAudioElement } from "@/lib/persistentAudio";
 import { DEFAULT_STATION_ID, STATIONS, isStationId } from "@/lib/stations";
 import type {
   PlaybackState,
@@ -41,17 +42,10 @@ const RECOVERY_RETRY_DELAYS = [2000, 5000, 10000] as const;
 const STALL_RECOVERY_DELAY = 8000;
 const RECOVERY_WATCHDOG_DELAY = 12000;
 
-declare global {
-  interface Window {
-    __neuralcastPersistentAudioElement__?: HTMLAudioElement;
-  }
-}
-
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const pathname = usePathname();
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioHostRef = useRef<HTMLDivElement | null>(null);
   const manualStopRef = useRef(false);
   const lastAudibleVolumeRef = useRef(DEFAULT_VOLUME);
   const recoveryAttemptRef = useRef(0);
@@ -126,22 +120,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const activeNowPlaying = nowPlaying[activeStationId];
 
   const getAudioElement = useCallback(() => {
-    if (typeof window === "undefined") {
-      throw new Error("Audio playback is only available in the browser.");
-    }
-
-    if (!window.__neuralcastPersistentAudioElement__) {
-      const audio = new Audio();
-      audio.preload = "none";
-      window.__neuralcastPersistentAudioElement__ = audio;
-    }
-
-    audioRef.current = window.__neuralcastPersistentAudioElement__;
-
-    if (audioHostRef.current && audioRef.current.parentElement !== audioHostRef.current) {
-      audioHostRef.current.appendChild(audioRef.current);
-    }
-
+    audioRef.current = getPersistentAudioElement();
     return audioRef.current;
   }, []);
 
@@ -596,7 +575,6 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-      <div ref={audioHostRef} className="persistentAudioHost" aria-hidden="true" />
     </AudioPlayerContext.Provider>
   );
 }
