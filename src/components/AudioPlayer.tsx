@@ -300,23 +300,6 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   }, [activeOverlay]);
 
   useEffect(() => {
-    if (!("serviceWorker" in navigator)) {
-      return;
-    }
-
-    if (process.env.NODE_ENV !== "production") {
-      navigator.serviceWorker.getRegistrations()
-        .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
-        .catch(() => undefined);
-      return;
-    }
-
-    if (process.env.NODE_ENV === "production") {
-      navigator.serviceWorker.register("/sw.js").catch(() => undefined);
-    }
-  }, []);
-
-  useEffect(() => {
     const standalone = window.matchMedia("(display-mode: standalone)").matches || (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
     setIsStandalone(standalone);
     setIsAndroid(/android/i.test(window.navigator.userAgent));

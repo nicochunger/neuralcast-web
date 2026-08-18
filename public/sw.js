@@ -1,18 +1,18 @@
-const CACHE_NAME = "neuralcast-shell-v4";
-const SHELL_ASSETS = [
-  "/",
+const CACHE_NAME = "neuralcast-static-v5";
+const STATIC_ASSETS = [
   "/manifest.webmanifest",
   "/neuralcast-logo-160.webp",
   "/icons/neuralcast-icon-192.png",
   "/icons/neuralcast-icon-512.png",
   "/icons/neuralcast-apple-touch-icon.png"
 ];
+const STATIC_ASSET_PATHS = new Set(STATIC_ASSETS);
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => cache.addAll(SHELL_ASSETS))
+      .then((cache) => cache.addAll(STATIC_ASSETS))
       .then(() => self.skipWaiting())
   );
 });
@@ -33,6 +33,7 @@ self.addEventListener("fetch", (event) => {
   if (
     request.method !== "GET" ||
     url.origin !== self.location.origin ||
+    request.headers.get("RSC") === "1" ||
     url.pathname.startsWith("/api/") ||
     url.pathname.startsWith("/_next/")
   ) {
@@ -42,15 +43,15 @@ self.addEventListener("fetch", (event) => {
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request).catch(() =>
-        caches.match("/").then(
-          (cached) =>
-            cached ??
-            new Response("NeuralCast needs a network connection for live radio.", {
-              headers: { "Content-Type": "text/plain" }
-            })
-        )
+        new Response("NeuralCast needs a network connection for live radio.", {
+          headers: { "Content-Type": "text/plain" }
+        })
       )
     );
+    return;
+  }
+
+  if (!STATIC_ASSET_PATHS.has(url.pathname)) {
     return;
   }
 

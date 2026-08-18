@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { LanguageProvider } from "@/lib/i18n";
 import { DEFAULT_LOCALE } from "@/lib/locale";
 import { PersistentMiniPlayerOverlay } from "@/components/PersistentMiniPlayerOverlay";
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
 import { PERSISTENT_AUDIO_ELEMENT_CLASS, PERSISTENT_AUDIO_ELEMENT_ID } from "@/lib/persistentAudio";
 import "./globals.css";
@@ -72,6 +73,7 @@ export default function RootLayout({
             <PersistentMiniPlayerOverlay />
           </AudioPlayerProvider>
         </LanguageProvider>
+        <ServiceWorkerRegistration />
         <Analytics />
       </body>
     </html>
