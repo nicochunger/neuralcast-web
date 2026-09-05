@@ -14,6 +14,12 @@ type TranslationKey =
   | "app.tagline"
   | "common.install"
   | "common.language"
+  | "host.language"
+  | "host.auto"
+  | "host.followAppLanguage"
+  | "host.spanishArgentinian"
+  | "host.frenchSwiss"
+  | "host.english"
   | "common.play"
   | "common.stop"
   | "common.loading"
@@ -256,6 +262,12 @@ const englishMessages: Record<TranslationKey, string> = {
     "app.tagline": "Live AI radio from Estavayer, Switzerland.",
     "common.install": "Install",
     "common.language": "Language",
+    "host.language": "Host language",
+    "host.auto": "Station default",
+    "host.followAppLanguage": "Follow app language",
+    "host.spanishArgentinian": "Spanish · Argentina",
+    "host.frenchSwiss": "French · Suisse romande",
+    "host.english": "English",
     "common.play": "Play",
     "common.stop": "Stop",
     "common.loading": "Loading",
@@ -511,6 +523,12 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "app.tagline": "Radio con IA en vivo desde Estavayer, Suiza.",
     "common.install": "Instalar",
     "common.language": "Idioma",
+    "host.language": "Idioma del host",
+    "host.auto": "Predeterminado de la emisora",
+    "host.followAppLanguage": "Seguir el idioma de la app",
+    "host.spanishArgentinian": "Español · Argentina",
+    "host.frenchSwiss": "Francés · Suiza romanda",
+    "host.english": "Inglés",
     "common.play": "Reproducir",
     "common.stop": "Detener",
     "common.loading": "Cargando",
@@ -764,6 +782,12 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "app.tagline": "Radio IA en direct depuis Estavayer, en Suisse.",
     "common.install": "Installer",
     "common.language": "Langue",
+    "host.language": "Langue de l’animateur",
+    "host.auto": "Par défaut de la station",
+    "host.followAppLanguage": "Suivre la langue de l’application",
+    "host.spanishArgentinian": "Espagnol · Argentine",
+    "host.frenchSwiss": "Français · Suisse romande",
+    "host.english": "Anglais",
     "common.play": "Lire",
     "common.stop": "Arrêter",
     "common.loading": "Chargement",

@@ -1,5 +1,5 @@
 import { fetchNowPlaying } from "@/lib/azuracast";
-import { getStation } from "@/lib/stations";
+import { getDefaultHostChannel, getHostChannel, getStation } from "@/lib/stations";
 import { NextResponse } from "next/server";
 
 interface RouteContext {
@@ -8,7 +8,7 @@ interface RouteContext {
   }>;
 }
 
-export async function GET(_request: Request, context: RouteContext) {
+export async function GET(request: Request, context: RouteContext) {
   const { stationId } = await context.params;
   const station = getStation(stationId);
 
@@ -17,7 +17,10 @@ export async function GET(_request: Request, context: RouteContext) {
   }
 
   try {
-    const status = await fetchNowPlaying(station);
+    const requestedChannelId = new URL(request.url).searchParams.get("channel") ?? undefined;
+    const hostChannel =
+      getHostChannel(station, requestedChannelId) ?? getDefaultHostChannel(station);
+    const status = await fetchNowPlaying(station, hostChannel);
     return NextResponse.json(status, {
       headers: {
         "Cache-Control": "no-store"

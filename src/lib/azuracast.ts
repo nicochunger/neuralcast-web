@@ -1,10 +1,13 @@
-import { AZURACAST_BASE_URL } from "@/lib/stations";
-import type { PlayedTrack, Station, StationNowPlaying } from "@/types/radio";
+import { AZURACAST_BASE_URL, getDefaultHostChannel } from "@/lib/stations";
+import type { PlayedTrack, Station, StationHostChannel, StationNowPlaying } from "@/types/radio";
 
 type JsonObject = Record<string, unknown>;
 
-export async function fetchNowPlaying(station: Station): Promise<StationNowPlaying> {
-  const response = await fetch(`${AZURACAST_BASE_URL}/api/nowplaying/${station.id}`, {
+export async function fetchNowPlaying(
+  station: Station,
+  hostChannel: StationHostChannel = getDefaultHostChannel(station)
+): Promise<StationNowPlaying> {
+  const response = await fetch(`${AZURACAST_BASE_URL}/api/nowplaying/${hostChannel.azuracastStationSlug}`, {
     cache: "no-store",
     headers: {
       Accept: "application/json"
@@ -16,10 +19,14 @@ export async function fetchNowPlaying(station: Station): Promise<StationNowPlayi
   }
 
   const payload = (await response.json()) as unknown;
-  return normalizeNowPlaying(station, payload);
+  return normalizeNowPlaying(station, hostChannel, payload);
 }
 
-function normalizeNowPlaying(station: Station, payload: unknown): StationNowPlaying {
+function normalizeNowPlaying(
+  station: Station,
+  hostChannel: StationHostChannel,
+  payload: unknown
+): StationNowPlaying {
   const root = asObject(payload);
   const nowPlaying = asObject(root.now_playing);
   const song = asObject(nowPlaying.song);
@@ -36,6 +43,7 @@ function normalizeNowPlaying(station: Station, payload: unknown): StationNowPlay
 
   return {
     stationId: station.id,
+    hostChannelId: hostChannel.id,
     stationName,
     text,
     artist,

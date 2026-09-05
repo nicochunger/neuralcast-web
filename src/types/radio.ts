@@ -1,5 +1,7 @@
 export type StationId = "neuralcast" | "neuralforge";
 
+export type HostMode = "auto" | "follow-ui" | "fixed";
+
 export type PlaybackState = "idle" | "buffering" | "playing" | "paused" | "error";
 
 export type ScheduleSegmentKind = "scheduled" | "open-slot" | "open-rotation";
@@ -13,11 +15,21 @@ export interface Station {
   backgroundImage: string;
   artworkImage: string;
   accentColor: string;
+  hostChannels: readonly StationHostChannel[];
+  defaultHostChannelId: string;
   openRotationThreshold?: number;
+}
+
+export interface StationHostChannel {
+  id: string;
+  locale: string;
+  azuracastStationSlug: string;
+  streamUrl: string;
 }
 
 export interface StationNowPlaying {
   stationId: StationId;
+  hostChannelId?: string;
   stationName: string;
   text?: string;
   artist?: string;

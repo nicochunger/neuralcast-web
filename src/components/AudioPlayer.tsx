@@ -64,6 +64,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   const {
     activeStationId,
     activeStation,
+    getHostSelection,
     playbackState,
     playbackError,
     currentTime,
@@ -76,7 +77,8 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     setVolume,
     toggleMute,
     refreshNowPlaying,
-    refreshSchedules
+    refreshSchedules,
+    setHostSelection
   } = useAudioPlayer();
 
   const [showAdminControls, setShowAdminControls] = useState(isAdmin);
@@ -589,6 +591,10 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
               isScheduleSelected={activeOverlay?.type === "schedule" && station.id === activeOverlay.stationId}
               isRequestSelected={activeOverlay?.type === "requests" && station.id === activeOverlay.stationId}
               onPlay={playStation}
+              hostSelection={getHostSelection(station)}
+              onHostSelectionChange={(selectedStation, selection) =>
+                setHostSelection(selectedStation.id, selection)
+              }
               onStop={stopPlayback}
               onSelectHistory={(selectedStation) => {
                 overlayTriggerRef.current = document.activeElement as HTMLElement | null;

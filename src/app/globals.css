@@ -770,6 +770,31 @@ img {
   -webkit-line-clamp: 2;
 }
 
+.hostLanguageControl {
+  display: grid;
+  gap: 4px;
+  width: min(100%, 220px);
+  margin-top: 10px;
+}
+
+.hostLanguageControl label {
+  color: var(--station-card-text);
+  font-size: 0.72rem;
+  font-weight: 720;
+  text-shadow: var(--station-card-text-shadow);
+}
+
+.hostLanguageControl select {
+  min-height: 30px;
+  border: 1px solid color-mix(in srgb, var(--station-card-title) 32%, transparent);
+  border-radius: 8px;
+  padding: 4px 8px;
+  background: color-mix(in srgb, var(--station-accent) 35%, rgba(8, 14, 20, 0.86));
+  color: var(--station-card-title);
+  font: inherit;
+  font-size: 0.78rem;
+}
+
 .stationControlGroup {
   display: grid;
   flex: 0 0 auto;

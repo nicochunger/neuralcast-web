@@ -24,6 +24,8 @@ interface StationCardProps {
   isScheduleSelected: boolean;
   isRequestSelected: boolean;
   onPlay: (station: Station) => void;
+  hostSelection: string;
+  onHostSelectionChange: (station: Station, selection: string) => void;
   onStop: () => void;
   onSelectHistory: (station: Station) => void;
   onSelectSchedule: (station: Station) => void;
@@ -48,6 +50,8 @@ export function StationCard({
   isScheduleSelected,
   isRequestSelected,
   onPlay,
+  hostSelection,
+  onHostSelectionChange,
   onStop,
   onSelectHistory,
   onSelectSchedule,
@@ -89,6 +93,24 @@ export function StationCard({
             <h2>{station.name}</h2>
             <p>{getStationDescription(station.id, t)}</p>
             <span className="listenerChip">{listenerText}</span>
+            {station.hostChannels.length > 1 ? (
+              <div className="hostLanguageControl">
+                <label htmlFor={`host-language-${station.id}`}>{t("host.language")}</label>
+                <select
+                  id={`host-language-${station.id}`}
+                  value={hostSelection}
+                  onChange={(event) => onHostSelectionChange(station, event.target.value)}
+                >
+                  <option value="follow-ui">{t("host.followAppLanguage")}</option>
+                  <option value="auto">{t("host.auto")}</option>
+                  {station.hostChannels.map((channel) => (
+                    <option key={channel.id} value={channel.id}>
+                      {getHostChannelLabel(channel.id, t)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
           </div>
 
           <div className="stationControlGroup">
@@ -209,6 +231,22 @@ export function StationCard({
       </div>
     </article>
   );
+}
+
+function getHostChannelLabel(
+  channelId: string,
+  t: ReturnType<typeof useI18n>["t"]
+): string {
+  switch (channelId) {
+    case "neuralforge-es":
+      return t("host.spanishArgentinian");
+    case "neuralforge-fr":
+      return t("host.frenchSwiss");
+    case "neuralcast-es":
+      return t("host.spanishArgentinian");
+    default:
+      return channelId;
+  }
 }
 
 function StationActionIcon({ icon }: { icon: "history" | "schedule" | "request" | "skip" }) {

@@ -5,10 +5,18 @@ import { createContext, useContext, useCallback, useEffect, useMemo, useRef, use
 import { useI18n } from "@/lib/i18n";
 import { clearMediaSessionPlaybackState, registerMediaSessionHandlers, updateMediaSession } from "@/lib/mediaSession";
 import { getPersistentAudioElement } from "@/lib/persistentAudio";
-import { DEFAULT_STATION_ID, STATIONS, isStationId } from "@/lib/stations";
+import {
+  DEFAULT_STATION_ID,
+  getHostChannel,
+  resolveHostChannel,
+  STATIONS,
+  isStationId
+} from "@/lib/stations";
 import type {
+  HostMode,
   PlaybackState,
   Station,
+  StationHostChannel,
   StationId,
   StationNowPlaying,
   StationNowPlayingState,
@@ -19,31 +27,38 @@ import type {
 interface AudioPlayerContextValue {
   activeStationId: StationId;
   activeStation: Station;
+  activeHostChannel: StationHostChannel;
   playbackState: PlaybackState;
   playbackError: string | undefined;
   currentTime: number;
   volume: number;
   nowPlaying: Record<StationId, StationNowPlayingState>;
   schedules: Record<StationId, StationScheduleState>;
-  playStation: (station: Station) => Promise<void>;
+  playStation: (station: Station, hostChannelId?: string) => Promise<void>;
   stopPlayback: () => void;
   reconnectPlayback: () => Promise<void>;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
-  refreshNowPlaying: (stationIds?: StationId[]) => Promise<void>;
+  refreshNowPlaying: (
+    stationIds?: StationId[],
+    hostChannelIds?: Partial<Record<StationId, string>>
+  ) => Promise<void>;
   refreshSchedules: (stationIds?: StationId[]) => Promise<void>;
+  getHostSelection: (station: Station) => string;
+  setHostSelection: (stationId: StationId, selection: string) => void;
 }
 
 const AudioPlayerContext = createContext<AudioPlayerContextValue | undefined>(undefined);
 const VOLUME_STORAGE_KEY = "neuralcast:volume";
 const LAST_AUDIBLE_VOLUME_STORAGE_KEY = "neuralcast:last-audible-volume";
+const HOST_PREFERENCES_STORAGE_KEY = "neuralcast:host-preferences";
 const DEFAULT_VOLUME = 1;
 const RECOVERY_RETRY_DELAYS = [2000, 5000, 10000] as const;
 const STALL_RECOVERY_DELAY = 8000;
 const RECOVERY_WATCHDOG_DELAY = 12000;
 
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const pathname = usePathname();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const manualStopRef = useRef(false);
@@ -53,6 +68,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const stallTimerRef = useRef<number | undefined>(undefined);
   const recoveryInFlightRef = useRef(false);
   const retryPlaybackRef = useRef<(() => Promise<void>) | undefined>(undefined);
+  const currentHostChannelIdsRef = useRef<Partial<Record<StationId, string>>>({});
 
   const [activeStationId, setActiveStationId] = useState<StationId>(DEFAULT_STATION_ID);
   const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
@@ -60,6 +76,9 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const [localTime, setLocalTime] = useState(0);
   const [serverTimeOffset, setServerTimeOffset] = useState(0);
   const [volume, setVolumeState] = useState(DEFAULT_VOLUME);
+  const [hostModes, setHostModes] = useState<Partial<Record<StationId, HostMode>>>({});
+  const [hostChannelIds, setHostChannelIds] = useState<Partial<Record<StationId, string>>>({});
+  const [hostPreferencesHydrated, setHostPreferencesHydrated] = useState(false);
 
   const [nowPlaying, setNowPlaying] = useState<Record<StationId, StationNowPlayingState>>(
     createInitialNowPlayingState
@@ -117,7 +136,73 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     () => STATIONS.find((station) => station.id === activeStationId) ?? STATIONS[0],
     [activeStationId]
   );
+  const getHostChannelForStation = useCallback(
+    (station: Station, channelIdOverride?: string) => {
+      const requestedChannel = getHostChannel(station, channelIdOverride);
+      if (requestedChannel) {
+        return requestedChannel;
+      }
+
+      const mode = hostModes[station.id] ?? "follow-ui";
+      return resolveHostChannel(
+        station,
+        mode,
+        hostChannelIds[station.id],
+        locale
+      );
+    },
+    [hostChannelIds, hostModes, locale]
+  );
+  const activeHostChannel = useMemo(
+    () => getHostChannelForStation(activeStation),
+    [activeStation, getHostChannelForStation]
+  );
+  const selectedHostChannelIds = useMemo(() => {
+    return STATIONS.reduce(
+      (channels, station) => ({
+        ...channels,
+        [station.id]: getHostChannelForStation(station).id
+      }),
+      {} as Partial<Record<StationId, string>>
+    );
+  }, [getHostChannelForStation]);
   const activeNowPlaying = nowPlaying[activeStationId];
+
+  useEffect(() => {
+    currentHostChannelIdsRef.current = selectedHostChannelIds;
+  }, [selectedHostChannelIds]);
+
+  const getHostSelection = useCallback(
+    (station: Station) => {
+      const mode = hostModes[station.id] ?? "follow-ui";
+      if (mode !== "fixed") {
+        return mode;
+      }
+
+      return getHostChannel(station, hostChannelIds[station.id])?.id ?? "auto";
+    },
+    [hostChannelIds, hostModes]
+  );
+
+  const setHostSelection = useCallback((stationId: StationId, selection: string) => {
+    const station = STATIONS.find((candidate) => candidate.id === stationId);
+    if (!station) return;
+
+    if (selection === "auto" || selection === "follow-ui") {
+      setHostModes((current) => ({ ...current, [stationId]: selection }));
+      setHostChannelIds((current) => {
+        const next = { ...current };
+        delete next[stationId];
+        return next;
+      });
+      return;
+    }
+
+    if (getHostChannel(station, selection)) {
+      setHostModes((current) => ({ ...current, [stationId]: "fixed" }));
+      setHostChannelIds((current) => ({ ...current, [stationId]: selection }));
+    }
+  }, []);
 
   const getAudioElement = useCallback(() => {
     audioRef.current = getPersistentAudioElement();
@@ -197,8 +282,8 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     let recoveryFailed = false;
 
     audio.pause();
-    if (audio.src !== activeStation.streamUrl) {
-      audio.src = activeStation.streamUrl;
+    if (audio.src !== activeHostChannel.streamUrl) {
+      audio.src = activeHostChannel.streamUrl;
     }
     audio.load();
 
@@ -223,7 +308,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
         clearRecoveryTimers();
       }
     }
-  }, [activeStation.streamUrl, clearRecoveryTimers, getAudioElement, queueRecovery, t]);
+  }, [activeHostChannel.streamUrl, clearRecoveryTimers, getAudioElement, queueRecovery, t]);
 
   useEffect(() => {
     retryPlaybackRef.current = retryPlayback;
@@ -241,19 +326,31 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     await retryPlayback();
   }, [clearRecoveryTimers, retryPlayback]);
 
-  const refreshNowPlaying = useCallback(async (stationIds: StationId[] = STATIONS.map((station) => station.id)) => {
+  const refreshNowPlaying = useCallback(async (
+    stationIds: StationId[] = STATIONS.map((station) => station.id),
+    hostChannelIdsOverride: Partial<Record<StationId, string>> = {}
+  ) => {
     setNowPlaying((current) => markNowPlayingLoading(current, stationIds));
 
     await Promise.all(
       stationIds.map(async (stationId) => {
+        let requestedChannelId: string | undefined;
         try {
-          const response = await fetch(`/api/nowplaying/${stationId}`, { cache: "no-store" });
+          const station = STATIONS.find((candidate) => candidate.id === stationId);
+          if (!station) throw new Error(t("common.unavailable"));
+          const channel = getHostChannelForStation(station, hostChannelIdsOverride[stationId]);
+          requestedChannelId = channel.id;
+          const query = `?channel=${encodeURIComponent(channel.id)}`;
+          const response = await fetch(`/api/nowplaying/${stationId}${query}`, { cache: "no-store" });
 
           if (!response.ok) {
             throw new Error(t("common.unavailable"));
           }
 
           const payload = (await response.json()) as StationNowPlaying;
+          if (currentHostChannelIdsRef.current[stationId] !== requestedChannelId) {
+            return;
+          }
           setNowPlaying((current) => ({
             ...current,
             [stationId]: {
@@ -262,6 +359,12 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
             }
           }));
         } catch {
+          if (
+            requestedChannelId === undefined ||
+            currentHostChannelIdsRef.current[stationId] !== requestedChannelId
+          ) {
+            return;
+          }
           setNowPlaying((current) => ({
             ...current,
             [stationId]: {
@@ -273,7 +376,25 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
         }
       })
     );
-  }, [t]);
+  }, [getHostChannelForStation, t]);
+
+  const previousHostChannelIdsRef = useRef<Partial<Record<StationId, string>> | undefined>(undefined);
+  useEffect(() => {
+    const previousChannelIds = previousHostChannelIdsRef.current;
+    previousHostChannelIdsRef.current = selectedHostChannelIds;
+
+    if (!previousChannelIds) {
+      return;
+    }
+
+    const changedStationIds = STATIONS.filter(
+      (station) => previousChannelIds[station.id] !== selectedHostChannelIds[station.id]
+    ).map((station) => station.id);
+
+    if (changedStationIds.length > 0) {
+      void refreshNowPlaying(changedStationIds);
+    }
+  }, [refreshNowPlaying, selectedHostChannelIds]);
 
   const refreshSchedules = useCallback(async (stationIds: StationId[] = STATIONS.map((station) => station.id)) => {
     setSchedules((current) => markScheduleLoading(current, stationIds));
@@ -326,8 +447,9 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   }, [clearRecoveryTimers, getAudioElement]);
 
   const playStation = useCallback(
-    async (station: Station) => {
+    async (station: Station, hostChannelId?: string) => {
       const audio = getAudioElement();
+      const hostChannel = getHostChannelForStation(station, hostChannelId);
 
       manualStopRef.current = false;
       clearRecoveryTimers();
@@ -341,9 +463,9 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
         window.localStorage.setItem("neuralcast:last-station", station.id);
       }
 
-      if (audio.src !== station.streamUrl) {
+      if (audio.src !== hostChannel.streamUrl) {
         audio.pause();
-        audio.src = station.streamUrl;
+        audio.src = hostChannel.streamUrl;
         audio.load();
       }
 
@@ -354,10 +476,64 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
         setPlaybackError(t("player.playbackBlocked"));
       }
 
-      void refreshNowPlaying([station.id]);
+      void refreshNowPlaying([station.id], { [station.id]: hostChannel.id });
     },
-    [clearRecoveryTimers, getAudioElement, refreshNowPlaying, t]
+    [clearRecoveryTimers, getAudioElement, getHostChannelForStation, refreshNowPlaying, t]
   );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    try {
+      const stored = JSON.parse(window.localStorage.getItem(HOST_PREFERENCES_STORAGE_KEY) ?? "null") as {
+        modes?: Partial<Record<StationId, unknown>>;
+        channels?: Partial<Record<StationId, unknown>>;
+      } | null;
+
+      if (stored?.modes) {
+        const validModes = Object.fromEntries(
+          Object.entries(stored.modes).filter(([, mode]) => isHostMode(mode))
+        ) as Partial<Record<StationId, HostMode>>;
+        setHostModes(validModes);
+      }
+      if (stored?.channels) {
+        const validChannels = Object.fromEntries(
+          Object.entries(stored.channels).filter(([stationId, channelId]) => {
+            const station = STATIONS.find((candidate) => candidate.id === stationId);
+            return Boolean(station && typeof channelId === "string" && getHostChannel(station, channelId));
+          })
+        ) as Partial<Record<StationId, string>>;
+        setHostChannelIds(validChannels);
+      }
+    } catch {
+      // Ignore malformed preferences and use the follow-app-language default.
+    }
+    setHostPreferencesHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !hostPreferencesHydrated) return;
+    window.localStorage.setItem(
+      HOST_PREFERENCES_STORAGE_KEY,
+      JSON.stringify({ modes: hostModes, channels: hostChannelIds })
+    );
+  }, [hostChannelIds, hostModes, hostPreferencesHydrated]);
+
+  const previousHostChannelRef = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    const channelKey = `${activeStation.id}:${activeHostChannel.id}`;
+    const previousChannelKey = previousHostChannelRef.current;
+    previousHostChannelRef.current = channelKey;
+
+    if (
+      previousChannelKey &&
+      previousChannelKey !== channelKey &&
+      playbackState !== "idle" &&
+      getAudioElement().src !== activeHostChannel.streamUrl
+    ) {
+      void playStation(activeStation, activeHostChannel.id);
+    }
+  }, [activeHostChannel, activeStation, getAudioElement, playStation, playbackState]);
 
   // Initialize station and audio element listeners
   useEffect(() => {
@@ -559,6 +735,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       value={{
         activeStationId,
         activeStation,
+        activeHostChannel,
         playbackState,
         playbackError,
         currentTime,
@@ -571,7 +748,9 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
         setVolume,
         toggleMute,
         refreshNowPlaying,
-        refreshSchedules
+        refreshSchedules,
+        getHostSelection,
+        setHostSelection
       }}
     >
       {children}
@@ -586,6 +765,10 @@ function readStoredVolume(value: string | null): number | undefined {
 
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0 && parsed <= 1 ? parsed : undefined;
+}
+
+function isHostMode(value: unknown): value is HostMode {
+  return value === "auto" || value === "follow-ui" || value === "fixed";
 }
 
 export function useAudioPlayer() {
