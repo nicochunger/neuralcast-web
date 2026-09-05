@@ -5,7 +5,10 @@ import { skipCurrentTrack } from "@/lib/admin";
 import { submitSongRequest } from "@/lib/songRequests";
 import { getStation, isStationId } from "@/lib/stations";
 
-export async function skipTrackAction(stationId: string): Promise<{ success: boolean; message?: string; error?: string }> {
+export async function skipTrackAction(
+  stationId: string,
+  hostChannelId?: string
+): Promise<{ success: boolean; message?: string; error?: string }> {
   try {
     const session = await getAuthSession();
 
@@ -17,7 +20,7 @@ export async function skipTrackAction(stationId: string): Promise<{ success: boo
       return { success: false, error: "Unknown station." };
     }
 
-    const message = await skipCurrentTrack(stationId);
+    const message = await skipCurrentTrack(stationId, hostChannelId);
     return { success: true, message };
   } catch (error) {
     return {

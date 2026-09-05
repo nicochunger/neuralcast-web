@@ -9,7 +9,7 @@ interface RouteContext {
   }>;
 }
 
-export async function POST(_request: Request, context: RouteContext) {
+export async function POST(request: Request, context: RouteContext) {
   const session = await getAuthSession();
 
   if (!session?.user?.isAdmin) {
@@ -23,7 +23,8 @@ export async function POST(_request: Request, context: RouteContext) {
   }
 
   try {
-    const message = await skipCurrentTrack(stationId);
+    const hostChannelId = new URL(request.url).searchParams.get("channel") ?? undefined;
+    const message = await skipCurrentTrack(stationId, hostChannelId);
     return NextResponse.json({ message }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to skip the current track.";

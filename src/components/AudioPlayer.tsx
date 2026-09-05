@@ -78,6 +78,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     toggleMute,
     refreshNowPlaying,
     refreshSchedules,
+    getHostChannelId,
     setHostSelection
   } = useAudioPlayer();
 
@@ -397,10 +398,14 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       setSkippingStationId(station.id);
 
       try {
-        const response = await fetch(`/api/admin/skip/${station.id}`, {
-          method: "POST",
-          cache: "no-store"
-        });
+        const hostChannelId = getHostChannelId(station);
+        const response = await fetch(
+          `/api/admin/skip/${station.id}?channel=${encodeURIComponent(hostChannelId)}`,
+          {
+            method: "POST",
+            cache: "no-store"
+          }
+        );
         const skipError = t("station.skipError");
         const payload = await readJsonResponse(response, skipError);
 
@@ -422,7 +427,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
         setSkippingStationId(null);
       }
     },
-    [refreshNowPlaying, showAdminControls, skippingStationId, t]
+    [getHostChannelId, refreshNowPlaying, showAdminControls, skippingStationId, t]
   );
 
   const openSongRequests = useCallback(

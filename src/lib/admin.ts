@@ -1,5 +1,10 @@
-import { AZURACAST_BASE_URL, getStation } from "@/lib/stations";
-import type { Station, StationId } from "@/types/radio";
+import {
+  AZURACAST_BASE_URL,
+  getDefaultHostChannel,
+  getHostChannel,
+  getStation
+} from "@/lib/stations";
+import type { StationId } from "@/types/radio";
 
 interface SkipAttempt {
   method: "POST" | "PUT";
@@ -13,7 +18,7 @@ interface RequestResult {
   body: string;
 }
 
-export async function skipCurrentTrack(stationId: StationId) {
+export async function skipCurrentTrack(stationId: StationId, hostChannelId?: string) {
   const station = getStation(stationId);
 
   if (!station) {
@@ -26,10 +31,12 @@ export async function skipCurrentTrack(stationId: StationId) {
     throw new Error("AzuraCast admin API key is not configured.");
   }
 
+  const hostChannel = getHostChannel(station, hostChannelId) ?? getDefaultHostChannel(station);
+
   const fallbackMessage = "Unable to skip the current track.";
   let lastErrorMessage = fallbackMessage;
 
-  for (const attempt of buildSkipAttempts(station)) {
+  for (const attempt of buildSkipAttempts(hostChannel.azuracastStationSlug)) {
     const result = await executeSkipAttempt(attempt, apiKey);
 
     if (!result.ok) {
@@ -58,24 +65,24 @@ export async function skipCurrentTrack(stationId: StationId) {
   throw new Error(lastErrorMessage);
 }
 
-function buildSkipAttempts(station: Station): SkipAttempt[] {
+function buildSkipAttempts(azuracastStationSlug: string): SkipAttempt[] {
   return [
-    { method: "POST", path: `/api/station/${station.id}/backend/skip` },
-    { method: "PUT", path: `/api/admin/debug/station/${station.id}/telnet?command=radio.skip` },
-    { method: "PUT", path: `/api/admin/debug/station/${station.id}/telnet?command=skip` },
+    { method: "POST", path: `/api/station/${azuracastStationSlug}/backend/skip` },
+    { method: "PUT", path: `/api/admin/debug/station/${azuracastStationSlug}/telnet?command=radio.skip` },
+    { method: "PUT", path: `/api/admin/debug/station/${azuracastStationSlug}/telnet?command=skip` },
     {
       method: "PUT",
-      path: `/api/admin/debug/station/${station.id}/telnet`,
+      path: `/api/admin/debug/station/${azuracastStationSlug}/telnet`,
       jsonBody: JSON.stringify({ command: "radio.skip" })
     },
     {
       method: "PUT",
-      path: `/api/admin/debug/station/${station.id}/telnet`,
+      path: `/api/admin/debug/station/${azuracastStationSlug}/telnet`,
       jsonBody: JSON.stringify({ command: "skip" })
     },
     {
       method: "PUT",
-      path: `/api/admin/debug/station/${station.id}/nextsong`,
+      path: `/api/admin/debug/station/${azuracastStationSlug}/nextsong`,
       treatUriOnlyAsPreview: true
     }
   ];

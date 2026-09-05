@@ -45,6 +45,7 @@ interface AudioPlayerContextValue {
   ) => Promise<void>;
   refreshSchedules: (stationIds?: StationId[]) => Promise<void>;
   getHostSelection: (station: Station) => string;
+  getHostChannelId: (station: Station) => string;
   setHostSelection: (stationId: StationId, selection: string) => void;
 }
 
@@ -182,6 +183,10 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       return getHostChannel(station, hostChannelIds[station.id])?.id ?? "auto";
     },
     [hostChannelIds, hostModes]
+  );
+  const getHostChannelId = useCallback(
+    (station: Station) => getHostChannelForStation(station).id,
+    [getHostChannelForStation]
   );
 
   const setHostSelection = useCallback((stationId: StationId, selection: string) => {
@@ -750,6 +755,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
         refreshNowPlaying,
         refreshSchedules,
         getHostSelection,
+        getHostChannelId,
         setHostSelection
       }}
     >
