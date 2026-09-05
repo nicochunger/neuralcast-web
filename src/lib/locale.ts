@@ -1,7 +1,7 @@
 export const LOCALE_STORAGE_KEY = "neuralcast:locale";
 export const LOCALE_COOKIE_KEY = "neuralcast-locale";
 
-export const SUPPORTED_LOCALES = ["en", "es"] as const;
+export const SUPPORTED_LOCALES = ["en", "es", "fr"] as const;
 
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "en";
@@ -30,6 +30,8 @@ const SPANISH_SPEAKING_COUNTRIES = new Set([
   "VE"
 ]);
 
+const FRENCH_SPEAKING_COUNTRIES = new Set(["FR", "MC"]);
+
 interface ResolveLocaleOptions {
   storedLocale?: string | null;
   browserLanguage?: string | null;
@@ -51,10 +53,18 @@ export function resolvePreferredLocale({
     return "es";
   }
 
+  if (normalizedBrowserLanguage?.startsWith("fr")) {
+    return "fr";
+  }
+
   const normalizedCountryCode = countryCode?.toUpperCase();
 
   if (normalizedCountryCode && SPANISH_SPEAKING_COUNTRIES.has(normalizedCountryCode)) {
     return "es";
+  }
+
+  if (normalizedCountryCode && FRENCH_SPEAKING_COUNTRIES.has(normalizedCountryCode)) {
+    return "fr";
   }
 
   return DEFAULT_LOCALE;

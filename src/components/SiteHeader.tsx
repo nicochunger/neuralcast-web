@@ -19,9 +19,10 @@ export function SiteHeader({ extraActions }: { extraActions?: ReactNode }) {
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const languageMenuRef = useRef<HTMLDivElement | null>(null);
 
-  const languageOptions: Array<{ locale: Locale; label: string; shortLabel: string; country: "us" | "ar" }> = [
+  const languageOptions: Array<{ locale: Locale; label: string; shortLabel: string; country: "us" | "ar" | "ch" }> = [
     { locale: "en", label: "English", shortLabel: "EN", country: "us" },
-    { locale: "es", label: "Español", shortLabel: "ES", country: "ar" }
+    { locale: "es", label: "Español", shortLabel: "ES", country: "ar" },
+    { locale: "fr", label: "Français", shortLabel: "FR", country: "ch" }
   ];
   const activeLanguage = languageOptions.find((option) => option.locale === locale) ?? languageOptions[0];
 
@@ -159,7 +160,7 @@ export function SiteHeader({ extraActions }: { extraActions?: ReactNode }) {
   );
 }
 
-function FlagIcon({ country }: { country: "us" | "ar" }) {
+function FlagIcon({ country }: { country: "us" | "ar" | "ch" }) {
   if (country === "ar") {
     return (
       <svg className="languageFlag" viewBox="0 0 28 20" aria-hidden="true">
@@ -167,6 +168,15 @@ function FlagIcon({ country }: { country: "us" | "ar" }) {
         <rect y="6.67" width="28" height="6.66" fill="#ffffff" />
         <circle cx="14" cy="10" r="2.1" fill="#f6b40e" />
         <circle cx="14" cy="10" r="1.1" fill="#d98f00" />
+      </svg>
+    );
+  }
+
+  if (country === "ch") {
+    return (
+      <svg className="languageFlag" viewBox="0 0 28 20" aria-hidden="true">
+        <rect width="28" height="20" fill="#da291c" />
+        <path d="M12 4h4v4h4v4h-4v4h-4v-4H8V8h4z" fill="#ffffff" />
       </svg>
     );
   }

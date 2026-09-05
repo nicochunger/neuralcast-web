@@ -275,7 +275,7 @@ function readPresentationTranslations(value: unknown): SchedulePresentationTrans
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return {};
   }
-  const entries = ["en", "es"].flatMap((locale) => {
+  const entries = ["en", "es", "fr"].flatMap((locale) => {
     const copy = (value as Record<string, unknown>)[locale];
     if (!copy || typeof copy !== "object" || Array.isArray(copy)) {
       return [];

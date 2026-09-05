@@ -77,6 +77,7 @@ export interface SchedulePresentationCopy {
 export interface SchedulePresentationTranslations {
   en?: SchedulePresentationCopy;
   es?: SchedulePresentationCopy;
+  fr?: SchedulePresentationCopy;
 }
 
 export interface StationSchedulePresentation {

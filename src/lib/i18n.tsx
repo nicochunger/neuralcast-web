@@ -252,8 +252,7 @@ type TranslationKey =
 
 type TranslationParams = Record<string, string | number>;
 
-const messages: Record<Locale, Record<TranslationKey, string>> = {
-  en: {
+const englishMessages: Record<TranslationKey, string> = {
     "app.tagline": "Live AI radio from Estavayer, Switzerland.",
     "common.install": "Install",
     "common.language": "Language",
@@ -504,7 +503,10 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "about.closing.title": "This is still a living project, and it is not finished.",
     "about.closing.body":
       "I may still create a parallel version of NeuralCast with the AI host as well. For now the host only speaks Argentinian Spanish, and there is no English version yet. It is still evolving while we live with it.",
-  },
+};
+
+const messages: Record<Locale, Record<TranslationKey, string>> = {
+  en: englishMessages,
   es: {
     "app.tagline": "Radio con IA en vivo desde Estavayer, Suiza.",
     "common.install": "Instalar",
@@ -756,6 +758,161 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "about.closing.title": "Esto sigue siendo un proyecto vivo y todavía no está terminado.",
     "about.closing.body":
       "Todavía es posible que haga una versión paralela de NeuralCast con el host de IA también. Por ahora el host habla solo en español rioplatense y no existe una versión en inglés. Sigue tomando forma mientras convivimos con él.",
+  },
+  fr: {
+    ...englishMessages,
+    "app.tagline": "Radio IA en direct depuis Estavayer, en Suisse.",
+    "common.install": "Installer",
+    "common.language": "Langue",
+    "common.play": "Lire",
+    "common.stop": "Arrêter",
+    "common.loading": "Chargement",
+    "common.unavailable": "Indisponible",
+    "common.liveStream": "Diffusion en direct",
+    "common.listeners": "Auditeurs : {count}",
+    "common.listenersUnknown": "Auditeurs : --",
+    "common.refreshing": "Actualisation...",
+    "common.submitting": "Envoi...",
+    "artwork.view": "Voir la pochette de l’album",
+    "artwork.close": "Fermer la pochette de l’album",
+    "nav.label": "Navigation principale",
+    "nav.live": "Écouter",
+    "nav.about": "À propos",
+    "nav.backToRadio": "Retour à la radio",
+    "nav.admin": "Console d’administration",
+    "favorites.kicker": "Votre sélection musicale",
+    "favorites.title": "Favoris",
+    "favorites.description": "Les morceaux que vous avez enregistrés depuis les stations en direct.",
+    "favorites.close": "Fermer les favoris",
+    "favorites.empty": "Vos favoris apparaîtront ici lorsque vous enregistrerez un morceau.",
+    "favorites.stationEmpty": "Aucun morceau de cette station n’a encore été enregistré.",
+    "favorites.count": "{count} morceaux",
+    "favorites.like": "Ajouter le morceau actuel aux favoris",
+    "favorites.unlike": "Retirer le morceau actuel des favoris",
+    "favorites.remove": "Retirer {title} des favoris",
+    "favorites.likedAt": "Enregistré à {time}",
+    "favorites.timeUnknown": "Heure d’enregistrement indisponible",
+    "favorites.syncError": "Les favoris n’ont pas pu être synchronisés ; ils restent enregistrés sur cet appareil.",
+    "auth.eyebrow": "Accès administrateur",
+    "auth.title": "Connectez-vous pour gérer NeuralCast",
+    "auth.lead": "Cet espace privé permet d’utiliser les commandes en direct, comme passer des morceaux et déclencher des interventions de l’animateur.",
+    "auth.notConfigured": "La connexion administrateur n’est pas encore configurée.",
+    "auth.configureEnv": "Ajoutez `NEXTAUTH_SECRET`, `ADMIN_EMAIL` et `ADMIN_PASSWORD_HASH` dans Vercel et dans votre fichier d’environnement local.",
+    "auth.email": "E-mail",
+    "auth.password": "Mot de passe",
+    "auth.signIn": "Se connecter",
+    "auth.signingIn": "Connexion...",
+    "auth.error": "Impossible de vous connecter avec ces identifiants.",
+    "auth.signOut": "Se déconnecter",
+    "player.playbackBlocked": "La lecture a été bloquée ou le flux est inaccessible. Vérifiez votre connexion, puis appuyez de nouveau sur Lire.",
+    "player.streamLoadError": "Impossible de charger le flux.",
+    "player.reconnecting": "Connexion perdue. Reconnexion...",
+    "player.reconnectFailed": "Impossible de rétablir la connexion au flux.",
+    "player.reconnect": "Reconnecter",
+    "player.installFallbackAndroid": "Pour installer l’application sur Android, ouvrez le menu du navigateur et appuyez sur Installer l’application ou Ajouter à l’écran d’accueil.",
+    "player.volume": "Volume",
+    "player.volumeValue": "Volume : {value} %",
+    "player.mute": "Couper le son",
+    "player.unmute": "Réactiver le son",
+    "player.trackProgress": "Progression du morceau",
+    "player.trackProgressValue": "{elapsed} sur {duration}",
+    "schedule.title": "Programme de {station}",
+    "schedule.description": "Découvrez ce qui passe maintenant et ce qui est prévu au fil de la journée.",
+    "schedule.error": "Programme indisponible.",
+    "schedule.blocks": "{count} blocs",
+    "schedule.summary.liveNow": "En direct",
+    "schedule.summary.upNext": "À suivre",
+    "schedule.weeklyNote": "Le programme hebdomadaire actuel se répète chaque jour. Un nouveau programme est généré dans la nuit du dimanche au lundi.",
+    "schedule.empty": "Programme indisponible.",
+    "schedule.toolbar": "Vue sur 24 heures · heure de Zurich (CET/CEST)",
+    "schedule.now": "Maintenant {time}",
+    "schedule.ariaLabel": "Programme de {station} sur 24 heures pour le {date}",
+    "schedule.close": "Fermer le programme",
+    "stations.ariaLabel": "Stations",
+    "station.nowPlaying": "À l’écoute",
+    "station.liveNow": "En direct",
+    "station.activeBlock": "Bloc actif",
+    "station.recentlyPlayed": "Diffusés récemment",
+    "station.schedule": "Programme",
+    "station.requestSong": "Demander un morceau",
+    "station.skipSong": "Passer le morceau",
+    "station.skippingSong": "Passage...",
+    "station.skippedSong": "Morceau passé",
+    "station.skipError": "Impossible de passer le morceau actuel.",
+    "station.scheduleWaiting": "En attente du programme.",
+    "station.description.neuralcast": "Sélection radio variée par IA",
+    "station.description.neuralforge": "Version heavy avec un animateur IA",
+    "request.title": "Demander un morceau",
+    "request.description": "Choisissez un morceau dans la bibliothèque de la station. AzuraCast le placera dans la file des demandes lorsqu’il sera disponible.",
+    "request.close": "Fermer les demandes de morceaux",
+    "request.searchLabel": "Rechercher dans le catalogue",
+    "request.searchPlaceholder": "Artiste, titre, album ou genre",
+    "request.loading": "Chargement des morceaux disponibles...",
+    "request.empty": "Aucun morceau ne peut être demandé pour le moment.",
+    "request.noMatches": "Aucun morceau ne correspond à votre recherche.",
+    "request.submit": "Demander",
+    "request.submitting": "Envoi...",
+    "request.requested": "Demandé",
+    "request.success": "Votre demande a été envoyée.",
+    "request.loadError": "Impossible de charger les morceaux disponibles.",
+    "request.submitError": "Impossible d’envoyer la demande.",
+    "history.title": "Diffusés récemment",
+    "history.description": "Morceaux récemment diffusés par AzuraCast sur {station}.",
+    "history.close": "Fermer les morceaux récents",
+    "history.empty": "Aucun morceau récent n’est encore disponible.",
+    "history.unavailable": "L’historique récent est indisponible.",
+    "history.playedAt": "Diffusé à {time}",
+    "history.timeUnknown": "Heure indisponible",
+    "track.waiting": "En attente des métadonnées en direct.",
+    "track.unavailable": "Métadonnées indisponibles.",
+    "status.ready": "Prêt",
+    "status.buffering": "Chargement",
+    "status.onAir": "À l’antenne",
+    "status.paused": "En pause",
+    "status.streamError": "Erreur de diffusion",
+    "theme.light": "clair",
+    "theme.dark": "sombre",
+    "theme.system": "système",
+    "theme.switchToLight": "Passer au thème clair",
+    "theme.switchToDark": "Passer au thème sombre",
+    "theme.title": "Thème : {theme}. {action}",
+    "about.eyebrow": "À propos de NeuralCast",
+    "about.title": "Tout a commencé à la maison, avec une radio et un problème tout simple : choisir quoi écouter.",
+    "about.lead": "Ma femme et moi voulions écouter davantage de musique à la maison, mais choisir quoi mettre nous freinait toujours. Nous finissions souvent par revenir aux mêmes choses. Ce qui nous manquait, c’était la simplicité de la radio : on l’allume et quelque chose passe déjà.",
+    "about.cta.listen": "Écouter en direct",
+    "about.cta.how": "Comment ça marche",
+    "about.philosophy.eyebrow": "Philosophie",
+    "about.philosophy.title": "Comment tout a vraiment commencé",
+    "about.philosophy.card1.kicker": "À la maison",
+    "about.philosophy.card1.title": "Je cherchais une meilleure expérience d’écoute au quotidien.",
+    "about.philosophy.card1.body": "Nous avons acheté une radio pour la maison et commencé à explorer les radios sur Internet. J’adorais l’idée de pouvoir écouter des stations du monde entier, y compris celles qui n’existent qu’en ligne.",
+    "about.philosophy.card2.kicker": "Recherche",
+    "about.philosophy.card2.title": "J’ai trouvé de bonnes stations, mais pas celle que je voulais vraiment.",
+    "about.philosophy.card2.body": "Je voulais de la musique variée et connue, dans différents genres. Une grande partie de ce que je trouvais était intéressante, mais souvent trop spécialisée ou simplement pas adaptée à une écoute toute la journée à la maison.",
+    "about.philosophy.card3.kicker": "Déclic",
+    "about.philosophy.card3.title": "C’est alors que créer ma propre station a commencé à sembler possible.",
+    "about.philosophy.card3.body": "J’ai commencé modestement avec quelques vieux MP3 que j’avais encore, juste pour voir si l’idée fonctionnait. Il est vite devenu évident que cela ne passerait pas à l’échelle, mais j’étais déjà complètement absorbé par le projet.",
+    "about.why.eyebrow": "Pourquoi",
+    "about.why.title": "Ce projet a pris tout son sens parce qu’il résolvait à la fois un vrai problème et une curiosité liée à l’IA.",
+    "about.why.body1": "À cette époque, je souhaitais vraiment construire quelque chose d’utile avec l’IA. Je cherchais activement des problèmes auxquels elle pouvait s’appliquer, et celui-ci convenait parfaitement puisqu’il faisait déjà partie de notre quotidien.",
+    "about.why.body2": "Le projet est ainsi devenu un système entièrement automatisé où les playlists sont générées par l’IA, tout en étant guidées par mes choix, mes contraintes et mes goûts. Je voulais créer quelque chose d’ambitieux, mais aussi quelque chose que nous utiliserions vraiment tous les jours.",
+    "about.why.stat1.label": "Origine",
+    "about.why.stat1.value": "Un problème d’écoute à la maison",
+    "about.why.stat2.label": "Deuxième moteur",
+    "about.why.stat2.value": "Une réelle envie de créer avec l’IA",
+    "about.why.stat3.label": "Résultat",
+    "about.why.stat3.value": "Une radio qui fait partie de notre quotidien",
+    "about.how.eyebrow": "Comment ça marche",
+    "about.how.title": "Les différentes stations",
+    "about.how.step1.title": "NeuralCast est le mix partagé de la maison.",
+    "about.how.step1.body": "C’est la station principale que nous avons créée pour le quotidien à la maison. Elle puise dans plus de 30 playlists de genres différents, toutes sélectionnées autour de ce que ma femme et moi aimons vraiment. Nous sommes tous les deux Argentins ; on y trouve donc beaucoup de musique de là-bas, aux côtés de classiques, de grands titres pop, de morceaux plus anciens et de découvertes récentes.",
+    "about.how.step2.title": "NeuralForge accueille mon côté plus heavy.",
+    "about.how.step2.body": "J’aime aussi beaucoup le metal et le hard rock, mais ma femme ne veut vraiment pas en entendre dans l’ambiance musicale de la maison toute la journée. J’ai donc créé un flux séparé pour cette facette de mes goûts.",
+    "about.how.step3.title": "L’animateur IA fait lui aussi partie de l’expérience radio.",
+    "about.how.step3.body": "Je voulais voir si un animateur IA pouvait rendre la station plus vivante en lui ajoutant de la personnalité et du contexte. Pour l’instant, cet animateur n’est actif que sur NeuralForge. Ma femme préfère NeuralCast uniquement avec de la musique et, puisque nous l’avons créée pour nous et l’écoutons toute la journée à la maison, son avis l’emporte sur cette décision.",
+    "about.closing.eyebrow": "Et ensuite",
+    "about.closing.title": "Ce projet continue d’évoluer et il n’est pas terminé.",
+    "about.closing.body": "Je créerai peut-être aussi une version parallèle de NeuralCast avec l’animateur IA. Pour l’instant, celui-ci parle uniquement en espagnol argentin et il n’existe pas encore de version anglaise. Le projet continue d’évoluer au rythme de notre quotidien."
   }
 };
 
@@ -827,15 +984,19 @@ export function getSegmentTitle(
   locale: Locale
 ): string {
   if (!segment) {
-    return locale === "es" ? "Esperando la programación." : "Waiting for schedule.";
+    return locale === "es"
+      ? "Esperando la programación."
+      : locale === "fr"
+        ? "En attente du programme."
+        : "Waiting for schedule.";
   }
 
   if (segment.kind === "open-slot") {
-    return locale === "es" ? "Espacio libre" : "Open slot";
+    return locale === "es" ? "Espacio libre" : locale === "fr" ? "Créneau libre" : "Open slot";
   }
 
   if (segment.kind === "open-rotation") {
-    return locale === "es" ? "Rotación abierta" : "Open rotation";
+    return locale === "es" ? "Rotación abierta" : locale === "fr" ? "Rotation ouverte" : "Open rotation";
   }
 
   const presentation = segment.presentation?.[locale];
@@ -849,7 +1010,9 @@ export function getSegmentTitle(
 
   return locale === "es"
     ? `${segment.playlistNames.length} listas activas`
-    : `${segment.playlistNames.length} active playlists`;
+    : locale === "fr"
+      ? `${segment.playlistNames.length} playlists actives`
+      : `${segment.playlistNames.length} active playlists`;
 }
 
 export function getSegmentDetail(
@@ -857,15 +1020,27 @@ export function getSegmentDetail(
   locale: Locale
 ): string {
   if (!segment) {
-    return locale === "es" ? "Se están cargando los metadatos de la programación." : "Schedule metadata is loading.";
+    return locale === "es"
+      ? "Se están cargando los metadatos de la programación."
+      : locale === "fr"
+        ? "Chargement des métadonnées du programme."
+        : "Schedule metadata is loading.";
   }
 
   if (segment.kind === "open-slot") {
-    return locale === "es" ? "No hay nada programado en esta franja." : "Nothing scheduled in this window.";
+    return locale === "es"
+      ? "No hay nada programado en esta franja."
+      : locale === "fr"
+        ? "Rien n’est programmé sur ce créneau."
+        : "Nothing scheduled in this window.";
   }
 
   if (segment.kind === "open-rotation") {
-    return locale === "es" ? "Mezcla amplia de la rotación activa." : "Broad mix from the active rotation.";
+    return locale === "es"
+      ? "Mezcla amplia de la rotación activa."
+      : locale === "fr"
+        ? "Sélection variée issue de la rotation active."
+        : "Broad mix from the active rotation.";
   }
 
   const presentation = segment.presentation?.[locale];
