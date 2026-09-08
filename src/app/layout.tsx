@@ -7,6 +7,7 @@ import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistratio
 import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
 import { PERSISTENT_AUDIO_ELEMENT_CLASS, PERSISTENT_AUDIO_ELEMENT_ID } from "@/lib/persistentAudio";
 import "./globals.css";
+import "./design.css";
 
 const themeBootScript = `
 try {

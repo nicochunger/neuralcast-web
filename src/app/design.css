@@ -1,0 +1,112 @@
+
+/* Presentation only: shared controls, dialogs and playback remain authoritative. */
+:root {
+  --control-compact: 44px;
+  --control-icon: 44px;
+  --panel-bg: var(--surface);
+  --mini-bg: var(--surface);
+  --header-bg: var(--paper);
+}
+html body .stationCard {
+  --station-card-title: var(--ink);
+  --station-card-text: var(--ink);
+  --station-card-muted: var(--muted);
+  --station-card-dim: var(--muted);
+  --station-card-text-shadow: none;
+  --station-card-action-bg: var(--surface-soft);
+  --station-card-action-border: var(--line-strong);
+  --station-card-action-shadow: none;
+  --station-card-art-ink: var(--ink);
+  --station-card-art-bg: var(--surface-soft);
+  --station-card-chip-bg: var(--surface-soft);
+  --station-card-chip-border: var(--line);
+  --station-card-chip-shadow: none;
+  --station-card-active-action-bg: var(--surface-soft);
+  background: var(--surface);
+}
+.stationCard::before, .stationCard::after { content: none; }
+.stationTitleBlock p { display: block; overflow: visible; }
+.hostLanguageControl select { min-height: 44px; background: var(--surface-soft); color: var(--ink); }
+.trackNowPlaying { width: 100%; max-width: none; background: transparent; box-shadow: none; backdrop-filter: none; }
+.trackTitle { width: auto; }
+.stationMetaTopline { width: 100%; flex-wrap: wrap; gap: 8px 24px; }
+.stationActiveBlock { white-space: normal; }
+.stateChipLive { color: var(--ink); }
+.headerActions, .headerUtilityRow { flex-wrap: wrap; }
+.requestModal, .schedulePanel, .authCard, .adminPanel, .adminHero, .aboutBand { box-shadow: none; }
+@media (max-width: 560px) {
+  .headerActions { flex-wrap: wrap; gap: 8px; }
+  .headerUtilityRow { flex-wrap: wrap; }
+  .stationTitleBlock h2 { overflow-wrap: anywhere; }
+}
+
+:root {
+  --ink: #272820; --muted: #646354; --dim: #747366;
+  --paper: #f3efdf; --canvas: #f3efdf; --surface: #faf7eb;
+  --surface-soft: #e9e4d2; --surface-raised: #faf7eb;
+  --line: #d1cbb7; --line-strong: #898774; --focus: #a13d24;
+  --body-background: var(--paper); --control-radius: 2px;
+}
+:root[data-theme="dark"] {
+  --ink: #eee8d5; --muted: #c1bba7; --dim: #aaa58f;
+  --paper: #24261f; --canvas: #24261f; --surface: #2c2e26;
+  --surface-soft: #393c30; --surface-raised: #2c2e26;
+  --line: #505342; --line-strong: #888b73; --focus: #efaa7d;
+  --body-background: var(--paper);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --ink: #eee8d5; --muted: #c1bba7; --dim: #aaa58f;
+    --paper: #24261f; --canvas: #24261f; --surface: #2c2e26;
+    --surface-soft: #393c30; --surface-raised: #2c2e26;
+    --line: #505342; --line-strong: #888b73; --focus: #efaa7d;
+    --body-background: var(--paper);
+  }
+}
+body { font-family: Arial, Helvetica, sans-serif; }
+.appShell { width: min(1280px, calc(100% - 48px)); }
+.appHeader { position: relative; margin: 0 0 32px; padding: 22px 0; border-bottom: 3px double var(--ink); background: transparent; }
+.appHeader h1 { font-family: Georgia, serif; font-size: 2.4rem; letter-spacing: -.07em; }
+.brandIcon { border-radius: 50%; box-shadow: none; }
+.designIntro { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding-bottom: 30px; }
+.designIntro h2 { font: normal clamp(3rem, 7vw, 6rem)/.95 Georgia, serif; letter-spacing: -.055em; margin: 0; max-width: 12ch; }
+.designIntro p { max-width: 27ch; margin: 0; color: var(--muted); line-height: 1.6; }
+.designEyebrow { display: block; font: 12px/1.4 monospace; letter-spacing: .18em; margin-bottom: 16px; text-transform: uppercase; }
+.stationGrid { grid-template-columns: 1fr; gap: 0; counter-reset: station; border-top: 1px solid var(--ink); }
+html body .stationCard { border: 0; border-bottom: 1px solid var(--ink); border-radius: 0; box-shadow: none; min-height: 0; background: transparent; }
+.stationCardInner { display: grid; grid-template-columns: minmax(240px, .8fr) minmax(0, 1.4fr); min-height: 0; padding: 32px 0; gap: 40px; }
+.stationCardHeader { flex-wrap: wrap; align-content: start; }
+.stationTitleBlock { flex-basis: 100%; }
+.stationTitleBlock::before { counter-increment: station; content: '0' counter(station); font: 14px monospace; color: var(--muted); margin-bottom: 12px; }
+.stationTitleBlock h2 { font: normal clamp(2rem, 3vw, 3rem)/1 Georgia, serif; letter-spacing: -.04em; }
+.stationControlGroup { justify-items: start; max-width: 100%; }
+.playButton { border: 0; box-shadow: none; min-width: 140px; }
+.stationInfoSurface { align-content: center; gap: 18px; }
+.trackNowPlaying { grid-template-columns: 124px minmax(0, 1fr) 44px; padding: 0; border: 0; border-radius: 0; }
+.trackArtwork { width: 124px; min-width: 124px; max-width: 124px; border-radius: 0; box-shadow: 5px 5px 0 var(--line); }
+.trackTitleText { font: bold 1.5rem/1.15 Georgia, serif; }
+.stationCommandButton { border-radius: 0; background: transparent; }
+.stationCardActive { border-left: 4px solid var(--focus) !important; padding-left: 18px; }
+.miniPlayer { border-radius: 0; border: 1px solid var(--ink); box-shadow: 5px 5px 0 var(--line); }
+.requestModal, .scheduleModal, .schedulePanel, .authCard, .adminPanel, .adminHero, .aboutBand, .aboutHero { border-radius: 2px; }
+.aboutHero h2, .authCard h2, .requestModalHero h2, .scheduleHeader h2 { font-family: Georgia, serif; }
+@media (max-width: 860px) {
+  .appShell { width: calc(100% - 32px); }
+  .appHeader { flex-wrap: wrap; }
+  .stationCardInner { grid-template-columns: 1fr; gap: 24px; }
+  .stationCardHeader { flex-wrap: nowrap; }
+  .stationTitleBlock { flex-basis: auto; }
+  .stationControlGroup { justify-items: end; }
+}
+@media (max-width: 560px) {
+  .designIntro { display: block; }
+  .designIntro p { margin-top: 20px; max-width: none; }
+  .appHeader h1 { font-size: 2rem; }
+  .trackNowPlaying { grid-template-columns: 76px minmax(0, 1fr) 40px; gap: 12px; }
+  .trackArtwork { width: 76px; min-width: 76px; max-width: 76px; }
+  .trackTitleText { font-size: 1.2rem; }
+  .playButton { min-width: 86px; }
+  .stationControlGroup { max-width: 44%; }
+}
+
+.stationCommandButton, .listenerChip, .favoriteButton { backdrop-filter: none; }

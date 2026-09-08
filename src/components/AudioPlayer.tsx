@@ -60,7 +60,7 @@ const SongRequestModal = dynamic(
 );
 
 export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const {
     activeStationId,
     activeStation,
@@ -578,6 +578,14 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
           </>
         }
       />
+
+      <section className="designIntro" aria-labelledby="design-heading">
+        <div>
+          <span className="designEyebrow">NeuralCast / Radio Journal</span>
+          <h2 id="design-heading">{({"en": "A daily dose of discovery.", "es": "Tu dosis diaria de descubrimiento.", "fr": "Votre dose quotidienne de découvertes."})[locale]}</h2>
+        </div>
+        <p>{({"en": "Two stations. Open ears. Find your next favorite sound.", "es": "Dos estaciones. Escuchá y descubrí tu próximo sonido favorito.", "fr": "Deux stations. Tendez l’oreille et découvrez votre prochain coup de cœur."})[locale]}</p>
+      </section>
 
       <section className="stationGrid" aria-label={t("stations.ariaLabel")}>
         {STATIONS.map((station) => {
