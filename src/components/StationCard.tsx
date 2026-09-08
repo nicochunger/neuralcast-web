@@ -3,6 +3,7 @@
 import { getSegmentTitle, getStationDescription, useI18n } from "@/lib/i18n";
 import { AnimatedSuccessIcon } from "@/components/AnimatedSuccessIcon";
 import { HeartIcon } from "@/components/HeartIcon";
+import { ScrollingTrackTitle } from "@/components/ScrollingTrackTitle";
 import { TrackProgressBar } from "@/components/TrackProgressBar";
 import type { ArtworkLightboxData } from "@/components/ArtworkLightbox";
 import type { CSSProperties } from "react";
@@ -162,7 +163,7 @@ export function StationCard({
               </div>
             )}
             <div className="trackTitle" aria-label={track.label}>
-              <strong className="trackTitleText">{track.title}</strong>
+              <ScrollingTrackTitle title={track.title} />
               {track.artist ? (
                 <span className="trackArtist">{track.artist}</span>
               ) : null}

@@ -1009,7 +1009,7 @@ img {
 .trackNowPlaying {
   grid-area: now;
   display: inline-grid;
-  grid-template-columns: 100px minmax(0, 1fr) 40px;
+  grid-template-columns: 128px minmax(0, 1fr) 40px;
   align-items: center;
   gap: 16px;
   justify-self: start;
@@ -1030,9 +1030,9 @@ img {
 .trackArtwork {
   position: relative;
   display: grid;
-  width: 100px;
-  min-width: 100px;
-  max-width: 100px;
+  width: 128px;
+  min-width: 128px;
+  max-width: 128px;
   aspect-ratio: 1;
   overflow: hidden;
   place-items: center;
@@ -1095,7 +1095,7 @@ img {
   min-width: 0;
   min-height: 0;
   align-content: center;
-  gap: 3px;
+  gap: 5px;
   overflow: hidden;
   color: var(--station-card-title);
   text-shadow: var(--station-card-text-shadow);
@@ -1165,21 +1165,46 @@ img {
   color: var(--station-card-title);
   font-size: 1.2rem;
   font-weight: 820;
-  line-height: 1.12;
+  line-height: 1.25;
+}
+
+.trackTitleViewport {
+  text-overflow: clip;
+}
+
+.trackTitleScroll {
+  display: block;
+  width: max-content;
+}
+
+.trackTitle .trackProgress {
+  margin-top: 7px;
+  gap: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trackTitleViewport {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .trackTitleScroll {
+    width: auto;
+  }
 }
 
 .trackArtist {
   color: var(--station-card-text);
   font-size: 1.08rem;
   font-weight: 680;
-  line-height: 1.14;
+  line-height: 1.25;
 }
 
 .trackAlbum {
   color: var(--station-card-dim);
   font-size: 0.94rem;
   font-weight: 620;
-  line-height: 1.14;
+  line-height: 1.25;
 }
 
 .trackProgress {
@@ -3618,7 +3643,7 @@ img {
   }
 
   .trackNowPlaying {
-    grid-template-columns: 88px minmax(0, 1fr) 38px;
+    grid-template-columns: 104px minmax(0, 1fr) 38px;
     gap: 14px;
     border-radius: 18px;
     padding: 10px 14px 10px 10px;
@@ -3630,9 +3655,9 @@ img {
   }
 
   .trackArtwork {
-    width: 88px;
-    min-width: 88px;
-    max-width: 88px;
+    width: 104px;
+    min-width: 104px;
+    max-width: 104px;
     border-radius: 15px;
   }
 
@@ -3782,7 +3807,7 @@ img {
   }
 
   .trackNowPlaying {
-    grid-template-columns: 76px minmax(0, 1fr) 36px;
+    grid-template-columns: 88px minmax(0, 1fr) 36px;
     gap: 12px;
     border-radius: 16px;
     padding: 9px 10px 9px 9px;
@@ -3813,9 +3838,9 @@ img {
   }
 
   .trackArtwork {
-    width: 76px;
-    min-width: 76px;
-    max-width: 76px;
+    width: 88px;
+    min-width: 88px;
+    max-width: 88px;
     border-radius: 13px;
     font-size: 1.7rem;
   }
