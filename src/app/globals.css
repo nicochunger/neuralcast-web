@@ -726,19 +726,20 @@ img {
 
 .stationCardInner {
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.4fr);
+  align-items: center;
   min-height: 352px;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 22px;
-  padding: 16px;
+  gap: 32px;
+  padding: 24px;
 }
 
 .stationCardHeader {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
+  gap: 16px;
+  min-width: 0;
 }
 
 .stationTitleBlock {
@@ -798,9 +799,9 @@ img {
 .stationControlGroup {
   display: grid;
   flex: 0 0 auto;
-  justify-items: end;
+  justify-items: start;
   gap: 8px;
-  max-width: min(100%, 220px);
+  max-width: 100%;
 }
 
 .stateChip,
@@ -1015,8 +1016,8 @@ img {
   justify-self: start;
   align-self: start;
   min-width: 0;
-  width: fit-content;
-  max-width: min(100%, 640px);
+  width: 100%;
+  max-width: 100%;
   border: 1px solid var(--station-card-glass-border);
   border-radius: 20px;
   padding: 12px 16px 12px 12px;
@@ -1091,7 +1092,7 @@ img {
 
 .trackTitle {
   display: grid;
-  width: min(40vw, 380px);
+  width: auto;
   min-width: 0;
   min-height: 0;
   align-content: center;
@@ -3599,11 +3600,20 @@ img {
   }
 
   .stationCardHeader {
+    flex-direction: row;
     align-items: flex-start;
+    justify-content: space-between;
   }
 
   .stationControlGroup {
-    max-width: 45%;
+    max-width: 46%;
+    justify-items: end;
+  }
+
+  .stationCardInner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding: 16px;
   }
 
   .stationInfoSurface {
@@ -3628,7 +3638,7 @@ img {
   }
 
   .trackTitle {
-    width: min(44vw, 340px);
+    width: auto;
   }
 
   .trackArtwork {
@@ -3773,17 +3783,6 @@ img {
 
   .brandLockup {
     width: 100%;
-  }
-
-  .stationCardHeader {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-
-  .stationControlGroup {
-    max-width: 46%;
-    justify-items: end;
   }
 
   .stationInfoSurface {
@@ -4071,19 +4070,6 @@ img {
   .aboutHostNote,
   .aboutClosingText {
     font-size: 0.98rem;
-  }
-}
-
-@media (max-width: 440px) {
-  .stationCardHeader {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-
-  .stationControlGroup {
-    max-width: 46%;
-    justify-items: end;
   }
 }
 
