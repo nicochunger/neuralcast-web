@@ -637,7 +637,6 @@ img {
 
 .stationCard {
   position: relative;
-  min-height: 352px;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -729,7 +728,6 @@ img {
   display: grid;
   grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.4fr);
   align-items: center;
-  min-height: 352px;
   gap: 32px;
   padding: 24px;
 }
@@ -3570,13 +3568,6 @@ img {
   font-size: 0.96rem;
 }
 
-@media (min-width: 1020px) {
-  .stationCard,
-  .stationCardInner {
-    min-height: 382px;
-  }
-}
-
 @media (max-width: 860px) {
   .appShell {
     width: min(100% - 20px, 620px);
@@ -3592,11 +3583,6 @@ img {
   .stationGrid,
   .scheduleSummaryGrid {
     grid-template-columns: 1fr;
-  }
-
-  .stationCard,
-  .stationCardInner {
-    min-height: 326px;
   }
 
   .stationCardHeader {
