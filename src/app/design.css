@@ -1,0 +1,126 @@
+
+/* Presentation only: shared controls, dialogs and playback remain authoritative. */
+:root {
+  --control-compact: 44px;
+  --control-icon: 44px;
+  --panel-bg: var(--surface);
+  --mini-bg: var(--surface);
+  --header-bg: var(--paper);
+}
+html body .stationCard {
+  --station-card-title: var(--ink);
+  --station-card-text: var(--ink);
+  --station-card-muted: var(--muted);
+  --station-card-dim: var(--muted);
+  --station-card-text-shadow: none;
+  --station-card-action-bg: var(--surface-soft);
+  --station-card-action-border: var(--line-strong);
+  --station-card-action-shadow: none;
+  --station-card-art-ink: var(--ink);
+  --station-card-art-bg: var(--surface-soft);
+  --station-card-chip-bg: var(--surface-soft);
+  --station-card-chip-border: var(--line);
+  --station-card-chip-shadow: none;
+  --station-card-active-action-bg: var(--surface-soft);
+  background: var(--surface);
+}
+.stationCard::before, .stationCard::after { content: none; }
+.stationTitleBlock p { display: block; overflow: visible; }
+.hostLanguageControl select { min-height: 44px; background: var(--surface-soft); color: var(--ink); }
+.trackNowPlaying { width: 100%; max-width: none; background: transparent; box-shadow: none; backdrop-filter: none; }
+.trackTitle { width: auto; }
+.stationMetaTopline { width: 100%; flex-wrap: wrap; gap: 8px 24px; }
+.stationActiveBlock { white-space: normal; }
+.stateChipLive { color: var(--ink); }
+.headerActions, .headerUtilityRow { flex-wrap: wrap; }
+.requestModal, .schedulePanel, .authCard, .adminPanel, .adminHero, .aboutBand { box-shadow: none; }
+@media (max-width: 560px) {
+  .headerActions { flex-wrap: wrap; gap: 8px; }
+  .headerUtilityRow { flex-wrap: wrap; }
+  .stationTitleBlock h2 { overflow-wrap: anywhere; }
+}
+
+:root {
+  --ink: #252446; --muted: #65627e; --dim: #76728d;
+  --paper: #efedf8; --canvas: #efedf8; --surface: #ffffff;
+  --surface-soft: #e8e4f4; --surface-raised: #ffffff;
+  --line: #d9d4ec; --line-strong: #a59bbf; --focus: #6550ba;
+  --body-background: radial-gradient(ellipse at top right, #ded5fc, transparent 65%), var(--paper);
+  --control-radius: 24px;
+}
+:root[data-theme="dark"] {
+  --ink: #f0edff; --muted: #b6afce; --dim: #a49abb;
+  --paper: #13111f; --canvas: #13111f; --surface: #211c32;
+  --surface-soft: #332b49; --surface-raised: #211c32;
+  --line: #403653; --line-strong: #756489; --focus: #c4adff;
+  --body-background: radial-gradient(ellipse at top right, #30214b, transparent 65%), var(--paper);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --ink: #f0edff; --muted: #b6afce; --dim: #a49abb;
+    --paper: #13111f; --canvas: #13111f; --surface: #211c32;
+    --surface-soft: #332b49; --surface-raised: #211c32;
+    --line: #403653; --line-strong: #756489; --focus: #c4adff;
+    --body-background: radial-gradient(ellipse at top right, #30214b, transparent 65%), var(--paper);
+  }
+}
+body { font-family: 'Trebuchet MS', Arial, sans-serif; }
+.appShell { width: auto; max-width: 1600px; margin: 0 auto; padding: 48px 40px 150px 280px; }
+.appHeader { position: fixed; inset: 0 auto 0 0; width: 236px; min-height: 100dvh; margin: 0; padding: 36px 22px; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 44px; border: 0; border-right: 1px solid var(--line); background: var(--paper); }
+.brandLockup { grid-template-columns: 1fr; gap: 18px; }
+.brandIcon { width: 60px; height: 60px; border-radius: 20px; }
+.appHeader h1 { font-size: 1.65rem; letter-spacing: -.06em; }
+.appHeader p { font-size: .8rem; line-height: 1.5; }
+.headerActions { flex-direction: column; align-items: stretch; gap: 28px; white-space: normal; }
+.headerUtilityRow { justify-content: flex-start; gap: 12px; }
+.languageMenuList { left: 0; right: auto; }
+.designIntro { margin-bottom: 32px; }
+.designEyebrow { font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.designIntro h2 { font-size: clamp(2.5rem, 5vw, 4.6rem); font-weight: 500; letter-spacing: -.065em; line-height: 1.05; margin: 12px 0; }
+.designIntro p { color: var(--muted); line-height: 1.6; margin: 0; }
+.stationGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+html body .stationCard { min-height: 0; border-radius: 32px; border: 1px solid var(--line); box-shadow: 0 20px 50px #130c2810; }
+.stationCardInner { min-height: 0; padding: 24px; gap: 28px; }
+.stationTitleBlock h2 { font-size: 1.6rem; letter-spacing: -.05em; }
+.stationTitleBlock p { font-size: .85rem; }
+.stationCardHeader { flex-wrap: wrap; }
+.stationTitleBlock { flex-basis: 100%; }
+.stationControlGroup { display: flex; align-items: center; max-width: 100%; width: 100%; flex-wrap: wrap; }
+.playButton { min-width: 140px; min-height: 52px; border: 0; box-shadow: none; background: var(--ink); color: var(--surface); border-radius: 28px; }
+.stationInfoSurface { grid-template-columns: 1fr; grid-template-areas: 'now' 'meta' 'actions'; gap: 20px; }
+.trackNowPlaying { grid-template-columns: minmax(0, 1fr) 44px; gap: 18px 12px; border: 0; border-radius: 0; padding: 0; }
+.trackArtwork { grid-column: 1 / -1; width: 100%; min-width: 0; max-width: none; border-radius: 22px; box-shadow: none; font-size: 5rem; background: radial-gradient(circle at 25% 20%, color-mix(in srgb, var(--station-accent), transparent 55%), transparent), var(--surface-soft); }
+.trackTitle { grid-column: 1; }
+.trackTitleText { font-size: 1.35rem; }
+.favoriteButton { grid-column: 2; width: 44px; min-height: 44px; }
+.stationActions { gap: 8px; }
+.stationCommandButton { flex-basis: 100%; justify-content: flex-start; padding: 0 18px; border-radius: 14px; }
+.stationCardActive { outline: 2px solid var(--focus); outline-offset: 4px; }
+.miniPlayer { left: 260px; right: 24px; max-width: 940px; border-radius: 24px; padding: 14px; }
+.authCard, .adminPanel, .adminHero, .aboutBand, .aboutHero { border-radius: 28px; }
+@media (max-width: 1100px) and (min-width: 861px) {
+  .appShell { padding-left: 232px; padding-right: 24px; }
+  .appHeader { width: 208px; }
+  .stationGrid { grid-template-columns: 1fr; }
+  .trackArtwork { max-height: 340px; object-fit: cover; }
+}
+@media (max-width: 860px) {
+  .appShell { width: min(100% - 32px, 700px); padding: 16px 0 180px; }
+  .appHeader { position: relative; inset: auto; width: auto; min-height: 0; padding: 8px 0 22px; margin: 0 0 28px; border-right: 0; border-bottom: 1px solid var(--line); gap: 20px; }
+  .brandLockup { grid-template-columns: 48px minmax(0, 1fr); gap: 14px; }
+  .brandIcon { width: 48px; height: 48px; }
+  .headerActions { flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; }
+  .headerUtilityRow { justify-content: flex-end; }
+  .languageMenuList { left: auto; right: 0; }
+  .stationGrid { grid-template-columns: 1fr; }
+  .stationCardInner { padding: 22px; }
+  .miniPlayer { left: 12px; right: 12px; }
+  .trackArtwork { max-height: 420px; }
+}
+@media (max-width: 560px) {
+  .stationControlGroup { max-width: 100%; justify-content: flex-start; }
+  .trackNowPlaying { grid-template-columns: minmax(0, 1fr) 44px; }
+  .stationInfoSurface { grid-template-areas: 'now' 'meta' 'actions'; }
+}
+
+.stationCommandButton, .listenerChip, .favoriteButton { backdrop-filter: none; }

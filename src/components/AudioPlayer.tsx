@@ -60,7 +60,7 @@ const SongRequestModal = dynamic(
 );
 
 export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const {
     activeStationId,
     activeStation,
@@ -578,6 +578,14 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
           </>
         }
       />
+
+      <section className="designIntro" aria-labelledby="design-heading">
+        <div>
+          <span className="designEyebrow">NeuralCast / Listening Room</span>
+          <h2 id="design-heading">{({"en": "Find your frequency.", "es": "Encontrá tu frecuencia.", "fr": "Trouvez votre fréquence."})[locale]}</h2>
+        </div>
+        <p>{({"en": "Settle in. Choose a station. Let the music take it from here.", "es": "Ponete cómodo. Elegí una estación y dejate llevar por la música.", "fr": "Installez-vous. Choisissez une station et laissez la musique vous emporter."})[locale]}</p>
+      </section>
 
       <section className="stationGrid" aria-label={t("stations.ariaLabel")}>
         {STATIONS.map((station) => {
