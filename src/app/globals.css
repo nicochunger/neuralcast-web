@@ -795,9 +795,10 @@ img {
 }
 
 .stationControlGroup {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   flex: 0 0 auto;
-  justify-items: start;
   gap: 8px;
   max-width: 100%;
 }
@@ -3592,6 +3593,7 @@ img {
   }
 
   .stationControlGroup {
+    display: grid;
     max-width: 46%;
     justify-items: end;
   }

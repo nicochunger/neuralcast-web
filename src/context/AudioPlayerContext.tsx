@@ -176,13 +176,14 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const getHostSelection = useCallback(
     (station: Station) => {
       const mode = hostModes[station.id] ?? "follow-ui";
-      if (mode !== "fixed") {
+      if (mode === "follow-ui") {
         return mode;
       }
 
-      return getHostChannel(station, hostChannelIds[station.id])?.id ?? "auto";
+      // Represent legacy station-default preferences with their actual language.
+      return getHostChannelForStation(station).id;
     },
-    [hostChannelIds, hostModes]
+    [getHostChannelForStation, hostModes]
   );
   const getHostChannelId = useCallback(
     (station: Station) => getHostChannelForStation(station).id,
@@ -331,20 +332,26 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     await retryPlayback();
   }, [clearRecoveryTimers, retryPlayback]);
 
+  const metadataRequestsInFlightRef = useRef(new Set<string>());
+
   const refreshNowPlaying = useCallback(async (
     stationIds: StationId[] = STATIONS.map((station) => station.id),
     hostChannelIdsOverride: Partial<Record<StationId, string>> = {}
   ) => {
-    setNowPlaying((current) => markNowPlayingLoading(current, stationIds));
-
     await Promise.all(
       stationIds.map(async (stationId) => {
         let requestedChannelId: string | undefined;
+        let requestKey: string | undefined;
         try {
           const station = STATIONS.find((candidate) => candidate.id === stationId);
           if (!station) throw new Error(t("common.unavailable"));
           const channel = getHostChannelForStation(station, hostChannelIdsOverride[stationId]);
           requestedChannelId = channel.id;
+          const key = `${stationId}:${channel.id}`;
+          if (metadataRequestsInFlightRef.current.has(key)) return;
+          metadataRequestsInFlightRef.current.add(key);
+          requestKey = key;
+          setNowPlaying((current) => markNowPlayingLoading(current, [stationId]));
           const query = `?channel=${encodeURIComponent(channel.id)}`;
           const response = await fetch(`/api/nowplaying/${stationId}${query}`, { cache: "no-store" });
 
@@ -378,6 +385,10 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
               error: t("common.unavailable")
             }
           }));
+        } finally {
+          if (requestKey !== undefined) {
+            metadataRequestsInFlightRef.current.delete(requestKey);
+          }
         }
       })
     );
@@ -654,7 +665,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       if (shouldSyncNowPlaying && !document.hidden) {
         void refreshNowPlaying();
       }
-    }, 25000);
+    }, 5000);
     const scheduleInterval = window.setInterval(() => {
       if (shouldSyncSchedules && !document.hidden) {
         void refreshSchedules();

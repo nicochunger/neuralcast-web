@@ -102,7 +102,6 @@ export function StationCard({
                   onChange={(event) => onHostSelectionChange(station, event.target.value)}
                 >
                   <option value="follow-ui">{t("host.followAppLanguage")}</option>
-                  <option value="auto">{t("host.auto")}</option>
                   {station.hostChannels.map((channel) => (
                     <option key={channel.id} value={channel.id}>
                       {getHostChannelLabel(channel.id, t)}
