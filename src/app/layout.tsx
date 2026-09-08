@@ -10,16 +10,9 @@ import "./globals.css";
 
 const themeBootScript = `
 try {
-  var theme = window.localStorage.getItem("neuralcast:theme");
-  if (theme === "light" || theme === "dark") {
-    document.documentElement.dataset.theme = theme;
-  }
-  var resolvedTheme = theme === "light" || theme === "dark"
-    ? theme
-    : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
   var themeColor = document.querySelector('meta[name="theme-color"]');
   if (themeColor) {
-    themeColor.setAttribute("content", resolvedTheme === "dark" ? "#101317" : "#f4f7fa");
+    themeColor.setAttribute("content", "#101317");
   }
 } catch (_) {}
 `;
@@ -49,7 +42,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#f4f7fa"
+  themeColor: "#101317"
 };
 
 export default function RootLayout({
@@ -58,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang={DEFAULT_LOCALE} suppressHydrationWarning>
+    <html lang={DEFAULT_LOCALE} data-theme="dark">
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <audio

@@ -6,16 +6,9 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { Locale } from "@/lib/locale";
 
-type ResolvedTheme = "light" | "dark";
-type ThemePreference = "system" | ResolvedTheme;
-
-const THEME_STORAGE_KEY = "neuralcast:theme";
-
 export function SiteHeader({ extraActions }: { extraActions?: ReactNode }) {
   const pathname = usePathname();
   const { locale, setLocale, t } = useI18n();
-  const [themePreference, setThemePreference] = useState<ThemePreference>("system");
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("light");
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const languageMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -25,34 +18,6 @@ export function SiteHeader({ extraActions }: { extraActions?: ReactNode }) {
     { locale: "fr", label: "Français", shortLabel: "FR", country: "ch" }
   ];
   const activeLanguage = languageOptions.find((option) => option.locale === locale) ?? languageOptions[0];
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-    const initialPreference: ThemePreference = storedTheme === "light" || storedTheme === "dark" ? storedTheme : "system";
-
-    const updateResolvedTheme = (preference: ThemePreference) => {
-      setResolvedTheme(preference === "system" ? (mediaQuery.matches ? "dark" : "light") : preference);
-    };
-
-    setThemePreference(initialPreference);
-    applyThemePreference(initialPreference);
-    updateResolvedTheme(initialPreference);
-
-    const handleSystemThemeChange = () => {
-      if (!document.documentElement.dataset.theme) {
-        updateResolvedTheme("system");
-      }
-    };
-
-    mediaQuery.addEventListener("change", handleSystemThemeChange);
-    return () => mediaQuery.removeEventListener("change", handleSystemThemeChange);
-  }, []);
-
-  useEffect(() => {
-    const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-    themeColor?.setAttribute("content", resolvedTheme === "dark" ? "#101317" : "#f4f7fa");
-  }, [resolvedTheme]);
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -74,14 +39,6 @@ export function SiteHeader({ extraActions }: { extraActions?: ReactNode }) {
       document.removeEventListener("keydown", handleEscape);
     };
   }, []);
-
-  const toggleTheme = () => {
-    const nextTheme: ResolvedTheme = resolvedTheme === "dark" ? "light" : "dark";
-    window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
-    setThemePreference(nextTheme);
-    setResolvedTheme(nextTheme);
-    applyThemePreference(nextTheme);
-  };
 
   return (
     <header className="appHeader">
@@ -136,24 +93,6 @@ export function SiteHeader({ extraActions }: { extraActions?: ReactNode }) {
             ) : null}
           </div>
           {extraActions}
-          <button
-            className={`themeButton themeButton${resolvedTheme === "dark" ? "Dark" : "Light"}`}
-            type="button"
-            onClick={toggleTheme}
-            aria-label={resolvedTheme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")}
-            title={t("theme.title", {
-              theme:
-                themePreference === "system"
-                  ? `${t("theme.system")} (${t(`theme.${resolvedTheme}`)})`
-                  : t(`theme.${resolvedTheme}`),
-              action: resolvedTheme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")
-            })}
-          >
-            <span className="themeIcon" aria-hidden="true">
-              <span className="themeSun" />
-              <span className="themeMoon" />
-            </span>
-          </button>
         </div>
       </div>
     </header>
@@ -199,13 +138,4 @@ function FlagIcon({ country }: { country: "us" | "ar" | "ch" }) {
       ))}
     </svg>
   );
-}
-
-function applyThemePreference(preference: ThemePreference) {
-  if (preference === "system") {
-    document.documentElement.removeAttribute("data-theme");
-    return;
-  }
-
-  document.documentElement.dataset.theme = preference;
 }
