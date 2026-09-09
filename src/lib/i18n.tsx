@@ -12,6 +12,8 @@ import type { ScheduleSegment, StationId } from "@/types/radio";
 
 type TranslationKey =
   | "app.tagline"
+  | "stations.introTitle"
+  | "stations.introDescription"
   | "common.install"
   | "common.language"
   | "host.language"
@@ -432,8 +434,10 @@ const englishMessages: Record<TranslationKey, string> = {
     "station.skippedSong": "Skipped",
     "station.skipError": "Unable to skip the current track.",
     "station.scheduleWaiting": "Waiting for schedule.",
-    "station.description.neuralcast": "Mixed AI radio selection",
-    "station.description.neuralforge": "Heavy variant with an AI host",
+    "stations.introTitle": "Great music. A voice of its own.",
+    "stations.introDescription": "Two custom-built radio stations, hosted by AI. Find your mix and tune in.",
+    "station.description.neuralcast": "A wide mix of genres, eras, and discoveries.",
+    "station.description.neuralforge": "Metal at heart. From melodic to heavy.",
     "request.title": "Request a song",
     "request.description": "Choose a track from the station library. AzuraCast will place it in the request queue when available.",
     "request.close": "Close song requests",
@@ -693,8 +697,10 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "station.skippedSong": "Saltada",
     "station.skipError": "No se pudo saltar la canción actual.",
     "station.scheduleWaiting": "Esperando la programación.",
-    "station.description.neuralcast": "Selección mixta de radio con IA",
-    "station.description.neuralforge": "Variante pesada con un locutor de IA",
+    "stations.introTitle": "Buena música. Una voz propia.",
+    "stations.introDescription": "Dos radios hechas a medida, con locutores de IA. Encontrá tu mezcla y dale play.",
+    "station.description.neuralcast": "Una mezcla de géneros, épocas y descubrimientos.",
+    "station.description.neuralforge": "Metal de corazón. De lo melódico a lo pesado.",
     "request.title": "Pedir una canción",
     "request.description": "Elegí una canción de la biblioteca de la emisora. AzuraCast la pondrá en la cola de pedidos cuando esté disponible.",
     "request.close": "Cerrar pedidos de canciones",
@@ -864,8 +870,10 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "station.skippedSong": "Morceau passé",
     "station.skipError": "Impossible de passer le morceau actuel.",
     "station.scheduleWaiting": "En attente du programme.",
-    "station.description.neuralcast": "Sélection radio variée par IA",
-    "station.description.neuralforge": "Version heavy avec un animateur IA",
+    "stations.introTitle": "De la bonne musique. Une voix bien à elle.",
+    "stations.introDescription": "Deux radios sur mesure, animées par l’IA. Trouvez votre univers et lancez l’écoute.",
+    "station.description.neuralcast": "Un mélange de genres, d’époques et de découvertes.",
+    "station.description.neuralforge": "Le metal au cœur. Du mélodique au plus intense.",
     "request.title": "Demander un morceau",
     "request.description": "Choisissez un morceau dans la bibliothèque de la station. AzuraCast le placera dans la file des demandes lorsqu’il sera disponible.",
     "request.close": "Fermer les demandes de morceaux",

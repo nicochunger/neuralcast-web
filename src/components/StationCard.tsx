@@ -94,14 +94,10 @@ export function StationCard({
           <div className="stationTitleBlock">
             <h2>{station.name}</h2>
             <p>{getStationDescription(station.id, t)}</p>
-            <span className="listenerChip">{listenerText}</span>
-            {station.hostChannels.length > 1 ? (
-              <HostLanguagePicker
-                station={station}
-                selection={hostSelection}
-                onChange={(selection) => onHostSelectionChange(station, selection)}
-              />
-            ) : null}
+            <span className="stationListeners">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14v-3a8 8 0 0 1 16 0v3M4 13H3v7h4v-7H4Zm16 0h1v7h-4v-7h3Z" /></svg>
+              {listenerText}
+            </span>
           </div>
 
           <div className="stationControlGroup">
@@ -114,6 +110,13 @@ export function StationCard({
               <span className={shouldStop ? "stopGlyph" : "playGlyph"} aria-hidden="true" />
               {shouldStop ? t("common.stop") : t("common.play")}
             </button>
+            {station.hostChannels.length > 1 ? (
+              <HostLanguagePicker
+                station={station}
+                selection={hostSelection}
+                onChange={(selection) => onHostSelectionChange(station, selection)}
+              />
+            ) : null}
             {isActive && playbackState !== "idle" ? (
               <span className={`stateChip ${isOnAir ? "stateChipLive" : ""} ${isBusy ? "stateChipBusy" : ""}`}>
                 {isOnAir ? <WaveformBars /> : null}
