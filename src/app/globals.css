@@ -1063,13 +1063,26 @@ img {
 .playButton {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-width: 102px;
+  gap: 6px;
+  width: 124px;
   justify-content: center;
-  padding: 0 14px;
+  padding: 0 10px;
   background: var(--ink);
   color: var(--paper);
   box-shadow: var(--button-shadow);
+}
+
+.playButton .waveformBars {
+  width: 11px;
+  justify-content: center;
+}
+
+.playButtonBuffering .waveformBars {
+  opacity: 0.72;
+}
+
+.playButtonBuffering .waveformBars span {
+  animation-duration: 1.1s;
 }
 
 .playGlyph {

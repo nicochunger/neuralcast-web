@@ -70,7 +70,6 @@ export function StationCard({
   const isBusy = isActive && playbackState === "buffering";
   const isOnAir = isActive && playbackState === "playing";
   const shouldStop = isActive && (playbackState === "playing" || playbackState === "buffering");
-  const statusLabel = getStatusLabel(isActive, playbackState, t);
   const track = getTrackDetails(nowPlaying, t);
   const canFavorite = Boolean(nowPlaying.title || nowPlaying.artist || nowPlaying.text);
   const listenerText =
@@ -102,12 +101,16 @@ export function StationCard({
 
           <div className="stationControlGroup">
             <button
-              className="playButton"
+              className={`playButton ${isOnAir ? "playButtonOnAir" : ""} ${isBusy ? "playButtonBuffering" : ""}`}
               type="button"
               onClick={() => (shouldStop ? onStop() : onPlay(station))}
               aria-label={`${shouldStop ? t("common.stop") : t("common.play")} ${station.name}`}
             >
-              <span className={shouldStop ? "stopGlyph" : "playGlyph"} aria-hidden="true" />
+              {isOnAir || isBusy ? (
+                <WaveformBars />
+              ) : (
+                <span className={shouldStop ? "stopGlyph" : "playGlyph"} aria-hidden="true" />
+              )}
               {shouldStop ? t("common.stop") : t("common.play")}
             </button>
             {station.hostChannels.length > 1 ? (
@@ -116,12 +119,6 @@ export function StationCard({
                 selection={hostSelection}
                 onChange={(selection) => onHostSelectionChange(station, selection)}
               />
-            ) : null}
-            {isActive && playbackState !== "idle" ? (
-              <span className={`stateChip ${isOnAir ? "stateChipLive" : ""} ${isBusy ? "stateChipBusy" : ""}`}>
-                {isOnAir ? <WaveformBars /> : null}
-                {statusLabel}
-              </span>
             ) : null}
           </div>
         </div>
@@ -276,29 +273,6 @@ function StationActionIcon({ icon }: { icon: "history" | "schedule" | "request" 
       </svg>
     </span>
   );
-}
-
-function getStatusLabel(
-  isActive: boolean,
-  playbackState: PlaybackState,
-  t: ReturnType<typeof useI18n>["t"]
-): string {
-  if (!isActive) {
-    return t("status.ready");
-  }
-
-  switch (playbackState) {
-    case "buffering":
-      return t("status.buffering");
-    case "playing":
-      return t("status.onAir");
-    case "paused":
-      return t("status.paused");
-    case "error":
-      return t("status.streamError");
-    default:
-      return t("status.ready");
-  }
 }
 
 interface TrackDetails {
