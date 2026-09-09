@@ -1016,11 +1016,15 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  height: 18px;
+  width: 22px;
+  height: 20px;
+  flex: 0 0 22px;
 }
 
 .waveformBars span {
-  width: 3px;
+  width: 4px;
+  min-width: 4px;
+  flex: 0 0 4px;
   height: 6px;
   border-radius: 2px;
   background: currentColor;
@@ -1041,11 +1045,11 @@ img {
 
 @keyframes waveform {
   from {
-    height: 5px;
+    height: 6px;
   }
 
   to {
-    height: 17px;
+    height: 18px;
   }
 }
 
@@ -1073,7 +1077,6 @@ img {
 }
 
 .playButton .waveformBars {
-  width: 11px;
   justify-content: center;
 }
 
