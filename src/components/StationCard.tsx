@@ -3,6 +3,7 @@
 import { getSegmentTitle, getStationDescription, useI18n } from "@/lib/i18n";
 import { AnimatedSuccessIcon } from "@/components/AnimatedSuccessIcon";
 import { HeartIcon } from "@/components/HeartIcon";
+import { HostLanguagePicker } from "@/components/HostLanguagePicker";
 import { ScrollingTrackTitle } from "@/components/ScrollingTrackTitle";
 import { TrackProgressBar } from "@/components/TrackProgressBar";
 import type { ArtworkLightboxData } from "@/components/ArtworkLightbox";
@@ -95,21 +96,11 @@ export function StationCard({
             <p>{getStationDescription(station.id, t)}</p>
             <span className="listenerChip">{listenerText}</span>
             {station.hostChannels.length > 1 ? (
-              <div className="hostLanguageControl">
-                <label htmlFor={`host-language-${station.id}`}>{t("host.language")}</label>
-                <select
-                  id={`host-language-${station.id}`}
-                  value={hostSelection}
-                  onChange={(event) => onHostSelectionChange(station, event.target.value)}
-                >
-                  <option value="follow-ui">{t("host.followAppLanguage")}</option>
-                  {station.hostChannels.map((channel) => (
-                    <option key={channel.id} value={channel.id}>
-                      {getHostChannelLabel(channel.id, t)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <HostLanguagePicker
+                station={station}
+                selection={hostSelection}
+                onChange={(selection) => onHostSelectionChange(station, selection)}
+              />
             ) : null}
           </div>
 
@@ -233,21 +224,6 @@ export function StationCard({
   );
 }
 
-function getHostChannelLabel(
-  channelId: string,
-  t: ReturnType<typeof useI18n>["t"]
-): string {
-  switch (channelId) {
-    case "neuralforge-es":
-      return t("host.spanishArgentinian");
-    case "neuralforge-fr":
-      return t("host.frenchSwiss");
-    case "neuralcast-es":
-      return t("host.spanishArgentinian");
-    default:
-      return channelId;
-  }
-}
 
 function StationActionIcon({ icon }: { icon: "history" | "schedule" | "request" | "skip" }) {
   if (icon === "history") {

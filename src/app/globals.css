@@ -770,28 +770,109 @@ img {
 }
 
 .hostLanguageControl {
-  display: grid;
-  gap: 4px;
-  width: min(100%, 220px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-top: 10px;
 }
 
-.hostLanguageControl label {
+.hostLanguageControl > span {
   color: var(--station-card-text);
   font-size: 0.72rem;
   font-weight: 720;
   text-shadow: var(--station-card-text-shadow);
 }
 
-.hostLanguageControl select {
-  min-height: 30px;
+.hostLanguageTrigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 8px;
+  min-height: 44px;
   border: 1px solid color-mix(in srgb, var(--station-card-title) 32%, transparent);
-  border-radius: 8px;
-  padding: 4px 8px;
+  border-radius: var(--control-radius);
+  padding: 0 10px;
   background: color-mix(in srgb, var(--station-accent) 35%, rgba(8, 14, 20, 0.86));
   color: var(--station-card-title);
   font: inherit;
   font-size: 0.78rem;
+  font-weight: 760;
+  cursor: pointer;
+}
+
+.hostLanguageTrigger:hover,
+.hostLanguageTrigger[aria-expanded="true"] {
+  border-color: var(--station-accent);
+  background: color-mix(in srgb, var(--station-accent) 55%, #080e14);
+}
+
+.hostLanguageTrigger .languageMenuChevron {
+  color: inherit;
+}
+
+.hostLanguageFollow {
+  opacity: 0.75;
+}
+
+.hostLanguageMenu {
+  position: fixed;
+  inset: auto;
+  width: min(240px, calc(100vw - 24px));
+  margin: 0;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-soft);
+}
+
+.hostLanguageOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hostLanguageOption:hover,
+.hostLanguageOption[aria-checked="true"] {
+  background: color-mix(in srgb, var(--station-accent) 14%, var(--surface));
+}
+
+.hostLanguageTrigger:focus-visible,
+.hostLanguageOption:focus-visible {
+  outline: 2px solid var(--station-accent);
+  outline-offset: 2px;
+}
+
+.hostLanguageOptionFollow {
+  margin-top: 5px;
+  border-top-color: var(--line);
+}
+
+.hostLanguageSync {
+  width: 24px;
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.hostLanguageCheck {
+  width: 14px;
+  margin-left: auto;
+  color: var(--station-accent);
 }
 
 .stationControlGroup {
