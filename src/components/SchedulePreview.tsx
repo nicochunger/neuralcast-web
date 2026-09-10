@@ -11,30 +11,43 @@ interface SchedulePreviewProps {
   schedule: StationScheduleState;
 }
 
-const MINUTES_PER_DAY = 24 * 60;
-const HOUR_MARKS = Array.from({ length: 24 }, (_, hour) => hour);
+const HOUR_MILLIS = 60 * 60 * 1000;
 
 export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
   const { locale, t } = useI18n();
   const segments = schedule.segments ?? [];
   const [now, setNow] = useState(() => new Date());
+  const [timeZone, setTimeZone] = useState(station.timeZone);
   const [selectedBlock, setSelectedBlock] = useState<TimelineBlock | undefined>(undefined);
   const timelineRef = useRef<HTMLDivElement | null>(null);
   const lastScrollKeyRef = useRef<string | undefined>(undefined);
   const scheduleDate = schedule.date ?? getZonedDateString(now, station.timeZone);
-  const todayDate = getZonedDateString(now, station.timeZone);
-  const nowMinutes = todayDate === scheduleDate ? getMinuteOfDay(now, station.timeZone) : undefined;
-  const nowPercent = nowMinutes === undefined ? undefined : (nowMinutes / MINUTES_PER_DAY) * 100;
   const dayStartMillis = zonedDateTimeToUtcMillis(scheduleDate, station.timeZone);
   const dayEndMillis = zonedDateTimeToUtcMillis(addDaysToDateString(scheduleDate, 1), station.timeZone);
-  const timelineBlocks = useMemo(
-    () =>
-      segments
-        .map((segment) => getTimelineBlock(segment, station.timeZone, dayStartMillis, dayEndMillis))
-        .filter((block) => block.heightPercent > 0),
-    [dayEndMillis, dayStartMillis, segments, station.timeZone]
+  const dayDuration = dayEndMillis - dayStartMillis;
+  const nowPercent = now.getTime() >= dayStartMillis && now.getTime() < dayEndMillis
+    ? ((now.getTime() - dayStartMillis) / dayDuration) * 100
+    : undefined;
+  const hourMarks = Array.from({ length: Math.ceil(dayDuration / HOUR_MILLIS) }, (_, hour) =>
+    new Date(dayStartMillis + hour * HOUR_MILLIS)
   );
-  const scrollKey = `${station.id}:${scheduleDate}:${timelineBlocks.length}`;
+  const dateFormatter = new Intl.DateTimeFormat(locale, { timeZone, month: "short", day: "numeric" });
+  const dateRange = `${dateFormatter.format(new Date(dayStartMillis))} – ${dateFormatter.format(new Date(dayEndMillis))}`;
+  const timelineBlocks = useMemo(
+    () => segments
+      .map((segment) => getTimelineBlock(segment, dayStartMillis, dayEndMillis))
+      .filter((block) => block.heightPercent > 0),
+    [dayEndMillis, dayStartMillis, segments]
+  );
+  const scrollKey = `${station.id}:${scheduleDate}:${timeZone}:${timelineBlocks.length}`;
+
+  useEffect(() => {
+    try {
+      setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone || station.timeZone);
+    } catch {
+      setTimeZone(station.timeZone);
+    }
+  }, [station.timeZone]);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 60_000);
@@ -78,23 +91,23 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
       ) : (
         <div className="scheduleTimelineShell">
           <div className="scheduleTimelineToolbar">
-            <span>{t("schedule.toolbar")}</span>
-            <span>{nowMinutes === undefined ? scheduleDate : t("schedule.now", { time: formatClock(now, station.timeZone, locale) })}</span>
+            <span>{t("schedule.toolbar", { timeZone: timeZone.replaceAll("_", " "), date: dateRange })}</span>
+            <span>{nowPercent === undefined ? scheduleDate : t("schedule.now", { time: formatClock(now, timeZone, locale) })}</span>
           </div>
 
           <div className="scheduleTimelineViewport" ref={timelineRef}>
             <div className="scheduleTimeline" aria-label={t("schedule.ariaLabel", { station: station.name, date: scheduleDate })}>
               <div className="scheduleTimeGutter" aria-hidden="true">
-                {HOUR_MARKS.map((hour) => (
+                {hourMarks.map((mark) => (
                   <span
-                    key={hour}
+                    key={mark.toISOString()}
                     style={
                       {
-                        top: `${(hour / 24) * 100}%`
+                        top: `${((mark.getTime() - dayStartMillis) / dayDuration) * 100}%`
                       } as CSSProperties
                     }
                   >
-                    {hour.toString().padStart(2, "0")}:00
+                    {formatClock(mark, timeZone, locale)}
                   </span>
                 ))}
               </div>
@@ -108,9 +121,9 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
                         top: `${nowPercent}%`
                       } as CSSProperties
                     }
-                    aria-label={`${t("schedule.now", { time: formatClock(now, station.timeZone, locale) })}`}
+                    aria-label={`${t("schedule.now", { time: formatClock(now, timeZone, locale) })}`}
                   >
-                    <span>{formatClock(now, station.timeZone, locale)}</span>
+                    <span>{formatClock(now, timeZone, locale)}</span>
                   </div>
                 )}
 
@@ -119,7 +132,7 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
                     key={`${block.segment.startTime}-${block.segment.endTime}`}
                     block={block}
                     locale={locale}
-                    timeZone={station.timeZone}
+                    timeZone={timeZone}
                     onSelect={setSelectedBlock}
                   />
                 ))}
@@ -133,7 +146,7 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
         <ScheduleBlockDetails
           block={selectedBlock}
           locale={locale}
-          timeZone={station.timeZone}
+          timeZone={timeZone}
           onClose={() => setSelectedBlock(undefined)}
         />
       ) : null}
@@ -209,6 +222,8 @@ function ScheduleBlockDetails({
 function formatRange(segment: ScheduleSegment, timeZone: string, locale: string): string {
   const formatter = new Intl.DateTimeFormat(locale, {
     timeZone,
+    month: "short",
+    day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
     hourCycle: "h23"
@@ -225,44 +240,20 @@ interface TimelineBlock {
 
 function getTimelineBlock(
   segment: ScheduleSegment,
-  timeZone: string,
   dayStartMillis: number,
   dayEndMillis: number
 ): TimelineBlock {
-  const startMinute = getMinutePosition(segment.startTime, timeZone, dayStartMillis, dayEndMillis);
-  const endMinute = getMinutePosition(segment.endTime, timeZone, dayStartMillis, dayEndMillis);
-  const durationMinutes = Math.max(0, endMinute - startMinute);
+  const duration = dayEndMillis - dayStartMillis;
+  const start = clamp(Date.parse(segment.startTime), dayStartMillis, dayEndMillis);
+  const end = clamp(Date.parse(segment.endTime), dayStartMillis, dayEndMillis);
+  const visibleDuration = Number.isFinite(start) && Number.isFinite(end) ? Math.max(0, end - start) : 0;
 
   return {
     segment,
-    topPercent: (startMinute / MINUTES_PER_DAY) * 100,
-    heightPercent: (durationMinutes / MINUTES_PER_DAY) * 100,
-    durationMinutes
+    topPercent: Number.isFinite(start) ? ((start - dayStartMillis) / duration) * 100 : 0,
+    heightPercent: (visibleDuration / duration) * 100,
+    durationMinutes: visibleDuration / 60_000
   };
-}
-
-function getMinutePosition(
-  isoTime: string,
-  timeZone: string,
-  dayStartMillis: number,
-  dayEndMillis: number
-): number {
-  const millis = Date.parse(isoTime);
-
-  if (!Number.isFinite(millis) || millis <= dayStartMillis) {
-    return 0;
-  }
-
-  if (millis >= dayEndMillis) {
-    return MINUTES_PER_DAY;
-  }
-
-  return getMinuteOfDay(new Date(millis), timeZone);
-}
-
-function getMinuteOfDay(date: Date, timeZone: string): number {
-  const parts = getClockParts(date, timeZone);
-  return clamp(parts.hour * 60 + parts.minute + parts.second / 60, 0, MINUTES_PER_DAY);
 }
 
 function formatClock(date: Date, timeZone: string, locale: string): string {
@@ -272,27 +263,6 @@ function formatClock(date: Date, timeZone: string, locale: string): string {
     minute: "2-digit",
     hourCycle: "h23"
   }).format(date);
-}
-
-function getClockParts(date: Date, timeZone: string): { hour: number; minute: number; second: number } {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-US", {
-      timeZone,
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hourCycle: "h23"
-    })
-      .formatToParts(date)
-      .filter((part) => part.type !== "literal")
-      .map((part) => [part.type, Number(part.value)])
-  );
-
-  return {
-    hour: parts.hour ?? 0,
-    minute: parts.minute ?? 0,
-    second: parts.second ?? 0
-  };
 }
 
 function clamp(value: number, min: number, max: number): number {
