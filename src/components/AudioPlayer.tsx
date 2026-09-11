@@ -291,7 +291,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       const dialog = document.querySelector<HTMLElement>("[role='dialog'][aria-modal='true']");
       const initialFocus = dialog?.querySelector<HTMLElement>("[data-modal-autofocus]") ??
         (dialog ? getFocusableElements(dialog)[0] : undefined);
-      initialFocus?.focus();
+      initialFocus?.focus({ preventScroll: activeOverlay.type === "schedule" });
     });
 
     return () => {

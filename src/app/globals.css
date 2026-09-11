@@ -2985,7 +2985,6 @@ img {
     linear-gradient(180deg, rgba(12, 18, 28, 0.16), rgba(12, 18, 28, 0.04)),
     var(--surface-raised);
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.34);
-  animation: requestModalIn 180ms ease-out both;
 }
 
 .schedulePanel::before {
@@ -3019,7 +3018,9 @@ img {
   width: min(100%, 980px);
   max-height: calc(100dvh - 36px);
   overflow: auto;
+  overflow-anchor: none;
   border-radius: 26px;
+  animation: requestModalIn 180ms ease-out both;
 }
 
 .scheduleModalClose {
