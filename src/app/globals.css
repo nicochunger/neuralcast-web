@@ -2017,7 +2017,8 @@ img {
   display: grid;
   gap: 10px;
   margin: 0;
-  padding: 0 10px 0 0;
+  /* Keep the first card's hover lift inside the scrollable area. */
+  padding: 2px 10px 0 0;
   list-style: none;
 }
 
