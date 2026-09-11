@@ -31,8 +31,6 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
   const hourMarks = Array.from({ length: Math.ceil(dayDuration / HOUR_MILLIS) }, (_, hour) =>
     new Date(dayStartMillis + hour * HOUR_MILLIS)
   );
-  const dateFormatter = new Intl.DateTimeFormat(locale, { timeZone, month: "short", day: "numeric" });
-  const dateRange = `${dateFormatter.format(new Date(dayStartMillis))} – ${dateFormatter.format(new Date(dayEndMillis))}`;
   const timelineBlocks = useMemo(
     () => segments
       .map((segment) => getTimelineBlock(segment, dayStartMillis, dayEndMillis))
@@ -91,7 +89,7 @@ export function SchedulePreview({ station, schedule }: SchedulePreviewProps) {
       ) : (
         <div className="scheduleTimelineShell">
           <div className="scheduleTimelineToolbar">
-            <span>{t("schedule.toolbar", { timeZone: timeZone.replaceAll("_", " "), date: dateRange })}</span>
+            <span>{t("schedule.toolbar", { timeZone: timeZone.replaceAll("_", " ") })}</span>
             <span>{nowPercent === undefined ? scheduleDate : t("schedule.now", { time: formatClock(now, timeZone, locale) })}</span>
           </div>
 
