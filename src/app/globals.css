@@ -714,7 +714,9 @@ img {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--station-card-overlay);
+  background:
+    radial-gradient(ellipse at left, rgba(8, 14, 23, 0.4), transparent 75%),
+    var(--station-card-overlay);
   content: "";
 }
 
@@ -740,15 +742,6 @@ img {
   align-items: flex-start;
   gap: 18px;
   min-width: 0;
-}
-
-.stationCardHeader::before {
-  position: absolute;
-  inset: -24px -18px;
-  z-index: -1;
-  background: radial-gradient(ellipse at left, rgba(8, 14, 23, 0.4), transparent 75%);
-  pointer-events: none;
-  content: "";
 }
 
 .stationTitleBlock {
