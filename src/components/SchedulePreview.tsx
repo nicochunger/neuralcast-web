@@ -220,8 +220,6 @@ function ScheduleBlockDetails({
 function formatRange(segment: ScheduleSegment, timeZone: string, locale: string): string {
   const formatter = new Intl.DateTimeFormat(locale, {
     timeZone,
-    month: "short",
-    day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
     hourCycle: "h23"
