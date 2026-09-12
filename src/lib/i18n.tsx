@@ -512,13 +512,13 @@ const englishMessages: Record<TranslationKey, string> = {
     "about.how.step2.title": "NeuralForge is where my heavier side goes.",
     "about.how.step2.body":
       "I also really love metal and hard rock, but my wife definitely does not want that as part of the all-day household soundtrack. So I made a separate stream for that side of my taste.",
-    "about.how.step3.title": "The AI host is part of the radio experiment too.",
+    "about.how.step3.title": "The AI host gives both stations a voice of their own.",
     "about.how.step3.body":
-      "I wanted to see whether an AI host could make the station feel more alive by adding personality and context. Right now that host is only active on NeuralForge. My wife prefers NeuralCast as music-only, and since we built this for ourselves and listen to it all day at home, she gets priority on that decision.",
+      "The AI host is a key part of NeuralCast and NeuralForge. Between songs, it introduces the music, shares stories about artists and albums, and gives a taste of what is coming next. It brings personality and context to the listening experience, with a style that fits each station.",
     "about.closing.eyebrow": "Looking ahead",
     "about.closing.title": "This is still a living project, and it is not finished.",
     "about.closing.body":
-      "I may still create a parallel version of NeuralCast with the AI host as well. For now the host only speaks Argentinian Spanish, and there is no English version yet. It is still evolving while we live with it.",
+      "I keep refining the music selection and the AI host as we listen every day. Both stations continue to take shape through new discoveries, ideas, and the small details that make radio worth coming back to.",
 };
 
 const messages: Record<Locale, Record<TranslationKey, string>> = {
@@ -775,13 +775,13 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "about.how.step2.title": "NeuralForge es donde va mi costado más pesado.",
     "about.how.step2.body":
       "A mí también me gusta mucho el metal y el hard rock, pero mi esposa definitivamente no quiere eso como parte del paisaje sonoro de la casa durante todo el día. Por eso armé una emisora separada para ese lado de mi gusto.",
-    "about.how.step3.title": "El host de IA también forma parte del experimento.",
+    "about.how.step3.title": "El locutor de IA les da una voz propia a las dos emisoras.",
     "about.how.step3.body":
-      "Quería probar si un host con IA podía hacer que la radio se sintiera más viva, aportando personalidad y contexto. Por ahora ese host solo está activo en NeuralForge. Mi esposa prefiere NeuralCast sin intervenciones, y como al final del día esto lo construimos para nosotros y lo escuchamos casi todo el tiempo en casa, ella tiene prioridad en esa decisión.",
+      "El locutor de IA es una parte central de NeuralCast y NeuralForge. Entre canciones, presenta la música, cuenta historias de artistas y discos, y adelanta algo de lo que viene. Le suma personalidad y contexto a lo que escuchás, con un estilo acorde a cada emisora.",
     "about.closing.eyebrow": "Lo que viene",
     "about.closing.title": "Esto sigue siendo un proyecto vivo y todavía no está terminado.",
     "about.closing.body":
-      "Todavía es posible que haga una versión paralela de NeuralCast con el host de IA también. Por ahora el host habla solo en español rioplatense y no existe una versión en inglés. Sigue tomando forma mientras convivimos con él.",
+      "Sigo ajustando la selección musical y el locutor de IA a partir de lo que escuchamos todos los días. Las dos emisoras siguen tomando forma con nuevos descubrimientos, ideas y esos pequeños detalles que dan ganas de volver a escuchar.",
   },
   fr: {
     ...englishMessages,
@@ -940,11 +940,11 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "about.how.step1.body": "C’est la station principale que nous avons créée pour le quotidien à la maison. Elle puise dans plus de 30 playlists de genres différents, toutes sélectionnées autour de ce que ma femme et moi aimons vraiment. Nous sommes tous les deux Argentins ; on y trouve donc beaucoup de musique de là-bas, aux côtés de classiques, de grands titres pop, de morceaux plus anciens et de découvertes récentes.",
     "about.how.step2.title": "NeuralForge accueille mon côté plus heavy.",
     "about.how.step2.body": "J’aime aussi beaucoup le metal et le hard rock, mais ma femme ne veut vraiment pas en entendre dans l’ambiance musicale de la maison toute la journée. J’ai donc créé un flux séparé pour cette facette de mes goûts.",
-    "about.how.step3.title": "L’animateur IA fait lui aussi partie de l’expérience radio.",
-    "about.how.step3.body": "Je voulais voir si un animateur IA pouvait rendre la station plus vivante en lui ajoutant de la personnalité et du contexte. Pour l’instant, cet animateur n’est actif que sur NeuralForge. Ma femme préfère NeuralCast uniquement avec de la musique et, puisque nous l’avons créée pour nous et l’écoutons toute la journée à la maison, son avis l’emporte sur cette décision.",
+    "about.how.step3.title": "L’animateur IA donne une voix à chacune des deux stations.",
+    "about.how.step3.body": "L’animateur IA fait partie intégrante de NeuralCast et de NeuralForge. Entre les morceaux, il présente la musique, raconte des histoires autour des artistes et des albums, et donne un aperçu de la suite. Il apporte de la personnalité à l’écoute et des repères sur la musique, dans un style adapté à chaque station.",
     "about.closing.eyebrow": "Et ensuite",
     "about.closing.title": "Ce projet continue d’évoluer et il n’est pas terminé.",
-    "about.closing.body": "Je créerai peut-être aussi une version parallèle de NeuralCast avec l’animateur IA. Pour l’instant, celui-ci parle uniquement en espagnol argentin et il n’existe pas encore de version anglaise. Le projet continue d’évoluer au rythme de notre quotidien."
+    "about.closing.body": "Je continue d’affiner la sélection musicale et l’animateur IA au fil de nos écoutes quotidiennes. Les deux stations évoluent avec les découvertes, les idées et ces petits détails qui donnent envie de retrouver une radio."
   }
 };
 
