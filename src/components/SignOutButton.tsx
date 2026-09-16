@@ -3,7 +3,7 @@
 import { signOut } from "next-auth/react";
 import { useI18n } from "@/lib/i18n";
 
-export function SignOutButton() {
+export function SignOutButton({ label }: { label?: string }) {
   const { t } = useI18n();
 
   return (
@@ -14,7 +14,7 @@ export function SignOutButton() {
         void signOut({ callbackUrl: "/" });
       }}
     >
-      {t("auth.signOut")}
+      {label ?? t("auth.signOut")}
     </button>
   );
 }

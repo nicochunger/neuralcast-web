@@ -18,8 +18,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const hostAdminConfigured = isHostAdminConfigured();
 
   return (
-    <main className="appShell adminShell">
-      <SiteHeader extraActions={<SignOutButton />} />
+    <main className="appShell adminShell" lang="en">
+      <SiteHeader englishOnly extraActions={<SignOutButton label="Sign out" />} />
       <AdminToolbar email={session.user.email} />
       <AdminConsole isHostAdminConfigured={hostAdminConfigured} />
       {children}

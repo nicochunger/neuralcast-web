@@ -4,6 +4,12 @@ The authenticated `/admin` layout owns the console so switching between AI host,
 scheduling, listeners, and preview routes preserves form values and job polling.
 Live radio remains owned by the root audio provider.
 
+The private workspace always uses English, independently of the public app locale.
+Admin copy lives in `src/lib/adminCopy.ts`; there are no Spanish or French admin
+translations. Capabilities load automatically on entry, with timed requests and
+ten-second retries on failure. AI host targets are grouped by station, followed
+by the available host languages; submissions retain the exact backend target ID.
+
 Job status requests run sequentially, with a 20-second client timeout and retries
 that back off from 8 to 30 seconds after failures. Successful requests restore the
 four-second cadence. Returning to the tab or coming online triggers a refresh.

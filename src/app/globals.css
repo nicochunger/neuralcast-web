@@ -4325,3 +4325,13 @@ img {
 .adminListenerTable small { display: block; opacity: .6; margin-top: 4px; }
 @media (max-width: 1200px) { .adminWorkspace { grid-template-columns: 185px minmax(0, 1fr); gap: 18px; } .adminWorkGrid { grid-template-columns: minmax(0, 1fr); } .adminActivity { position: static; grid-row: 1; } .adminActivityEmpty { padding: 20px; } .adminActivityEmpty > span { display: none; } .adminActivity .adminPanel { max-height: 400px; } }
 @media (max-width: 700px) { .adminWorkspace { grid-template-columns: 1fr; gap: 16px; margin-top: 0; } .adminSidebar { position: static; grid-template-columns: 1fr 1fr; padding: 0; gap: 6px; } .adminSidebar > .sectionEyebrow, .adminSidebarNote, .adminNavItem small { display: none; } .adminNavItem { padding: 12px; background: var(--panel-bg); border-color: var(--line); } .adminMain .adminHero { padding: 22px; } .adminMetricGrid { grid-template-columns: 1fr; } .adminMetric { grid-template-columns: 1fr auto; align-items: center; } .adminMetric small { grid-column: 1 / -1; } .adminAudienceFilters { grid-template-columns: 1fr; } .adminCountryGrid { grid-template-columns: 1fr; } }
+
+.adminStationCards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.adminStationCard { display: grid; gap: 8px; padding: 18px; text-align: left; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--panel-bg); color: var(--ink); transition: border-color .2s, background .2s; }
+.adminStationCard strong { font-size: 1.05rem; }
+.adminStationCard span { font-size: .78rem; opacity: .7; }
+.adminStationCard:hover { border-color: var(--focus); }
+.adminStationCard.isSelected { border-color: var(--focus); background: color-mix(in srgb, var(--focus), var(--panel-bg) 92%); box-shadow: inset 0 0 0 1px var(--focus); }
+.adminStationLanguages { display: grid; gap: 12px; margin-top: 4px; padding-left: 16px; border-left: 2px solid var(--line-strong); }
+.adminStationLanguages h5 { margin: 0; font-size: .8rem; font-weight: 500; }
+@media (max-width: 420px) { .adminStationCards { grid-template-columns: 1fr; } }

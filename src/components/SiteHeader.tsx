@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { Locale } from "@/lib/locale";
 
-export function SiteHeader({ extraActions }: { extraActions?: ReactNode }) {
+export function SiteHeader({ extraActions, englishOnly = false }: { extraActions?: ReactNode; englishOnly?: boolean }) {
   const pathname = usePathname();
   const { locale, setLocale, t } = useI18n();
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
@@ -43,21 +43,21 @@ export function SiteHeader({ extraActions }: { extraActions?: ReactNode }) {
 
   return (
     <header className="appHeader">
-      <Link className="brandLockup" href="/" aria-label={t("nav.backToRadio")}>
+      <Link className="brandLockup" href="/" aria-label={(englishOnly ? "Back to radio" : t("nav.backToRadio"))}>
         <img src="/neuralcast-logo-160.webp" alt="" className="brandIcon" width="160" height="160" />
         <div>
           <h1>NeuralCast</h1>
-          <p>{t("app.tagline")}</p>
+          <p>{(englishOnly ? "Live AI radio from Estavayer, Switzerland." : t("app.tagline"))}</p>
         </div>
       </Link>
       <div className="headerActions">
-        <nav aria-label={t("nav.label")}>
+        <nav aria-label={(englishOnly ? "Primary navigation" : t("nav.label"))}>
           <Link className="headerContextLink" href={pathname === "/about" ? "/" : "/about"}>
-            {pathname === "/about" ? t("nav.backToRadio") : t("nav.about")}
+            {pathname === "/about" ? (englishOnly ? "Back to radio" : t("nav.backToRadio")) : (englishOnly ? "About" : t("nav.about"))}
           </Link>
         </nav>
         <div className="headerUtilityRow">
-          <div className="languageMenu" ref={languageMenuRef}>
+          {!englishOnly ? <div className="languageMenu" ref={languageMenuRef}>
             <button
               className="languageMenuTrigger"
               type="button"
@@ -93,6 +93,7 @@ export function SiteHeader({ extraActions }: { extraActions?: ReactNode }) {
               </div>
             ) : null}
           </div>
+          : null}
           {extraActions}
         </div>
       </div>

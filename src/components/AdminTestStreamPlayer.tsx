@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useI18n } from "@/lib/i18n";
+import { adminText as t } from "@/lib/adminCopy";
 
 const STREAM_URL =
   "https://neuralcast.duckdns.org/listen/neuralcast_shared_media_test/radio.mp3";
@@ -11,7 +11,6 @@ const PUBLIC_PAGE_URL =
 type TestPlayerState = "idle" | "loading" | "playing" | "error";
 
 export function AdminTestStreamPlayer() {
-  const { t } = useI18n();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playerState, setPlayerState] = useState<TestPlayerState>("idle");
 

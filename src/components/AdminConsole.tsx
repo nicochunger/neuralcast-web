@@ -12,12 +12,14 @@ import {
   HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM,
   HOST_ADMIN_SCHEDULE_SEED_MODE_FRESH
 } from "@/types/hostAdmin";
-import { useI18n } from "@/lib/i18n";
+import { adminText as t } from "@/lib/adminCopy";
 import { DEFAULT_STATION_ID, STATIONS } from "@/lib/stations";
 
 interface AdminConsoleProps {
   isHostAdminConfigured: boolean;
 }
+
+type AdminText = typeof t;
 
 type AdminOperation = typeof HOST_ADMIN_OPERATION_FORCE_ARCHETYPE | typeof HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR;
 
@@ -33,7 +35,6 @@ const emptyCapabilities: HostAdminCapabilities = {
 };
 
 export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
-  const { t } = useI18n();
   const pathname = usePathname();
   const section = pathname.split("/")[2] || "host";
   const [pollError, setPollError] = useState<string | null>(null);
@@ -70,6 +71,20 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     () => capabilities.hostChannels.length ? capabilities.hostChannels : capabilities.stations,
     [capabilities.hostChannels, capabilities.stations]
   );
+  const stationGroups = useMemo(() => {
+    const groups = new Map<string, { id: string; name: string; targets: { id: string; language: string }[] }>();
+    for (const target of forceArchetypeTargets) {
+      const station = STATIONS.find(station => station.id === target || station.hostChannels.some(channel => channel.id === target) || target.startsWith(`${station.id}-`));
+      const id = station?.id ?? target;
+      const channel = station?.hostChannels.find(channel => channel.id === target);
+      const locale = channel?.locale ?? (station && target !== station.id ? target.slice(station.id.length + 1) : undefined);
+      const language = locale ? new Intl.DisplayNames(["en"], { type: "language" }).of(locale.split("-")[0]) ?? locale : "Station default";
+      if (!groups.has(id)) groups.set(id, { id, name: station?.name ?? humanize(target), targets: [] });
+      groups.get(id)!.targets.push({ id: target, language });
+    }
+    return [...groups.values()];
+  }, [forceArchetypeTargets]);
+  const selectedStationGroup = stationGroups.find(group => group.targets.some(target => target.id === forceArchetypeStationId));
   const supportsTrackFocus =
     forceArchetypeCapability?.trackFocusSupported === true &&
     Boolean(selectedArchetype && capabilities.trackFocusArchetypes.includes(selectedArchetype));
@@ -88,13 +103,6 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     normalizedScheduleSeedMode === HOST_ADMIN_SCHEDULE_SEED_MODE_CUSTOM &&
     scheduleGeneratorSeedSalt.trim().length === 0;
 
-  useEffect(() => {
-    if (!isHostAdminConfigured) {
-      return;
-    }
-
-    void loadCapabilities();
-  }, [isHostAdminConfigured]);
 
   useEffect(() => {
     if (!isPollingJob || !activeJob?.jobId) return;
@@ -121,7 +129,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
         failures = 0;
         setActiveJob(job);
         setPollError(null);
-        setLastUpdated(new Date().toLocaleTimeString());
+        setLastUpdated(new Date().toLocaleTimeString("en-GB"));
         if (terminal) {
           setIsPollingJob(false);
           setMessage(buildJobStatusMessage(job, t));
@@ -150,60 +158,75 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     };
   }, [activeJob?.jobId, isPollingJob, pollRevision, t]);
 
-  async function loadCapabilities() {
-    if (!isHostAdminConfigured || isLoadingCapabilities) {
-      return;
-    }
-
-    setIsLoadingCapabilities(true);
-    setCapabilitiesStatusMessage(t("admin.loadingCapabilities"));
-    setIsCapabilitiesStatusError(false);
-
-    try {
-      const response = await fetch("/api/admin/host/capabilities", { cache: "no-store" });
-      const payload = await response.json();
-
-      if (!response.ok) {
-        throw new Error(payload.error || t("admin.refreshJobError"));
+  useEffect(() => {
+    if (!isHostAdminConfigured) return;
+    let stopped = false;
+    let retry: ReturnType<typeof setTimeout>;
+    let controller: AbortController;
+    async function loadCapabilities() {
+      if (stopped) {
+        return;
       }
 
-      const loaded = payload as HostAdminCapabilities;
-      const loadedForceTargets = loaded.hostChannels?.length
-        ? loaded.hostChannels
-        : loaded.stations;
-      setCapabilities(loaded);
-      setForceArchetypeStationId((current) => resolveSelectedStation(loadedForceTargets, current));
-      setScheduleGeneratorStationId((current) => resolveSelectedStation(loaded.stations, current));
-      setSelectedArchetype((current) => resolveSelectedArchetype(loaded.archetypes, current));
-      setSelectedTrackFocus((current) => (current && loaded.trackFocusValues.includes(current) ? current : null));
-      setSelectedScheduleGeneratorSeedMode((current) => {
-        const supportedSeedModes = loaded.operations[HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR]?.supportedSeedModes ?? [];
-        const defaultSeedMode =
-          loaded.operations[HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR]?.defaultSeedMode &&
-          supportedSeedModes.includes(loaded.operations[HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR].defaultSeedMode ?? "")
-            ? loaded.operations[HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR].defaultSeedMode ?? HOST_ADMIN_SCHEDULE_SEED_MODE_FRESH
-            : supportedSeedModes[0] ?? HOST_ADMIN_SCHEDULE_SEED_MODE_FRESH;
-
-        return supportedSeedModes.includes(current) ? current : defaultSeedMode;
-      });
-      setCapabilitiesStatusMessage(
-        t("admin.loadedCapabilities", {
-          stations: loaded.stations.length,
-          archetypes: loaded.archetypes.length,
-          operations: Object.keys(loaded.operations).length
-        })
-      );
+      setIsLoadingCapabilities(true);
+      setCapabilitiesStatusMessage(t("admin.loadingCapabilities"));
       setIsCapabilitiesStatusError(false);
-      setMessage(null);
-    } catch (error) {
-      const nextMessage = error instanceof Error ? error.message : t("admin.loadCapabilitiesError");
-      setCapabilitiesStatusMessage(nextMessage);
-      setIsCapabilitiesStatusError(true);
-      setMessage(nextMessage);
-    } finally {
-      setIsLoadingCapabilities(false);
+
+      controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 20000);
+      try {
+        const response = await fetch("/api/admin/host/capabilities", { cache: "no-store", signal: controller.signal });
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(payload.error || t("admin.loadCapabilitiesError"));
+        }
+
+        if (stopped) return;
+        const loaded = payload as HostAdminCapabilities;
+        const loadedForceTargets = loaded.hostChannels?.length
+          ? loaded.hostChannels
+          : loaded.stations;
+        setCapabilities(loaded);
+        setForceArchetypeStationId((current) => resolveSelectedStation(loadedForceTargets, current));
+        setScheduleGeneratorStationId((current) => resolveSelectedStation(loaded.stations, current));
+        setSelectedArchetype((current) => resolveSelectedArchetype(loaded.archetypes, current));
+        setSelectedTrackFocus((current) => (current && loaded.trackFocusValues.includes(current) ? current : null));
+        setSelectedScheduleGeneratorSeedMode((current) => {
+          const supportedSeedModes = loaded.operations[HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR]?.supportedSeedModes ?? [];
+          const defaultSeedMode =
+            loaded.operations[HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR]?.defaultSeedMode &&
+            supportedSeedModes.includes(loaded.operations[HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR].defaultSeedMode ?? "")
+              ? loaded.operations[HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR].defaultSeedMode ?? HOST_ADMIN_SCHEDULE_SEED_MODE_FRESH
+              : supportedSeedModes[0] ?? HOST_ADMIN_SCHEDULE_SEED_MODE_FRESH;
+
+          return supportedSeedModes.includes(current) ? current : defaultSeedMode;
+        });
+        setCapabilitiesStatusMessage(
+          t("admin.loadedCapabilities", {
+            stations: loaded.stations.length,
+            archetypes: loaded.archetypes.length,
+            operations: Object.keys(loaded.operations).length
+          })
+        );
+        setIsCapabilitiesStatusError(false);
+
+      } catch (error) {
+        if (stopped) return;
+        retry = setTimeout(() => void loadCapabilities(), 10000);
+        const nextMessage = error instanceof Error ? error.message : t("admin.loadCapabilitiesError");
+        setCapabilitiesStatusMessage(`${nextMessage} Retrying automatically…`);
+        setIsCapabilitiesStatusError(true);
+
+      } finally {
+        clearTimeout(timeout);
+        if (!stopped) setIsLoadingCapabilities(false);
+      }
     }
-  }
+
+    void loadCapabilities();
+    return () => { stopped = true; clearTimeout(retry); controller?.abort(); };
+  }, [isHostAdminConfigured]);
 
   async function runForceArchetype() {
     if (!forceArchetypeStationId || !selectedArchetype || submittingOperation || isPollingJob) {
@@ -426,9 +449,6 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                 <h3>{t("admin.hostOrchestrator")}</h3>
                 <p>{t("admin.hostConfigured")}</p>
               </div>
-              <button className="adminGhostButton" type="button" onClick={() => void loadCapabilities()} disabled={isLoadingCapabilities}>
-                {isLoadingCapabilities ? t("common.refreshing") : t("admin.refreshCapabilities")}
-              </button>
             </div>
 
             {capabilitiesStatusMessage ? (
@@ -443,25 +463,31 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
               <div className="adminOperationHeader">
                 <h3>{t("admin.forceArchetype")}</h3>
               </div>
-              {forceArchetypeTargets.length ? (
-              <div className="adminSection">
-                <h4>{t("admin.station")}</h4>
-                <div className="adminChipRow" role="radiogroup" aria-label={t("admin.station")}>
-                  {forceArchetypeTargets.map((stationId) => (
-                    <button
-                      key={stationId}
-                      className={`adminChip ${forceArchetypeStationId === stationId ? "adminChipActive" : ""}`}
-                      type="button"
-                      onClick={() => setForceArchetypeStationId(stationId)}
-                      role="radio"
-                      aria-checked={forceArchetypeStationId === stationId}
-                    >
-                      {stationLabel(stationId)}
-                    </button>
-                  ))}
+              {stationGroups.length ? (
+                <div className="adminSection">
+                  <h4>Station</h4>
+                  <div className="adminStationCards" role="radiogroup" aria-label="Station">
+                    {stationGroups.map(group => (
+                      <button key={group.id} type="button" role="radio" aria-checked={selectedStationGroup?.id === group.id}
+                        className={`adminStationCard ${selectedStationGroup?.id === group.id ? "isSelected" : ""}`}
+                        onClick={() => setForceArchetypeStationId(group.targets.find(target => target.id === forceArchetypeStationId)?.id ?? group.targets[0].id)}>
+                        <strong>{group.name}</strong>
+                        <span>{group.targets.length === 1 ? group.targets[0].language : `${group.targets.length} host languages`}</span>
+                      </button>
+                    ))}
+                  </div>
+                  {selectedStationGroup && selectedStationGroup.targets.some(target => target.language !== "Station default") ? (
+                    <div className="adminStationLanguages">
+                      <h5>Host language</h5>
+                      <div className="adminChipRow" role="radiogroup" aria-label={`${selectedStationGroup.name} host language`}>
+                        {selectedStationGroup.targets.map(target => (
+                          <button key={target.id} type="button" className={`adminChip ${forceArchetypeStationId === target.id ? "adminChipActive" : ""}`} role="radio" aria-checked={forceArchetypeStationId === target.id} onClick={() => setForceArchetypeStationId(target.id)}>{target.language}</button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
-              </div>
-            ) : null}
+              ) : null}
 
               <div className="adminOperationBody">
                 {capabilities.archetypes.length === 0 && !isLoadingCapabilities ? (
@@ -762,7 +788,6 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
 }
 
 function HostAdminJobPanel({ job, isPolling }: { job: HostAdminJob; isPolling: boolean }) {
-  const { t } = useI18n();
   const statusLabel = toStatusLabel(job.status, t);
   const scheduleLines = job.scheduleOptions
     ? [
@@ -834,10 +859,10 @@ function isTerminalJobStatus(status: string) {
 
 function isAdminErrorMessage(message: string) {
   const normalized = message.toLowerCase();
-  return ["failed", "unable", "invalid", "falló", "no se pudo", "debe"].some((term) => normalized.includes(term));
+  return ["failed", "unable", "invalid", "error"].some((term) => normalized.includes(term));
 }
 
-function buildJobStatusMessage(job: HostAdminJob, t: ReturnType<typeof useI18n>["t"]) {
+function buildJobStatusMessage(job: HostAdminJob, t: AdminText) {
   const operationLabel = toOperationLabel(job.operation, t);
 
   if (job.status.toLowerCase() === "succeeded") {
@@ -874,7 +899,7 @@ function toArchetypeLabel(value: string) {
   return humanize(value);
 }
 
-function toTrackFocusLabel(value: string, t: ReturnType<typeof useI18n>["t"]) {
+function toTrackFocusLabel(value: string, t: AdminText) {
   if (value === "current") {
     return t("admin.focusCurrent");
   }
@@ -886,7 +911,7 @@ function toTrackFocusLabel(value: string, t: ReturnType<typeof useI18n>["t"]) {
   return humanize(value);
 }
 
-function toSeedModeLabel(value: string, t: ReturnType<typeof useI18n>["t"]) {
+function toSeedModeLabel(value: string, t: AdminText) {
   if (value === "stable_week") {
     return t("admin.seedStableWeek");
   }
@@ -902,7 +927,7 @@ function toSeedModeLabel(value: string, t: ReturnType<typeof useI18n>["t"]) {
   return humanize(value);
 }
 
-function toOperationLabel(value: string, t: ReturnType<typeof useI18n>["t"]) {
+function toOperationLabel(value: string, t: AdminText) {
   if (value === HOST_ADMIN_OPERATION_FORCE_ARCHETYPE) {
     return t("admin.forceArchetype");
   }
@@ -914,7 +939,7 @@ function toOperationLabel(value: string, t: ReturnType<typeof useI18n>["t"]) {
   return humanize(value);
 }
 
-function toStatusLabel(value: string, t: ReturnType<typeof useI18n>["t"]) {
+function toStatusLabel(value: string, t: AdminText) {
   switch (value.toLowerCase()) {
     case "accepted":
       return t("admin.statusAccepted");
