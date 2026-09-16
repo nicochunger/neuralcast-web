@@ -4270,3 +4270,58 @@ img {
     animation: none;
   }
 }
+
+/* Admin workspace */
+.adminShell { max-width: 1680px; }
+.adminWorkspace { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 30px; margin-top: 24px; align-items: start; }
+.adminSidebar { position: sticky; top: 24px; display: grid; gap: 8px; padding: 22px 0; }
+.adminSidebar > .sectionEyebrow { padding-left: 16px; margin-bottom: 18px; }
+.adminNavItem { display: flex; gap: 12px; align-items: center; padding: 16px; border: 1px solid transparent; border-radius: 12px; text-decoration: none; color: var(--ink); transition: background .2s; }
+.adminNavItem > span { font-size: .7rem; opacity: .5; font-variant-numeric: tabular-nums; }
+.adminNavItem strong { font-size: .92rem; }
+.adminNavItem small { display: block; font-size: .73rem; margin-top: 5px; opacity: .65; }
+.adminNavItem:hover, .adminNavItem.isActive { background: var(--surface-soft); border-color: var(--line); }
+.adminNavItem.isActive { box-shadow: inset 3px 0 var(--focus); }
+.adminSidebarNote { padding: 24px 16px; font-size: .72rem; opacity: .5; }
+.adminMain { min-width: 0; }
+.adminMain .adminHero { margin: 0 0 24px; padding: 30px; border-radius: 16px; background: radial-gradient(ellipse at top right, color-mix(in srgb, var(--focus), transparent 88%), transparent 70%), var(--panel-bg); }
+.adminMain .adminHero h2 { font-size: clamp(1.6rem, 2.5vw, 2.5rem); letter-spacing: -.045em; }
+.adminMain .adminLead { max-width: 680px; line-height: 1.7; }
+.adminWorkGrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, .8fr); gap: 22px; align-items: start; }
+.adminWorkGrid > .adminConsoleStack { margin-top: 0; min-width: 0; }
+.adminMain .adminPanel { min-height: auto; border-radius: 14px; }
+.adminMain button { cursor: pointer; }
+.adminMain button:disabled { cursor: not-allowed; }
+.adminMain :is(button, a, input, select):focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
+.adminActivity { position: sticky; top: 24px; min-width: 0; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--panel-bg); overflow: hidden; }
+.adminActivityHeading { display: flex; align-items: center; gap: 10px; padding: 20px; border-bottom: 1px solid var(--line); }
+.adminActivityHeading h3 { margin: 0; font-size: 1rem; }
+.adminActivityHeading > span:last-child { margin-left: auto; font-size: .7rem; opacity: .65; }
+.adminLiveDot { width: 7px; height: 7px; border-radius: 50%; background: #89938f; }
+.adminLiveDot.isLive { background: #43bd95; box-shadow: 0 0 0 4px #43bd9518; }
+.adminActivityTools { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; }
+.adminActivity .adminPanel { border: 0; box-shadow: none; margin-top: 0; padding: 18px; gap: 10px; background: transparent; max-height: calc(100dvh - 190px); overflow: auto; }
+.adminActivity .adminPanel p { font-size: .78rem; overflow-wrap: anywhere; }
+.adminActivity .adminPanel h3 { font-size: .92rem; }
+.adminActivity .adminLogTail { max-height: 48dvh; min-height: 180px; background: #111d22; color: #c7e6dc; border: 1px solid #284039; border-radius: 9px; font-size: .73rem; line-height: 1.8; padding: 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.adminActivityEmpty { padding: 44px 28px; text-align: center; }
+.adminActivityEmpty > span { font-size: 3rem; color: var(--focus); }
+.adminActivityEmpty h4 { font-size: 1.1rem; margin: 14px 0; }
+.adminActivityEmpty p { font-size: .85rem; line-height: 1.8; opacity: .65; }
+.adminAudience { display: grid; gap: 20px; }
+.adminAudienceFilters { grid-template-columns: 1fr 1fr auto; align-items: end; }
+.adminReportStatus { margin: 0; font-size: .8rem; line-height: 1.7; opacity: .8; }
+.adminMetricGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.adminMetric strong { font-size: clamp(2rem, 3vw, 3rem); letter-spacing: -.06em; color: var(--focus); }
+.adminMetric small { opacity: .65; }
+.adminCountryGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 36px; padding: 16px 0; }
+.adminCountry > div:first-child { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: .85rem; }
+.adminCountryTrack { height: 6px; border-radius: 9px; overflow: hidden; background: var(--line); }
+.adminCountryTrack span { display: block; height: 100%; background: var(--focus); border-radius: inherit; }
+.adminTableScroll { overflow-x: auto; }
+.adminListenerTable { width: 100%; border-collapse: collapse; text-align: left; font-size: .8rem; }
+.adminListenerTable th { opacity: .6; font-size: .7rem; font-weight: 500; }
+.adminListenerTable :is(th, td) { padding: 16px 12px; border-bottom: 1px solid var(--line); }
+.adminListenerTable small { display: block; opacity: .6; margin-top: 4px; }
+@media (max-width: 1200px) { .adminWorkspace { grid-template-columns: 185px minmax(0, 1fr); gap: 18px; } .adminWorkGrid { grid-template-columns: minmax(0, 1fr); } .adminActivity { position: static; grid-row: 1; } .adminActivityEmpty { padding: 20px; } .adminActivityEmpty > span { display: none; } .adminActivity .adminPanel { max-height: 400px; } }
+@media (max-width: 700px) { .adminWorkspace { grid-template-columns: 1fr; gap: 16px; margin-top: 0; } .adminSidebar { position: static; grid-template-columns: 1fr 1fr; padding: 0; gap: 6px; } .adminSidebar > .sectionEyebrow, .adminSidebarNote, .adminNavItem small { display: none; } .adminNavItem { padding: 12px; background: var(--panel-bg); border-color: var(--line); } .adminMain .adminHero { padding: 22px; } .adminMetricGrid { grid-template-columns: 1fr; } .adminMetric { grid-template-columns: 1fr auto; align-items: center; } .adminMetric small { grid-column: 1 / -1; } .adminAudienceFilters { grid-template-columns: 1fr; } .adminCountryGrid { grid-template-columns: 1fr; } }

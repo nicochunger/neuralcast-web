@@ -1,5 +1,9 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { AdminTestStreamPlayer } from "@/components/AdminTestStreamPlayer";
+import { AdminListeners } from "@/components/AdminListeners";
 import { useEffect, useMemo, useState } from "react";
 import type { HostAdminCapabilities, HostAdminJob, HostAdminOperationCapability } from "@/types/hostAdmin";
 import {
@@ -30,6 +34,11 @@ const emptyCapabilities: HostAdminCapabilities = {
 
 export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
   const { t } = useI18n();
+  const pathname = usePathname();
+  const section = pathname.split("/")[2] || "host";
+  const [pollError, setPollError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [pollRevision, setPollRevision] = useState(0);
   const [capabilities, setCapabilities] = useState<HostAdminCapabilities>(emptyCapabilities);
   const [capabilitiesStatusMessage, setCapabilitiesStatusMessage] = useState<string | null>(null);
   const [isCapabilitiesStatusError, setIsCapabilitiesStatusError] = useState(false);
@@ -88,16 +97,58 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
   }, [isHostAdminConfigured]);
 
   useEffect(() => {
-    if (!isPollingJob || !activeJob?.jobId) {
-      return;
+    if (!isPollingJob || !activeJob?.jobId) return;
+    const jobId = activeJob.jobId;
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout>;
+    let controller: AbortController | undefined;
+    let busy = false;
+    let failures = 0;
+    async function poll() {
+      if (stopped || busy) return;
+      clearTimeout(timer);
+      busy = true;
+      controller = new AbortController();
+      const timeout = setTimeout(() => controller?.abort(), 20000);
+      let terminal = false;
+      try {
+        const response = await fetch(`/api/admin/host/jobs/${encodeURIComponent(jobId)}`, { cache: "no-store", signal: controller.signal });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || "Unable to refresh job.");
+        if (stopped) return;
+        const job = payload as HostAdminJob;
+        terminal = isTerminalJobStatus(job.status);
+        failures = 0;
+        setActiveJob(job);
+        setPollError(null);
+        setLastUpdated(new Date().toLocaleTimeString());
+        if (terminal) {
+          setIsPollingJob(false);
+          setMessage(buildJobStatusMessage(job, t));
+        }
+      } catch (error) {
+        if (!stopped) {
+          failures++;
+          setPollError(`${error instanceof Error ? error.message : "Connection interrupted"} Retrying automatically…`);
+        }
+      } finally {
+        clearTimeout(timeout);
+        busy = false;
+        if (!stopped && !terminal) timer = setTimeout(poll, Math.min(POLL_INTERVAL_MS * 2 ** failures, 30000));
+      }
     }
-
-    const timeout = window.setTimeout(() => {
-      void refreshJob(activeJob.jobId);
-    }, POLL_INTERVAL_MS);
-
-    return () => window.clearTimeout(timeout);
-  }, [activeJob?.jobId, isPollingJob]);
+    const resume = () => { if (document.visibilityState === "visible") void poll(); };
+    void poll();
+    window.addEventListener("online", resume);
+    document.addEventListener("visibilitychange", resume);
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+      controller?.abort();
+      window.removeEventListener("online", resume);
+      document.removeEventListener("visibilitychange", resume);
+    };
+  }, [activeJob?.jobId, isPollingJob, pollRevision, t]);
 
   async function loadCapabilities() {
     if (!isHostAdminConfigured || isLoadingCapabilities) {
@@ -293,30 +344,6 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
     }
   }
 
-  async function refreshJob(jobId: string) {
-    try {
-      const response = await fetch(`/api/admin/host/jobs/${jobId}`, { cache: "no-store" });
-      const payload = await response.json();
-
-      if (!response.ok) {
-        throw new Error(payload.error || t("admin.loadCapabilitiesError"));
-      }
-
-      const job = payload as HostAdminJob;
-      const terminal = isTerminalJobStatus(job.status);
-
-      setActiveJob(job);
-      setIsPollingJob(!terminal);
-
-      if (terminal) {
-        setMessage(buildJobStatusMessage(job, t));
-      }
-    } catch (error) {
-      setIsPollingJob(false);
-      setMessage(error instanceof Error ? error.message : t("admin.refreshJobError"));
-    }
-  }
-
   function supportsOperation(operation: string) {
     return Boolean(capabilities.operations[operation]);
   }
@@ -366,22 +393,33 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
   }
 
   return (
-    <>
+    <div className="adminWorkspace">
+      <nav className="adminSidebar" aria-label="Admin navigation">
+        <p className="sectionEyebrow">WORKSPACE</p>
+        {[
+          ["host", "/admin", "01", "AI host", "Create a radio moment"],
+          ["schedule", "/admin/schedule", "02", "Scheduling", "Shape the week ahead"],
+          ["listeners", "/admin/listeners", "03", "Listeners", "Know your audience"],
+          ["preview", "/admin/preview", "04", "Stream preview", "Listen before going live"]
+        ].map(([id, href, number, label, description]) => <Link key={id} href={href} className={`adminNavItem ${section === id ? "isActive" : ""}`} aria-current={section === id ? "page" : undefined}><span>{number}</span><div><strong>{label}</strong><small>{description}</small></div></Link>)}
+        <p className="adminSidebarNote">NeuralCast / Control room</p>
+      </nav>
+      <div className="adminMain">
       <section className="adminHero">
         <div>
           <p className="sectionEyebrow">{t("admin.controlRoom")}</p>
-          <h2>{t("admin.title")}</h2>
-          <p className="adminLead">{t("admin.lead")}</p>
+          <h2>{{ host: "Make the airwaves yours.", schedule: "A rhythm for every day.", listeners: "On the other side of the stream.", preview: "Your private listening room." }[section]}</h2>
+          <p className="adminLead">{{ host: "Craft an AI host segment. Follow every step as it comes to life.", schedule: "Build your station’s next chapter, one week at a time.", listeners: "Live connections and listening history, directly from AzuraCast.", preview: "Check the test stream in a dedicated preview player." }[section]}</p>
         </div>
       </section>
 
-      {!isHostAdminConfigured ? (
+      {section === "listeners" ? <AdminListeners /> : section === "preview" ? <AdminTestStreamPlayer /> : !isHostAdminConfigured ? (
         <section className="adminPanel adminConsoleStack">
           <h3>{t("admin.hostOrchestrator")}</h3>
           <p>{t("admin.hostNotConfigured")}</p>
         </section>
       ) : (
-        <div className="adminConsoleStack">
+        <div className="adminWorkGrid"><div className="adminConsoleStack">
           <section className="adminPanel">
             <div className="adminPanelHeader">
               <div>
@@ -400,7 +438,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
             ) : null}
           </section>
 
-          {supportsOperation(HOST_ADMIN_OPERATION_FORCE_ARCHETYPE) ? (
+          {section === "host" && supportsOperation(HOST_ADMIN_OPERATION_FORCE_ARCHETYPE) ? (
             <section className="adminPanel adminOperationPanel">
               <div className="adminOperationHeader">
                 <h3>{t("admin.forceArchetype")}</h3>
@@ -518,7 +556,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
             </section>
           ) : null}
 
-          {supportsOperation(HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR) ? (
+          {section === "schedule" && supportsOperation(HOST_ADMIN_OPERATION_SCHEDULE_GENERATOR) ? (
             <section className="adminPanel adminOperationPanel">
               <div className="adminOperationHeader">
                 <h3>{t("admin.scheduleGenerator")}</h3>
@@ -628,7 +666,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
                 {scheduleGeneratorCapability?.weekStartDateSupported ? (
                   <label className="adminField">
                     <span>{t("admin.weekStartDate")}</span>
-                    <input value={scheduleGeneratorWeekStartDate} onChange={(event) => setScheduleGeneratorWeekStartDate(event.target.value)} />
+                    <input type="date" value={scheduleGeneratorWeekStartDate} onChange={(event) => setScheduleGeneratorWeekStartDate(event.target.value)} />
                   </label>
                 ) : null}
 
@@ -708,10 +746,18 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
             </p>
           ) : null}
 
-          {activeJob ? <HostAdminJobPanel job={activeJob} isPolling={isPollingJob} /> : null}
+          </div>
+          <aside className="adminActivity" aria-label="Job activity">
+            <div className="adminActivityHeading"><span className={`adminLiveDot ${isPollingJob ? "isLive" : ""}`} /><h3>Job activity</h3><span>{isPollingJob ? "Following live" : "Ready"}</span></div>
+            {activeJob ? <>
+              <div className="adminActivityTools"><small>{lastUpdated ? `Updated ${lastUpdated}` : "Waiting for first update"}</small><button type="button" className="adminGhostButton" onClick={() => { setIsPollingJob(true); setPollRevision(value => value + 1); }}>Reconnect</button></div>
+              {pollError ? <p className="adminStatusNotice adminStatusNoticeError" role="status">{pollError}</p> : null}
+              <HostAdminJobPanel job={activeJob} isPolling={isPollingJob} />
+            </> : <div className="adminActivityEmpty"><span aria-hidden="true">⌁</span><h4>A front-row seat to your next job.</h4><p>Queue a segment or generate a schedule. Progress and logs will appear here automatically.</p></div>}
+          </aside>
         </div>
       )}
-    </>
+    </div></div>
   );
 }
 
@@ -761,7 +807,7 @@ function HostAdminJobPanel({ job, isPolling }: { job: HostAdminJob; isPolling: b
       {job.acceptedAt ? <p>{t("admin.acceptedAtLine", { value: job.acceptedAt })}</p> : null}
       {job.startedAt ? <p>{t("admin.startedAtLine", { value: job.startedAt })}</p> : null}
       {job.finishedAt ? <p>{t("admin.finishedAtLine", { value: job.finishedAt })}</p> : null}
-      {job.logTail ? <pre className="adminLogTail">{job.logTail.trim()}</pre> : null}
+      <pre className="adminLogTail" tabIndex={0} aria-label="Job logs">{job.logTail?.trim() || "Waiting for log output…"}</pre>
     </section>
   );
 }
