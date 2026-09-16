@@ -202,13 +202,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
 
           return supportedSeedModes.includes(current) ? current : defaultSeedMode;
         });
-        setCapabilitiesStatusMessage(
-          t("admin.loadedCapabilities", {
-            stations: loaded.stations.length,
-            archetypes: loaded.archetypes.length,
-            operations: Object.keys(loaded.operations).length
-          })
-        );
+        setCapabilitiesStatusMessage(null);
         setIsCapabilitiesStatusError(false);
 
       } catch (error) {
@@ -443,20 +437,11 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
         </section>
       ) : (
         <div className="adminWorkGrid"><div className="adminConsoleStack">
-          <section className="adminPanel">
-            <div className="adminPanelHeader">
-              <div>
-                <h3>{t("admin.hostOrchestrator")}</h3>
-                <p>{t("admin.hostConfigured")}</p>
-              </div>
-            </div>
-
-            {capabilitiesStatusMessage ? (
-              <p className={`adminStatusNotice ${isCapabilitiesStatusError ? "adminStatusNoticeError" : "adminStatusNoticeSuccess"}`}>
-                {capabilitiesStatusMessage}
-              </p>
-            ) : null}
-          </section>
+          {capabilitiesStatusMessage && (isLoadingCapabilities || isCapabilitiesStatusError) ? (
+            <p className={`adminStatusNotice ${isCapabilitiesStatusError ? "adminStatusNoticeError" : ""}`} role="status">
+              {capabilitiesStatusMessage}
+            </p>
+          ) : null}
 
           {section === "host" && supportsOperation(HOST_ADMIN_OPERATION_FORCE_ARCHETYPE) ? (
             <section className="adminPanel adminOperationPanel">
