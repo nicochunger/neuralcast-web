@@ -6,7 +6,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import { STATIONS } from "@/lib/stations";
-import { HostCompanionCard } from "@/components/HostCompanionCard";
+import { HostCompanionModal } from "@/components/HostCompanionModal";
+import { useHostCompanions } from "@/hooks/useHostCompanions";
+import type { HostCompanion } from "@/types/hostCompanion";
 import { MiniPlayer } from "@/components/MiniPlayer";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StationCard } from "@/components/StationCard";
@@ -48,6 +50,7 @@ type ActiveOverlay =
   | { type: "history"; stationId: StationId }
   | { type: "schedule"; stationId: StationId }
   | { type: "requests"; stationId: StationId }
+  | { type: "recap"; stationId: StationId; card: HostCompanion }
   | ({ type: "artwork"; stationId: StationId } & ArtworkLightboxData)
   | null;
 
@@ -82,6 +85,11 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     getHostChannelId,
     setHostSelection
   } = useAudioPlayer();
+
+  const companionChannels = useMemo(() => STATIONS.map((station) => ({
+    stationId: station.id, channelId: getHostChannelId(station)
+  })), [getHostChannelId]);
+  const companionCards = useHostCompanions(companionChannels);
 
   const [showAdminControls, setShowAdminControls] = useState(isAdmin);
   const [isAdminUser, setIsAdminUser] = useState(isAdmin);
@@ -249,6 +257,12 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       isMounted = false;
     };
   }, [favoritesReady, isAdminUser, persistAdminFavorites, t]);
+
+  useEffect(() => {
+    if (activeOverlay?.type !== "recap") return;
+    const station = STATIONS.find((candidate) => candidate.id === activeOverlay.stationId);
+    if (!station || getHostChannelId(station) !== activeOverlay.card.channel) setActiveOverlay(null);
+  }, [activeOverlay, getHostChannelId]);
 
   useEffect(() => {
     if (!activeOverlay) {
@@ -600,6 +614,14 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
               isHistorySelected={activeOverlay?.type === "history" && station.id === activeOverlay.stationId}
               isScheduleSelected={activeOverlay?.type === "schedule" && station.id === activeOverlay.stationId}
               isRequestSelected={activeOverlay?.type === "requests" && station.id === activeOverlay.stationId}
+              hasHostRecap={Boolean(companionCards[station.id])}
+              isRecapSelected={activeOverlay?.type === "recap" && activeOverlay.stationId === station.id}
+              onSelectRecap={() => {
+                const card = companionCards[station.id];
+                if (!card) return;
+                overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+                setActiveOverlay({ type: "recap", stationId: station.id, card });
+              }}
               onPlay={playStation}
               hostSelection={getHostSelection(station)}
               onHostSelectionChange={(selectedStation, selection) =>
@@ -632,12 +654,6 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
         })}
       </section>
 
-      <HostCompanionCard
-        key={`${activeStation.id}:${getHostChannelId(activeStation)}`}
-        stationId={activeStation.id}
-        channelId={getHostChannelId(activeStation)}
-      />
-
       {playbackError ? (
         <div className="playerError" role="alert">
           <span>{playbackError}</span>
@@ -649,6 +665,14 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
         </div>
       ) : null}
       {adminMessage ? <p className="playerError">{adminMessage}</p> : null}
+
+      {activeOverlay?.type === "recap" ? (
+        <HostCompanionModal
+          station={STATIONS.find((station) => station.id === activeOverlay.stationId)!}
+          card={activeOverlay.card}
+          onDismiss={() => setActiveOverlay(null)}
+        />
+      ) : null}
 
       {activeOverlay?.type === "favorites" ? (
         <FavoritesModal

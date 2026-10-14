@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { HostCompanion } from "@/types/hostCompanion";
 import styles from "./HostCompanionCard.module.css";
@@ -22,37 +22,11 @@ function concertDate(value: string | undefined, locale: string): string | undefi
   }).format(date);
 }
 
-export function HostCompanionCard({ stationId, channelId }: { stationId: string; channelId: string }) {
+export function HostCompanionCard({ card: active }: { card: HostCompanion }) {
   const { locale, t } = useI18n();
-  const [card, setCard] = useState<HostCompanion | null>(null);
-  const [pinned, setPinned] = useState<HostCompanion | null>(null);
-  const [now, setNow] = useState(() => Date.now() / 1000);
+  const [showTranscript, setShowTranscript] = useState(false);
+  const now = Date.now() / 1000;
 
-  useEffect(() => {
-    const controller = new AbortController();
-    let pending = false;
-    async function refresh() {
-      if (pending) return;
-      pending = true;
-      try {
-        const response = await fetch(`/api/host-companion/${encodeURIComponent(stationId)}?channel=${encodeURIComponent(channelId)}`, {
-          cache: "no-store", signal: controller.signal
-        });
-        if (!response.ok) throw new Error("Companion unavailable");
-        const payload = await response.json() as { card: HostCompanion | null };
-        if (!controller.signal.aborted) setCard(payload.card?.channel === channelId ? payload.card : null);
-      } catch {
-        if (!controller.signal.aborted) setCard(null);
-      } finally { pending = false; }
-    }
-    void refresh();
-    const polling = window.setInterval(() => void refresh(), 15_000);
-    const ticking = window.setInterval(() => setNow(Date.now() / 1000), 1_000);
-    return () => { controller.abort(); window.clearInterval(polling); window.clearInterval(ticking); };
-  }, [stationId, channelId]);
-
-  const active = pinned ?? (card && card.expected_start <= now && card.expires_at > now ? card : null);
-  if (!active || active.channel !== channelId) return null;
   const labels = {
     news: t("companion.news"), concert_check: t("companion.concert"),
     short_story: t("companion.story"), album_spotlight: t("companion.album"),
@@ -77,8 +51,8 @@ export function HostCompanionCard({ stationId, channelId }: { stationId: string;
           {link ? <a href={link} target="_blank" rel="noopener noreferrer">{active.archetype === "concert_check" ? t("companion.eventLink") : t("companion.source")} <span aria-hidden="true">↗</span></a> : null}
         </li>;
       })}</ul> : null}
-      <button className={styles.transcriptButton} type="button" aria-expanded={Boolean(pinned)} onClick={() => setPinned(pinned ? null : active)}>{pinned ? t("companion.hideTranscript") : t("companion.readTranscript")}</button>
-      {pinned ? <div className={styles.transcript}>{pinned.transcript}</div> : null}
+      <button className={styles.transcriptButton} type="button" aria-expanded={showTranscript} onClick={() => setShowTranscript((open) => !open)}>{showTranscript ? t("companion.hideTranscript") : t("companion.readTranscript")}</button>
+      {showTranscript ? <div className={styles.transcript}>{active.transcript}</div> : null}
     </aside>
   );
 }

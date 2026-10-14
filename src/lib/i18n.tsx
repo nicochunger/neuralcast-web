@@ -18,6 +18,10 @@ type TranslationKey =
   | "common.language"
   | "host.language"
   | "companion.label"
+  | "companion.button"
+  | "companion.available"
+  | "companion.unavailable"
+  | "companion.close"
   | "companion.news"
   | "companion.concert"
   | "companion.story"
@@ -191,6 +195,10 @@ const englishMessages: Record<TranslationKey, string> = {
     "common.language": "Language",
     "host.language": "Host language",
     "companion.label": "From the host",
+    "companion.button": "Host recap",
+    "companion.available": "Open recent host recap",
+    "companion.unavailable": "No recent host recap",
+    "companion.close": "Close host recap",
     "companion.news": "News",
     "companion.concert": "Concerts",
     "companion.story": "Music story",
@@ -379,6 +387,10 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "common.language": "Idioma",
     "host.language": "Idioma del host",
     "companion.label": "Lo que contó el host",
+    "companion.button": "Resumen del host",
+    "companion.available": "Abrir resumen reciente del host",
+    "companion.unavailable": "No hay un resumen reciente del host",
+    "companion.close": "Cerrar resumen del host",
     "companion.news": "Noticias",
     "companion.concert": "Conciertos",
     "companion.story": "Historia musical",
@@ -565,6 +577,10 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "common.language": "Langue",
     "host.language": "Langue de l’animateur",
     "companion.label": "À propos de ce passage",
+    "companion.button": "Résumé du passage",
+    "companion.available": "Ouvrir le résumé récent",
+    "companion.unavailable": "Aucun résumé récent",
+    "companion.close": "Fermer le résumé",
     "companion.news": "Actualités",
     "companion.concert": "Concerts",
     "companion.story": "Histoire musicale",

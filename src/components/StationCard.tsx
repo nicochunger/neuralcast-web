@@ -5,6 +5,7 @@ import { AnimatedSuccessIcon } from "@/components/AnimatedSuccessIcon";
 import { HeartIcon } from "@/components/HeartIcon";
 import { HostLanguagePicker } from "@/components/HostLanguagePicker";
 import { ScrollingTrackTitle } from "@/components/ScrollingTrackTitle";
+import companionStyles from "./HostCompanionCard.module.css";
 import { TrackProgressBar } from "@/components/TrackProgressBar";
 import type { ArtworkLightboxData } from "@/components/ArtworkLightbox";
 import type { CSSProperties } from "react";
@@ -25,6 +26,9 @@ interface StationCardProps {
   isHistorySelected: boolean;
   isScheduleSelected: boolean;
   isRequestSelected: boolean;
+  hasHostRecap: boolean;
+  isRecapSelected: boolean;
+  onSelectRecap: () => void;
   onPlay: (station: Station) => void;
   hostSelection: string;
   onHostSelectionChange: (station: Station, selection: string) => void;
@@ -51,6 +55,9 @@ export function StationCard({
   isHistorySelected,
   isScheduleSelected,
   isRequestSelected,
+  hasHostRecap,
+  isRecapSelected,
+  onSelectRecap,
   onPlay,
   hostSelection,
   onHostSelectionChange,
@@ -204,6 +211,22 @@ export function StationCard({
             >
               <StationActionIcon icon="request" />
               {t("station.requestSong")}
+            </button>
+            <button
+              className={`actionButton stationCommandButton ${companionStyles.recapButton} ${hasHostRecap ? companionStyles.recapAvailable : ""} ${isRecapSelected ? "actionButtonActive" : ""}`}
+              type="button"
+              onClick={() => { if (hasHostRecap) onSelectRecap(); }}
+              aria-disabled={!hasHostRecap}
+              aria-haspopup="dialog"
+              aria-expanded={isRecapSelected}
+              aria-label={hasHostRecap ? t("companion.available") : t("companion.unavailable")}
+              title={hasHostRecap ? t("companion.available") : t("companion.unavailable")}
+            >
+              <span className="stationActionIcon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6 4V6a2 2 0 0 1 2-2Z" /><path d="M7 9h10M7 13h7" /></svg>
+              </span>
+              {t("companion.button")}
+              {hasHostRecap ? <span className={companionStyles.availabilityDot} aria-hidden="true" /> : null}
             </button>
             {showAdminSkip ? (
               <button

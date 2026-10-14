@@ -74,7 +74,9 @@ Song requests are intentionally left for a later phase.
 
 ## Host companion cards
 
-The player shows reading cards for news, concert checks, short stories, album
+Each station card has a Host recap button, enabled with an accent dot while a
+recap is available and greyed out otherwise. It opens a popup with reading cards
+for news, concert checks, short stories, album
 spotlights, era snapshots, and deep dives. Cards follow the selected station and
 host channel, with optional full transcripts. Editorial text stays in the host
 language; interface labels follow the app language.
@@ -86,8 +88,11 @@ station/channel pairs are rejected. Missing configuration hides the card.
 
 Queue insertion establishes publication. Cards appear at estimated snippet start
 and expire 20 minutes after estimated end, or when a newer eligible segment
-starts. The player polls every 15 seconds. Opening the transcript keeps that card
-available until closed; station/channel switches clear it. Backend outages never
+starts. The player polls every 15 seconds. Opening the popup keeps that recap
+available until dismissed, even after expiry or replacement. Changing its host
+language closes it. The popup uses the existing Escape, backdrop dismissal, focus
+trap, and focus restoration behavior. Both station buttons update independently
+without switching playback. Backend outages never
 interrupt audio. Existing host segments are not retroactively summarized.
 
 Run `npm run build`, then `npm run check:host-companion` for an offline

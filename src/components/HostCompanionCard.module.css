@@ -1,13 +1,13 @@
 .card {
-  max-width: 760px;
+  max-width: none;
   width: 100%;
-  margin: 1.5rem auto;
+  margin: 0;
   padding: clamp(1.2rem, 3vw, 2rem);
-  border: 1px solid rgba(191, 174, 141, .28);
-  border-radius: 22px;
+  border: 0;
+  border-radius: 0;
   background: linear-gradient(135deg, rgba(41, 46, 49, .97), rgba(22, 27, 31, .97));
   color: #f4f0e8;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, .15);
+  box-shadow: none;
   overflow-wrap: anywhere;
   box-sizing: border-box;
 }
@@ -28,3 +28,10 @@
 .transcriptButton:focus-visible, .items a:focus-visible { outline: 2px solid #e6c48d; outline-offset: 4px; }
 .transcript { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,.12); line-height: 1.7; color: #d4dadb; white-space: pre-wrap; }
 @media (prefers-reduced-motion: no-preference) { .card { animation: arrive .25s ease-out; } @keyframes arrive { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } } }
+
+.backdrop.backdrop { padding: 1rem; }
+.modal.modal { display: block; width: min(760px, 100%); max-height: calc(100dvh - 2rem); overflow-y: auto; overscroll-behavior: contain; }
+.recapButton[aria-disabled="true"] { opacity: .4; cursor: not-allowed; }
+.recapAvailable { border-color: var(--station-accent); }
+.availabilityDot { width: .45rem; height: .45rem; border-radius: 50%; background: var(--station-accent); flex-shrink: 0; }
+@media (max-width: 540px) { .backdrop.backdrop { padding: .5rem; } .modal.modal { max-height: calc(100dvh - 1rem); } }
