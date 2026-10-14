@@ -1,3 +1,4 @@
+import type { HostCompanion } from "@/types/hostCompanion";
 import type { HostAdminCapabilities, HostAdminJob, HostAdminOperationCapability, HostAdminScheduleOptions } from "@/types/hostAdmin";
 import type { SchedulePresentationTranslations, StationId, StationSchedulePresentation } from "@/types/radio";
 
@@ -290,4 +291,30 @@ function readPresentationTranslations(value: unknown): SchedulePresentationTrans
   });
 
   return Object.fromEntries(entries) as SchedulePresentationTranslations;
+}
+
+export async function getHostCompanion(channel: string): Promise<HostCompanion | null> {
+  const payload = await requestHostAdminJson("GET", `/admin/host-channels/${encodeURIComponent(channel)}/companion`);
+  const card = payload.card;
+  if (!card || typeof card !== "object" || Array.isArray(card)) return null;
+  const record = card as Record<string, unknown>;
+  if (record.channel !== channel || typeof record.id !== "string" ||
+      typeof record.expected_start !== "number" || typeof record.expires_at !== "number" ||
+      typeof record.expected_end !== "number" ||
+      ![record.expected_start, record.expected_end, record.expires_at].every(Number.isFinite) || typeof record.transcript !== "string" ||
+      !["news", "concert_check", "short_story", "album_spotlight", "era_snapshot", "deep_dive"].includes(String(record.archetype))) return null;
+  const content = record.content as Record<string, unknown> | undefined;
+  if (!content || typeof content.title !== "string" || typeof content.summary !== "string" ||
+      !Array.isArray(content.key_points) || !content.key_points.every((point) => typeof point === "string") ||
+      !Array.isArray(content.items) || !content.items.every((item) => {
+        if (!item || typeof item !== "object" || Array.isArray(item)) return false;
+        return Object.values(item).every((value) => value === null || typeof value === "string");
+      })) return null;
+  if (content.subject !== undefined) {
+    if (!content.subject || typeof content.subject !== "object" || Array.isArray(content.subject)) return null;
+    const subject = content.subject as Record<string, unknown>;
+    if (typeof subject.artist !== "string" || typeof subject.title !== "string" ||
+        !Object.values(subject).every((value) => value === null || typeof value === "string")) return null;
+  }
+  return card as HostCompanion;
 }

@@ -7,7 +7,8 @@
     "build": "npm run check:audio-persistence && next build",
     "check:audio-persistence": "node scripts/check-audio-persistence.mjs",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:host-companion": "node scripts/check-host-companion.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

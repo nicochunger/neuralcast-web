@@ -17,6 +17,17 @@ type TranslationKey =
   | "common.install"
   | "common.language"
   | "host.language"
+  | "companion.label"
+  | "companion.news"
+  | "companion.concert"
+  | "companion.story"
+  | "companion.album"
+  | "companion.era"
+  | "companion.deepDive"
+  | "companion.eventLink"
+  | "companion.source"
+  | "companion.readTranscript"
+  | "companion.hideTranscript"
   | "host.auto"
   | "host.followAppLanguage"
   | "host.spanishArgentinian"
@@ -179,6 +190,17 @@ const englishMessages: Record<TranslationKey, string> = {
     "common.install": "Install",
     "common.language": "Language",
     "host.language": "Host language",
+    "companion.label": "From the host",
+    "companion.news": "News",
+    "companion.concert": "Concerts",
+    "companion.story": "Music story",
+    "companion.album": "Album spotlight",
+    "companion.era": "Era snapshot",
+    "companion.deepDive": "Deep dive",
+    "companion.eventLink": "Event details",
+    "companion.source": "Read source",
+    "companion.readTranscript": "Read full transcript",
+    "companion.hideTranscript": "Hide transcript",
     "host.auto": "Station default",
     "host.followAppLanguage": "Follow app language",
     "host.spanishArgentinian": "Spanish · Argentina",
@@ -356,6 +378,17 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "common.install": "Instalar",
     "common.language": "Idioma",
     "host.language": "Idioma del host",
+    "companion.label": "Lo que contó el host",
+    "companion.news": "Noticias",
+    "companion.concert": "Conciertos",
+    "companion.story": "Historia musical",
+    "companion.album": "Álbum destacado",
+    "companion.era": "Una época musical",
+    "companion.deepDive": "En profundidad",
+    "companion.eventLink": "Ver evento",
+    "companion.source": "Leer fuente",
+    "companion.readTranscript": "Leer transcripción completa",
+    "companion.hideTranscript": "Ocultar transcripción",
     "host.auto": "Predeterminado de la emisora",
     "host.followAppLanguage": "Seguir el idioma de la app",
     "host.spanishArgentinian": "Español · Argentina",
@@ -531,6 +564,17 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "common.install": "Installer",
     "common.language": "Langue",
     "host.language": "Langue de l’animateur",
+    "companion.label": "À propos de ce passage",
+    "companion.news": "Actualités",
+    "companion.concert": "Concerts",
+    "companion.story": "Histoire musicale",
+    "companion.album": "Album à découvrir",
+    "companion.era": "Une époque musicale",
+    "companion.deepDive": "En profondeur",
+    "companion.eventLink": "Voir l’événement",
+    "companion.source": "Lire la source",
+    "companion.readTranscript": "Lire la transcription complète",
+    "companion.hideTranscript": "Masquer la transcription",
     "host.auto": "Par défaut de la station",
     "host.followAppLanguage": "Suivre la langue de l’application",
     "host.spanishArgentinian": "Espagnol · Argentine",

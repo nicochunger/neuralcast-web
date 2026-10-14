@@ -71,3 +71,27 @@ HTTPS is required for PWA installation and browser media behavior; Vercel provid
 - `https://neuralcast.duckdns.org/api/station/{stationId}/schedule?rows=1000&now={isoOffsetDateTime}`
 
 Song requests are intentionally left for a later phase.
+
+## Host companion cards
+
+The player shows reading cards for news, concert checks, short stories, album
+spotlights, era snapshots, and deep dives. Cards follow the selected station and
+host channel, with optional full transcripts. Editorial text stays in the host
+language; interface labels follow the app language.
+
+The public `/api/host-companion/{stationId}?channel={channelId}` route uses the
+existing server-only `HOST_ADMIN_BASE_URL` and `HOST_ADMIN_TOKEN` to read
+`/admin/host-channels/{channelId}/companion` from NeuralCast. Unknown or mismatched
+station/channel pairs are rejected. Missing configuration hides the card.
+
+Queue insertion establishes publication. Cards appear at estimated snippet start
+and expire 20 minutes after estimated end, or when a newer eligible segment
+starts. The player polls every 15 seconds. Opening the transcript keeps that card
+available until closed; station/channel switches clear it. Backend outages never
+interrupt audio. Existing host segments are not retroactively summarized.
+
+Run `npm run build`, then `npm run check:host-companion` for an offline
+production-route check using a local fixture backend. This checks channel
+isolation, server-side authentication, null/malformed responses, and outage
+handling without calling live stations. `npm run check:audio-persistence` verifies
+the persistent audio architecture.

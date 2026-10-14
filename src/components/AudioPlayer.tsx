@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import { STATIONS } from "@/lib/stations";
+import { HostCompanionCard } from "@/components/HostCompanionCard";
 import { MiniPlayer } from "@/components/MiniPlayer";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StationCard } from "@/components/StationCard";
@@ -630,6 +631,12 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
           );
         })}
       </section>
+
+      <HostCompanionCard
+        key={`${activeStation.id}:${getHostChannelId(activeStation)}`}
+        stationId={activeStation.id}
+        channelId={getHostChannelId(activeStation)}
+      />
 
       {playbackError ? (
         <div className="playerError" role="alert">
