@@ -122,7 +122,10 @@ rendered/uploaded previews never appear in listener guides.
 
 ## On-demand episodes
 
-`/episodes` lists explicitly published VPS episodes for both stations. Individual
+`/episodes` opens the Podcasts destination under the shared Live radio / Podcasts navigation.
+A central selector switches between the independent NeuralCast and NeuralForge
+series (`/episodes?station=<station>`); each series lists numbered episode rows
+with the newest first. Numbers follow publication order within each station. Individual
 pages use `/episodes/<station>/<episode-id>`. Metadata uses the existing server-only
 `HOST_ADMIN_BASE_URL`; it must point to the browser-reachable HTTPS VPS proxy in
 production (currently `/admin-http`). No additional credentials are exposed.

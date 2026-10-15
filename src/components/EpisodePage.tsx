@@ -37,8 +37,8 @@ export function EpisodePage({ episode }: { episode: PublishedEpisode }) {
     else if (!showGuide && dialog.current?.open) dialog.current.close();
   }, [showGuide]);
   const guide = <EpisodeGuide card={card} position={position} fallbackArtwork={station.artworkImage} onSeek={seek} />;
-  return <div className="appShell"><SiteHeader /><main className={styles.page}>
-    <Link className={styles.back} href="/episodes">← {t("episodes.back")}</Link>
+  return <div className="appShell"><SiteHeader podcastStation={episode.station} /><main className={styles.page}>
+    <Link className={styles.back} href={`/episodes?station=${episode.station}`}>← {t("episodes.back")}</Link>
     <div className={styles.detailGrid}>
       <article className={styles.mainColumn}>
         <div className={styles.hero}><img className={styles.heroCover} src={station.artworkImage} alt="" />

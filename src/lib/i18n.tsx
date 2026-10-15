@@ -11,12 +11,17 @@ import {
 import type { ScheduleSegment, StationId } from "@/types/radio";
 
 type TranslationKey =
+  | "nav.listen"
+  | "nav.liveRadio"
+  | "nav.podcasts"
+  | "podcasts.selectSeries"
+  | "podcasts.series"
+  | "podcasts.episodeNumber"
   | "episodes.currentChapter"
   | "episodes.liveInvite"
   | "episodes.retry"
   | "episodes.title"
   | "episodes.intro"
-  | "episodes.all"
   | "episodes.empty"
   | "episodes.unavailable"
   | "episodes.listen"
@@ -214,12 +219,17 @@ type TranslationKey =
 type TranslationParams = Record<string, string | number>;
 
 const englishMessages: Record<TranslationKey, string> = {
+    "nav.listen": "Listen",
+    "nav.liveRadio": "Live radio",
+    "nav.podcasts": "Podcasts",
+    "podcasts.selectSeries": "Choose your podcast",
+    "podcasts.series": "Podcast series",
+    "podcasts.episodeNumber": "Episode {number}",
     "episodes.currentChapter": "Current chapter",
     "episodes.liveInvite": "Keep exploring with our live radio and its AI host.",
     "episodes.retry": "Try again",
     "episodes.title": "Episodes",
     "episodes.intro": "Musical journeys with an AI host. Choose an episode and start with the story.",
-    "episodes.all": "Both stations",
     "episodes.empty": "New episodes are on their way. Listen live in the meantime.",
     "episodes.unavailable": "Episodes are temporarily unavailable. Please try again shortly.",
     "episodes.listen": "Listen to episode",
@@ -234,7 +244,7 @@ const englishMessages: Record<TranslationKey, string> = {
     "episodes.playbackError": "Playback could not start. Press play to try again.",
     "episodes.back": "All episodes",
     "episodes.language": "Host language",
-    "app.tagline": "Live AI radio from Estavayer, Switzerland.",
+    "app.tagline": "AI-hosted radio and podcasts from Estavayer, Switzerland.",
     "common.install": "Install",
     "common.language": "Language",
     "host.language": "Host language",
@@ -430,12 +440,17 @@ const englishMessages: Record<TranslationKey, string> = {
 const messages: Record<Locale, Record<TranslationKey, string>> = {
   en: englishMessages,
   es: {
+    "nav.listen": "Escuchar",
+    "nav.liveRadio": "Radio en vivo",
+    "nav.podcasts": "Podcasts",
+    "podcasts.selectSeries": "Elegí tu podcast",
+    "podcasts.series": "Serie de podcast",
+    "podcasts.episodeNumber": "Episodio {number}",
     "episodes.currentChapter": "Capítulo actual",
     "episodes.liveInvite": "Seguí explorando con nuestra radio en vivo y su host de IA.",
     "episodes.retry": "Volver a intentar",
     "episodes.title": "Episodios",
     "episodes.intro": "Viajes musicales con un host de IA. Elegí un episodio y empezá por la historia.",
-    "episodes.all": "Ambas emisoras",
     "episodes.empty": "Pronto habrá nuevos episodios. Mientras tanto, escuchá la radio en vivo.",
     "episodes.unavailable": "Los episodios no están disponibles por el momento. Volvé a intentarlo en unos minutos.",
     "episodes.listen": "Escuchar episodio",
@@ -450,7 +465,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "episodes.playbackError": "No se pudo reproducir. Presioná reproducir para volver a intentarlo.",
     "episodes.back": "Todos los episodios",
     "episodes.language": "Idioma del host",
-    "app.tagline": "Radio con IA en vivo desde Estavayer, Suiza.",
+    "app.tagline": "Radio y podcasts con hosts de IA desde Estavayer, Suiza.",
     "common.install": "Instalar",
     "common.language": "Idioma",
     "host.language": "Idioma del host",
@@ -644,12 +659,17 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
   },
   fr: {
     ...englishMessages,
+    "nav.listen": "Écouter",
+    "nav.liveRadio": "Radio en direct",
+    "nav.podcasts": "Podcasts",
+    "podcasts.selectSeries": "Choisissez votre podcast",
+    "podcasts.series": "Série de podcasts",
+    "podcasts.episodeNumber": "Épisode {number}",
     "episodes.currentChapter": "Chapitre actuel",
     "episodes.liveInvite": "Poursuivez la découverte avec notre radio en direct et son animateur IA.",
     "episodes.retry": "Réessayer",
     "episodes.title": "Épisodes",
     "episodes.intro": "Des voyages musicaux avec un animateur IA. Choisissez un épisode et entrez dans le récit.",
-    "episodes.all": "Les deux stations",
     "episodes.empty": "De nouveaux épisodes arrivent. En attendant, écoutez la radio en direct.",
     "episodes.unavailable": "Les épisodes sont temporairement indisponibles. Réessayez dans quelques instants.",
     "episodes.listen": "Écouter l’épisode",
@@ -664,7 +684,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "episodes.playbackError": "La lecture a échoué. Appuyez sur lecture pour réessayer.",
     "episodes.back": "Tous les épisodes",
     "episodes.language": "Langue de l’animateur",
-    "app.tagline": "Radio IA en direct depuis Estavayer, en Suisse.",
+    "app.tagline": "Radio et podcasts avec des animateurs IA depuis Estavayer, en Suisse.",
     "common.install": "Installer",
     "common.language": "Langue",
     "host.language": "Langue de l’animateur",

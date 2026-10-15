@@ -12,13 +12,15 @@ const episode={id:'test-journey',station:'neuralforge',channel:'neuralforge-es',
 {id:'intro',kind:'commentary',start:0,end:10,title:'Introduction',summary:'Meet the host.',transcript:'An introduction.'},
 {id:'song',kind:'music',start:10,end:30,title:'Test song',artist:'Test artist',rationale:'A musical example.',art_url:'/public/episodes/neuralforge/test-journey/art/song'},
 {id:'outro',kind:'commentary',start:30,end:40,title:'Conclusion',summary:'The closing story.',transcript:'A conclusion.'}]};
+const newer={...episode,id:'next-journey',title:'A second journey',published_at:'2026-10-16T12:00:00Z'};
+const cast={...episode,id:'cast-journey',station:'neuralcast',channel:'neuralcast-es',title:'A NeuralCast journey'};
 let unavailable=false;
 const fixture=createServer((req,res)=>{
 const path=new URL(req.url,'http://fixture').pathname;
 if(path.endsWith('/audio')){const r=/bytes=(\d+)-(\d*)/.exec(req.headers.range||'');if(r){const a=Number(r[1]),b=r[2]?Math.min(Number(r[2]),song.length-1):song.length-1;res.writeHead(206,{'Content-Type':'audio/wav','Accept-Ranges':'bytes','Content-Range':`bytes ${a}-${b}/${song.length}`,'Content-Length':b-a+1});res.end(song.subarray(a,b+1));}else{res.writeHead(200,{'Content-Type':'audio/wav','Content-Length':song.length,'Accept-Ranges':'bytes'});res.end(song);}return;}
 if(path.includes('/art/')){res.writeHead(404);res.end();return;}
 res.setHeader('Content-Type','application/json');if(unavailable){res.writeHead(503);res.end('{}');return;}
-if(path==='/public/episodes'){res.end(JSON.stringify({episodes:[episode]}));return;}
+if(path==='/public/episodes'){res.end(JSON.stringify({episodes:[newer,episode,cast]}));return;}
 if(path==='/public/episodes/neuralforge/test-journey'){res.end(JSON.stringify(episode));return;}
 res.writeHead(404);res.end('{}');});
 (async()=>{fixture.listen(0,'127.0.0.1');await once(fixture,'listening');const reservation=createServer();reservation.listen(0,'127.0.0.1');await once(reservation,'listening');const port=reservation.address().port;await new Promise(r=>reservation.close(r));
@@ -28,14 +30,31 @@ assert.equal((await fetch(base+'/episodes/neuralforge/unknown')).status,404);
 browser=await chromium.launch({args:['--no-sandbox']});const page=await browser.newPage({viewport:{width:1440,height:1050}});const errors=[];page.on('pageerror',e=>errors.push(String(e)));
 await page.route('**/api/**',r=>r.fulfill({json:{}}));await page.route('**/listen/**',r=>r.fulfill({contentType:'audio/wav',body:song}));
 await page.goto(base+'/episodes');await page.getByRole('heading',{name:'A musical journey'}).waitFor();
-await page.getByRole('button',{name:'NeuralCast',exact:true}).click();assert.equal(await page.getByRole('heading',{name:'A musical journey'}).count(),0);
-await page.getByRole('button',{name:'NeuralForge',exact:true}).click();await page.getByRole('heading',{name:'A musical journey'}).click();
+const series=page.getByRole('navigation',{name:'Choose your podcast'});
+assert.equal(await page.getByRole('link',{name:'Podcasts',exact:true}).getAttribute('aria-current'),'page');
+assert.equal(await series.getByRole('link').count(),2);
+assert.equal(await page.getByText('Both stations',{exact:true}).count(),0);
+const firstRow=page.getByRole('listitem').filter({has:page.getByRole('heading',{name:'A musical journey',exact:true})});
+assert.equal(await firstRow.locator('[aria-label="Episode 1"]').textContent(),'#1');
+const secondRow=page.getByRole('listitem').filter({has:page.getByRole('heading',{name:'A second journey',exact:true})});
+assert.equal(await secondRow.locator('[aria-label="Episode 2"]').textContent(),'#2');
+if(process.env.EPISODE_SCREENSHOT_DIR) await page.screenshot({path:`${process.env.EPISODE_SCREENSHOT_DIR}/podcasts-desktop.png`,fullPage:true});
+await page.setViewportSize({width:390,height:844});
+assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+if(process.env.EPISODE_SCREENSHOT_DIR) await page.screenshot({path:`${process.env.EPISODE_SCREENSHOT_DIR}/podcasts-mobile.png`,fullPage:true});
+await page.setViewportSize({width:1440,height:1050});
+await series.getByRole('link',{name:'NeuralCast Podcasts',exact:true}).click();
+await page.waitForURL(base+'/episodes?station=neuralcast');
+await page.getByRole('heading',{name:'A NeuralCast journey',exact:true}).waitFor();
+assert.equal(await page.getByRole('heading',{name:'A musical journey',exact:true}).count(),0);
+assert.equal(await page.getByRole('listitem').locator('[aria-label="Episode 1"]').textContent(),'#1');
+await series.getByRole('link',{name:'NeuralForge Podcasts',exact:true}).click();await page.getByRole('heading',{name:'A musical journey'}).click();
 await page.getByRole('button',{name:'Play / resume',exact:true}).waitFor();await page.evaluate(()=>window.__liveElement=document.querySelector('#neuralcast-persistent-audio'));
 await page.getByRole('button',{name:'Play / resume',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('#neuralcast-episode-audio').paused);
 await page.getByRole('button',{name:'Jump to Test song',exact:true}).click();await page.waitForFunction(()=>document.querySelector('#neuralcast-episode-audio').currentTime>=10);
 assert.equal(await page.locator('li[aria-current="step"]').first().getByRole('heading').textContent(),'Test song');
 await page.getByRole('button',{name:'Pause',exact:true}).click();const paused=await page.locator('#neuralcast-episode-audio').evaluate(a=>a.currentTime);await page.waitForTimeout(350);assert.equal(await page.locator('#neuralcast-episode-audio').evaluate(a=>a.currentTime),paused);
-await page.getByRole('button',{name:'Play / resume',exact:true}).click();await page.getByRole('link',{name:/All episodes/}).click();await page.waitForURL(base+'/episodes');
+await page.getByRole('button',{name:'Play / resume',exact:true}).click();await page.getByRole('link',{name:/All episodes/}).click();await page.waitForURL(base+'/episodes?station=neuralforge');
 assert.equal(await page.evaluate(()=>document.querySelector('#neuralcast-persistent-audio')===window.__liveElement),true);assert.equal(await page.locator('#neuralcast-episode-audio').evaluate(a=>a.paused),false);
 await page.getByRole('link',{name:'A musical journey ↗',exact:true}).click();await page.waitForURL(base+'/episodes/neuralforge/test-journey');
 await page.getByRole('button',{name:/Listen live/}).click();await page.waitForFunction(()=>document.querySelector('#neuralcast-episode-audio').paused&&!document.querySelector('#neuralcast-persistent-audio').paused);
@@ -48,5 +67,5 @@ await page.locator('dialog').getByRole('button',{name:'Jump to Conclusion',exact
 assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await page.locator('dialog img').evaluate(img=>img.decode());await page.evaluate(() => window.scrollTo(0, 0)); if (process.env.EPISODE_SCREENSHOT_DIR) await page.screenshot({path:`${process.env.EPISODE_SCREENSHOT_DIR}/episode-mobile.png`,fullPage:true});await page.keyboard.press('Escape');assert.equal(await page.locator('dialog[open]').count(),0);
 for(const width of [320,800,1440]){await page.setViewportSize({width,height:950});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);}
 assert.deepEqual(errors,[]);unavailable=true;await page.goto(base+'/episodes');await page.getByText('Episodes are temporarily unavailable. Please try again shortly.',{exact:true}).waitFor();
-console.log('Episode browser checks passed: filtering, playback, chapter seeking/highlighting, persistent navigation, exclusive live/episode playback, transcript, reload resume, mobile dialog, responsive layouts, service failure.');
+console.log('Episode browser checks passed: main navigation, independent podcast selection, chronological numbering, playback, chapter seeking/highlighting, persistent navigation, exclusive live/episode playback, transcript, reload resume, mobile dialog, responsive layouts, service failure.');
 }finally{if(browser)await browser.close();app.kill('SIGTERM');await once(app,'exit');await new Promise(r=>fixture.close(r));}})().catch(e=>{console.error(e);process.exit(1)});
