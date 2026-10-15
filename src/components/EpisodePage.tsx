@@ -39,8 +39,8 @@ export function EpisodePage({ episode }: { episode: PublishedEpisode }) {
     <Link className={styles.back} href={`/episodes?station=${episode.station}`}>← {t("episodes.back")}</Link>
     <div className={styles.detailGrid}>
       <article className={styles.mainColumn}>
-        <section className={`stationCard stationCard-${station.id} ${styles.playerCard}`} aria-labelledby="episode-title" style={{
-          "--station-bg": `url(${station.backgroundImage})`, "--station-accent": station.accentColor
+        <section className={styles.playerCard} aria-labelledby="episode-title" style={{
+          "--station-accent": station.accentColor
         } as CSSProperties}>
           <div className={styles.playerCardContent}>
             <div className={styles.playerTopline}><strong>{station.name}</strong><span>{t("nav.podcasts")}</span></div>
