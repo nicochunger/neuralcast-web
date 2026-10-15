@@ -23,7 +23,7 @@ export function EpisodesPage({ episodes, stationId, unavailable = false }: {
   const numbered = chronological.map((episode, index) => ({ episode, number: index + 1 })).reverse();
 
   return <div className="appShell"><SiteHeader podcastStation={stationId} /><main className={styles.page}>
-    <div className={styles.podcastIntro}><h1>{t("nav.podcasts")}</h1><p>{t("episodes.intro")}</p></div>
+    <div className={styles.podcastIntro}><p>{t("episodes.intro")}</p></div>
     <nav className={styles.seriesSelector} aria-label={t("podcasts.selectSeries")}>
       {STATIONS.map((item) => <Link key={item.id} href={`/episodes?station=${item.id}`}
         className={styles.seriesOption} aria-current={stationId === item.id ? "page" : undefined}>
@@ -35,14 +35,12 @@ export function EpisodesPage({ episodes, stationId, unavailable = false }: {
     {unavailable ? <p role="alert">{t("episodes.unavailable")}</p> : numbered.length === 0 ? <div className={styles.empty}><p>{t("episodes.empty")}</p><Link href="/">{t("episodes.live")} →</Link></div> : <ol className={styles.episodeList} aria-label={`${station.name} · ${t("episodes.title")}`}>
       {numbered.map(({ episode, number }) => <li key={episode.id} value={number}>
         <Link className={styles.episodeRow} href={`/episodes/${episode.station}/${episode.id}`}>
-          <span className={styles.episodeNumber} aria-label={t("podcasts.episodeNumber", { number: String(number) })}>#{number}</span>
-          <img className={styles.rowCover} src={station.artworkImage} alt="" width={104} height={104} />
+          <div className={styles.rowArtwork}><img src={station.artworkImage} alt="" /></div>
           <div className={styles.rowCopy}>
             <p className={styles.eyebrow}>{new Intl.DisplayNames([locale], { type: "language" }).of(episode.language.split("-")[0])} · {formatTrackTime(episode.duration)} · <time dateTime={episode.published_at}>{new Date(episode.published_at).toLocaleDateString(locale, { timeZone: "UTC" })}</time></p>
-            <h3>{episode.title}</h3><p className={styles.rowDescription}>{episode.description}</p>
-            <span className={styles.rowListen}>{t("episodes.listen")} <span aria-hidden="true">→</span></span>
+            <h3><span className={styles.episodeNumber} aria-label={t("podcasts.episodeNumber", { number: String(number) })}>#{number}<span className={styles.numberSeparator} aria-hidden="true"> · </span></span>{episode.title}</h3><p className={styles.rowDescription}>{episode.description}</p>
+            <span className={styles.rowListen}>{t("episodes.open")} <span aria-hidden="true">→</span></span>
           </div>
-          <span className={styles.rowPlay} aria-hidden="true">▶</span>
         </Link>
       </li>)}
     </ol>}

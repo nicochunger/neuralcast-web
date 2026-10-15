@@ -1,11 +1,10 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { EpisodeControls } from "@/components/EpisodeControls";
 import { EpisodeGuide } from "@/components/EpisodeGuide";
 import { useEpisodePlayer } from "@/context/EpisodePlayerContext";
-import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import { useI18n } from "@/lib/i18n";
 import { STATIONS } from "@/lib/stations";
 import type { PublishedEpisode } from "@/types/episode";
@@ -15,7 +14,6 @@ import styles from "./Episodes.module.css";
 export function EpisodePage({ episode }: { episode: PublishedEpisode }) {
   const { t, locale } = useI18n();
   const player = useEpisodePlayer();
-  const radio = useAudioPlayer();
   const [showGuide, setShowGuide] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -41,14 +39,20 @@ export function EpisodePage({ episode }: { episode: PublishedEpisode }) {
     <Link className={styles.back} href={`/episodes?station=${episode.station}`}>← {t("episodes.back")}</Link>
     <div className={styles.detailGrid}>
       <article className={styles.mainColumn}>
-        <div className={styles.hero}><img className={styles.heroCover} src={station.artworkImage} alt="" />
-          <div><p className={styles.eyebrow}>{station.name} · {new Date(episode.published_at).toLocaleDateString(locale)}</p>
-            <h1>{episode.title}</h1><p>{t("episodes.language")}: {new Intl.DisplayNames([locale], { type: "language" }).of(episode.language.split("-")[0])}</p></div>
-        </div>
-        <p className={styles.description}>{episode.description}</p>
-        <EpisodeControls episode={episode} />
-        <button className={styles.mobileGuideButton} type="button" onClick={() => setShowGuide(true)}>{t("episodes.guide")} ↗</button>
-        <div className={styles.liveCallout}><h2>{station.name}</h2><p>{t("episodes.liveInvite")}</p><button type="button" onClick={() => { void radio.playStation(station, episode.channel); }}>{t("episodes.live")} →</button></div>
+        <section className={`stationCard stationCard-${station.id} ${styles.playerCard}`} aria-labelledby="episode-title" style={{
+          "--station-bg": `url(${station.backgroundImage})`, "--station-accent": station.accentColor
+        } as CSSProperties}>
+          <div className={styles.playerCardContent}>
+            <div className={styles.playerTopline}><strong>{station.name}</strong><span>{t("nav.podcasts")}</span></div>
+            <div className={styles.playerIdentity}>
+              <img src={station.artworkImage} alt="" width={112} height={112} />
+              <div><h1 id="episode-title">{episode.title}</h1><p>{new Intl.DisplayNames([locale], { type: "language" }).of(episode.language.split("-")[0])} · <time dateTime={episode.published_at}>{new Date(episode.published_at).toLocaleDateString(locale, { timeZone: "UTC" })}</time></p></div>
+            </div>
+            <p className={styles.playerDescription}>{episode.description}</p>
+            <EpisodeControls episode={episode} />
+            <button className={styles.mobileGuideButton} type="button" onClick={() => setShowGuide(true)}>{t("episodes.guide")} ↗</button>
+          </div>
+        </section>
         <button className={styles.transcriptToggle} type="button" aria-expanded={showTranscript} onClick={() => setShowTranscript((value) => !value)}>{t(showTranscript ? "companion.hideTranscript" : "companion.readTranscript")}</button>
         {showTranscript ? <div className={styles.transcript}>{episode.transcript}</div> : null}
       </article>

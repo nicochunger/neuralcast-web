@@ -46,6 +46,7 @@ export function SiteHeader({ extraActions, englishOnly = false, podcastStation }
   }, []);
 
   return (
+    <>
     <header className="appHeader">
       <Link className="brandLockup" href="/" aria-label={(englishOnly ? "Back to radio" : t("nav.backToRadio"))}>
         <img src="/neuralcast-logo-160.webp" alt="" className="brandIcon" width="160" height="160" />
@@ -101,6 +102,10 @@ export function SiteHeader({ extraActions, englishOnly = false, podcastStation }
           {extraActions}
         </div>
       </div>
+    </header>
+    {pathname === "/" || pathname === "/episodes" ? <div className="listeningIntroduction">
+      <h2>{t("stations.introTitle")}</h2><p>{t("stations.introDescription")}</p>
+    </div> : null}
       <nav className="productNavigation" aria-label={englishOnly ? "Listen" : t("nav.listen")}>
         <Link href="/" className="productNavigationTab" aria-current={pathname === "/" ? "page" : undefined}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M5 9v6m4-10v14m4-17v20m4-17v14m4-10v6" /></svg>
@@ -111,6 +116,6 @@ export function SiteHeader({ extraActions, englishOnly = false, podcastStation }
           {englishOnly ? "Podcasts" : t("nav.podcasts")}
         </Link>
       </nav>
-    </header>
+    </>
   );
 }

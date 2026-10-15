@@ -24,6 +24,7 @@ type TranslationKey =
   | "episodes.intro"
   | "episodes.empty"
   | "episodes.unavailable"
+  | "episodes.open"
   | "episodes.listen"
   | "episodes.guide"
   | "episodes.closeGuide"
@@ -232,6 +233,7 @@ const englishMessages: Record<TranslationKey, string> = {
     "episodes.intro": "Musical journeys with an AI host. Choose an episode and start with the story.",
     "episodes.empty": "New episodes are on their way. Listen live in the meantime.",
     "episodes.unavailable": "Episodes are temporarily unavailable. Please try again shortly.",
+    "episodes.open": "View episode",
     "episodes.listen": "Listen to episode",
     "episodes.guide": "Episode guide",
     "episodes.closeGuide": "Close episode guide",
@@ -453,6 +455,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "episodes.intro": "Viajes musicales con un host de IA. Elegí un episodio y empezá por la historia.",
     "episodes.empty": "Pronto habrá nuevos episodios. Mientras tanto, escuchá la radio en vivo.",
     "episodes.unavailable": "Los episodios no están disponibles por el momento. Volvé a intentarlo en unos minutos.",
+    "episodes.open": "Ver episodio",
     "episodes.listen": "Escuchar episodio",
     "episodes.guide": "Guía del episodio",
     "episodes.closeGuide": "Cerrar guía del episodio",
@@ -672,6 +675,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "episodes.intro": "Des voyages musicaux avec un animateur IA. Choisissez un épisode et entrez dans le récit.",
     "episodes.empty": "De nouveaux épisodes arrivent. En attendant, écoutez la radio en direct.",
     "episodes.unavailable": "Les épisodes sont temporairement indisponibles. Réessayez dans quelques instants.",
+    "episodes.open": "Voir l’épisode",
     "episodes.listen": "Écouter l’épisode",
     "episodes.guide": "Guide de l’épisode",
     "episodes.closeGuide": "Fermer le guide",
