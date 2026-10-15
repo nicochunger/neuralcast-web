@@ -51,7 +51,8 @@ export function SiteHeader({ extraActions, englishOnly = false }: { extraActions
         </div>
       </Link>
       <div className="headerActions">
-        <nav aria-label={(englishOnly ? "Primary navigation" : t("nav.label"))}>
+        <nav className="primaryNavigation" aria-label={(englishOnly ? "Primary navigation" : t("nav.label"))}>
+          <Link className="headerContextLink" href="/episodes" aria-current={pathname.startsWith("/episodes") ? "page" : undefined}>{englishOnly ? "Episodes" : t("episodes.title")}</Link>
           <Link className="headerContextLink" href={pathname === "/about" ? "/" : "/about"}>
             {pathname === "/about" ? (englishOnly ? "Back to radio" : t("nav.backToRadio")) : (englishOnly ? "About" : t("nav.about"))}
           </Link>

@@ -6,6 +6,8 @@ import { PersistentMiniPlayerOverlay } from "@/components/PersistentMiniPlayerOv
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
 import { PERSISTENT_AUDIO_ELEMENT_CLASS, PERSISTENT_AUDIO_ELEMENT_ID } from "@/lib/persistentAudio";
+import { EpisodePlayerProvider } from "@/context/EpisodePlayerContext";
+import { EpisodeMiniPlayer } from "@/components/EpisodeMiniPlayer";
 import "./globals.css";
 
 const themeBootScript = `
@@ -60,10 +62,14 @@ export default function RootLayout({
           preload="none"
           aria-hidden="true"
         />
+        <audio id="neuralcast-episode-audio" className={PERSISTENT_AUDIO_ELEMENT_CLASS} preload="none" aria-hidden="true" />
         <LanguageProvider initialLocale={DEFAULT_LOCALE}>
           <AudioPlayerProvider>
-            {children}
-            <PersistentMiniPlayerOverlay />
+            <EpisodePlayerProvider>
+              {children}
+              <PersistentMiniPlayerOverlay />
+              <EpisodeMiniPlayer />
+            </EpisodePlayerProvider>
           </AudioPlayerProvider>
         </LanguageProvider>
         <ServiceWorkerRegistration />

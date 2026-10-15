@@ -50,3 +50,5 @@
 .chapterTrack span, .chapter p { color: #c0c7ca; font-size: .85rem; line-height: 1.6; }
 .chapterSources { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
 .chapterSources a { color: #d7bb86; font-size: .8rem; text-underline-offset: 3px; }
+
+.chapterSeek { border: 0; background: transparent; color: var(--lime); cursor: pointer; font: inherit; padding: 6px 0; text-align: left; text-decoration: underline; text-underline-offset: 3px; }

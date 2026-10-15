@@ -4335,3 +4335,5 @@ img {
 .adminStationLanguages { display: grid; gap: 12px; margin-top: 4px; padding-left: 16px; border-left: 2px solid var(--line-strong); }
 .adminStationLanguages h5 { margin: 0; font-size: .8rem; font-weight: 500; }
 @media (max-width: 420px) { .adminStationCards { grid-template-columns: 1fr; } }
+
+.primaryNavigation { display: flex; flex-wrap: wrap; align-items: center; column-gap: 14px; }

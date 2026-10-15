@@ -30,6 +30,7 @@ interface AudioPlayerContextValue {
   activeHostChannel: StationHostChannel;
   playbackState: PlaybackState;
   playbackError: string | undefined;
+  episodeMode: boolean;
   currentTime: number;
   volume: number;
   nowPlaying: Record<StationId, StationNowPlayingState>;
@@ -74,6 +75,12 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const [activeStationId, setActiveStationId] = useState<StationId>(DEFAULT_STATION_ID);
   const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
   const [playbackError, setPlaybackError] = useState<string | undefined>();
+  const [episodeMode, setEpisodeMode] = useState(false);
+  useEffect(() => {
+    const handler = () => setEpisodeMode(true);
+    window.addEventListener("neuralcast:episode-active", handler);
+    return () => window.removeEventListener("neuralcast:episode-active", handler);
+  }, []);
   const [localTime, setLocalTime] = useState(0);
   const [serverTimeOffset, setServerTimeOffset] = useState(0);
   const [volume, setVolumeState] = useState(DEFAULT_VOLUME);
@@ -464,6 +471,8 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
 
   const playStation = useCallback(
     async (station: Station, hostChannelId?: string) => {
+      setEpisodeMode(false);
+      window.dispatchEvent(new Event("neuralcast:play-live"));
       const audio = getAudioElement();
       const hostChannel = getHostChannelForStation(station, hostChannelId);
 
@@ -733,6 +742,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
 
   // Media Session handlers & metadata synchronization
   useEffect(() => {
+    if (episodeMode) return;
     registerMediaSessionHandlers({
       onPlay: () => {
         void playStation(activeStation);
@@ -740,11 +750,11 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       onPause: stopPlayback,
       onStop: stopPlayback
     });
-  }, [activeStation, playStation, stopPlayback]);
+  }, [activeStation, playStation, stopPlayback, episodeMode]);
 
   useEffect(() => {
-    updateMediaSession(activeStation, activeNowPlaying, playbackState);
-  }, [activeNowPlaying, activeStation, playbackState]);
+    if (!episodeMode) updateMediaSession(activeStation, activeNowPlaying, playbackState);
+  }, [activeNowPlaying, activeStation, playbackState, episodeMode]);
 
   return (
     <AudioPlayerContext.Provider
@@ -754,6 +764,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
         activeHostChannel,
         playbackState,
         playbackError,
+        episodeMode,
         currentTime,
         volume,
         nowPlaying,

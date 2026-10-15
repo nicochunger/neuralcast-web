@@ -604,6 +604,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
       <div className="stationIntroduction">
         <h2>{t("stations.introTitle")}</h2>
         <p>{t("stations.introDescription")}</p>
+        <Link className="headerContextLink" href="/episodes">{t("episodes.listen")} →</Link>
       </div>
       <section className="stationGrid" aria-label={t("stations.ariaLabel")}>
         {STATIONS.map((station) => {

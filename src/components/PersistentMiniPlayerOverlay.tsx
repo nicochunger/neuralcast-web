@@ -11,6 +11,7 @@ export function PersistentMiniPlayerOverlay() {
   const pathname = usePathname();
   const [artwork, setArtwork] = useState<ArtworkLightboxData | undefined>();
   const {
+    episodeMode,
     activeStationId,
     activeStation,
     playbackState,
@@ -23,7 +24,7 @@ export function PersistentMiniPlayerOverlay() {
     toggleMute
   } = useAudioPlayer();
 
-  if (pathname === "/" || !activeStationId) {
+  if (episodeMode || pathname === "/" || !activeStationId) {
     return null;
   }
 

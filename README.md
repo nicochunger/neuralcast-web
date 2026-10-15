@@ -118,3 +118,28 @@ recap replaces it. Artwork comes through `/api/episode-art/...`, which proxies t
 VPS endpoint server-side without exposing admin credentials. Missing artwork uses
 the station image. Only explicitly approved episodes are published by the backend;
 rendered/uploaded previews never appear in listener guides.
+
+
+## On-demand episodes
+
+`/episodes` lists explicitly published VPS episodes for both stations. Individual
+pages use `/episodes/<station>/<episode-id>`. Metadata uses the existing server-only
+`HOST_ADMIN_BASE_URL`; it must point to the browser-reachable HTTPS VPS proxy in
+production (currently `/admin-http`). No additional credentials are exposed.
+Audio and artwork are served directly by that VPS, not through Vercel functions.
+
+Publication is a separate manual command in NeuralCast's episode producer; a
+preview upload or radio queue request does not publish a website episode. See
+`docs/episode_producer.md` in that repository. The guide and artwork are permanent
+publication assets. RSS is not part of this version.
+
+The on-demand audio element is mounted in the root layout, separately from the
+unchanged persistent live-radio element. `EpisodePlayerProvider` owns it, saves
+resume positions locally per revision, and coordinates exclusive playback with
+`AudioPlayerProvider`. Internal navigation must continue using Next links.
+
+After `npm run build`, run `npm run check:audio-persistence`,
+`npm run check:host-companion`, and `npm run check:episode-playback`. The last
+check requires Playwright and Chromium. For an existing external installation,
+set `EPISODE_PLAYWRIGHT_MODULE` to its module path. It generates synthetic tones,
+uses a localhost fixture, and never publishes or plays real station media.

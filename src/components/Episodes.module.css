@@ -1,0 +1,50 @@
+.page { max-width: 1240px; margin: 0 auto; padding: 32px 24px 180px; color: var(--ink); }
+.intro { max-width: 720px; margin-bottom: 28px; }
+.intro h1, .hero h1 { font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.08; margin: 12px 0 20px; letter-spacing: -.035em; }
+.intro > p:last-child, .description { color: var(--muted); line-height: 1.8; font-size: 1.06rem; }
+.eyebrow { color: var(--muted); font-size: .76rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; line-height: 1.7; }
+.filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0; }
+.filters button, .controls button, .mobileGuideButton, .dialogHeader button, .liveCallout button, .transcriptToggle { border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); color: var(--ink); padding: 12px 18px; cursor: pointer; font: inherit; min-height: 44px; }
+.filters button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.grid { display: grid; gap: 24px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.episodeCard { display: flex; overflow: hidden; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; color: var(--ink); text-decoration: none; transition: border-color .2s, transform .2s; }
+.episodeCard:hover { transform: translateY(-3px); border-color: var(--lime); }
+.cover { width: 100%; aspect-ratio: 16/8; object-fit: cover; }
+.cardCopy { padding: 24px; }
+.cardCopy h2 { margin: 12px 0; font-size: 1.65rem; }
+.cardCopy > p:not(.eyebrow) { color: var(--muted); line-height: 1.7; }
+.cardAction { display: inline-block; color: var(--lime); font-weight: 700; margin-top: 16px; }
+.empty { border: 1px dashed var(--line-strong); border-radius: 18px; padding: 32px; line-height: 1.7; }
+.back { display: inline-block; margin-bottom: 28px; color: var(--muted); text-decoration: none; }
+.detailGrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, .8fr); gap: 36px; align-items: start; }
+.mainColumn { min-width: 0; }
+.hero { display: flex; flex-direction: column; gap: 22px; }
+.heroCover { width: 100%; max-height: 320px; object-fit: cover; border-radius: 22px; }
+.hero p { color: var(--muted); }
+.description { margin: 24px 0; }
+.controls { display: flex; flex-direction: column; gap: 16px; background: var(--surface); border: 1px solid var(--line); padding: 20px; border-radius: 18px; }
+.controlButtons { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.controls .primary { background: var(--lime); border-color: var(--lime); color: #101317; font-weight: 750; }
+.time { color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; }
+.scrubber { width: 100%; accent-color: var(--lime); cursor: pointer; min-height: 24px; }
+.desktopGuide { position: sticky; top: 20px; max-height: calc(100dvh - 40px); overflow-y: auto; border: 1px solid var(--line); border-radius: 22px; background: var(--surface); padding: 24px; scrollbar-width: thin; }
+.desktopGuide > h2 { margin: 0 0 20px; }
+.liveCallout { border-left: 3px solid var(--lime); padding: 2px 22px 12px; margin-top: 36px; }
+.liveCallout p { color: var(--muted); line-height: 1.7; }
+.transcriptToggle { margin-top: 32px; }
+.transcript { white-space: pre-wrap; line-height: 1.9; padding-top: 24px; color: var(--muted); }
+.mobileGuideButton { display: none; width: 100%; margin-top: 16px; }
+.guideDialog { max-width: 700px; width: calc(100% - 24px); max-height: 90dvh; padding: 0; border: 1px solid var(--line-strong); border-radius: 20px; background: var(--surface); color: var(--ink); }
+.guideDialog::backdrop { background: rgb(0 0 0 / .7); backdrop-filter: blur(5px); }
+.dialogContent { padding: 22px; }
+.dialogHeader { position: sticky; top: 0; display: flex; justify-content: space-between; align-items: center; background: var(--surface); gap: 20px; padding-bottom: 16px; z-index: 1; }
+.dialogHeader h2 { margin: 0; }
+.miniPlayer { position: fixed; bottom: max(16px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: min(650px, calc(100% - 24px)); background: var(--surface-raised); border: 1px solid var(--line-strong); border-radius: 18px; padding: 14px; z-index: 100; box-shadow: var(--shadow); }
+.miniPlayer > a { display: block; color: var(--ink); padding: 0 6px 12px; font-weight: 700; text-decoration: none; }
+.miniPlayer .controls { padding: 10px; border: 0; background: transparent; gap: 6px; }
+.miniPlayer .controlButtons { justify-content: space-between; }
+@media(max-width: 800px) { .detailGrid { grid-template-columns: 1fr; } .desktopGuide { display: none; } .mobileGuideButton { display: block; } .grid { grid-template-columns: 1fr; } .page { padding: 24px 16px 200px; } .heroCover { max-height: 240px; } }
+@media(prefers-reduced-motion: reduce) { .episodeCard { transition: none; } }
+
+.volume { display: flex; align-items: center; gap: 16px; }
+.volume input { width: min(180px, 100%); accent-color: var(--lime); }
