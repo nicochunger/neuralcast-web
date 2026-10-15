@@ -7,8 +7,8 @@ import type { HostCompanion } from "@/types/hostCompanion";
 import type { Station } from "@/types/radio";
 import styles from "./HostCompanionCard.module.css";
 
-export function HostCompanionModal({ station, card, onDismiss }: {
-  station: Station; card: HostCompanion; onDismiss: () => void;
+export function HostCompanionModal({ station, card, currentTime, onDismiss }: {
+  station: Station; card: HostCompanion; currentTime: number; onDismiss: () => void;
 }) {
   const { t } = useI18n();
   return (
@@ -22,7 +22,7 @@ export function HostCompanionModal({ station, card, onDismiss }: {
           <div><span className="requestModalKicker">{station.name}</span><h2 id="host-recap-title">{t("companion.button")}</h2></div>
           <button className="requestModalClose" type="button" onClick={onDismiss} aria-label={t("companion.close")} data-modal-autofocus>×</button>
         </div>
-        <HostCompanionCard card={card} />
+        <HostCompanionCard card={card} currentTime={currentTime} fallbackArtwork={station.artworkImage} />
       </section>
     </div>
   );

@@ -52,6 +52,7 @@ function normalizeNowPlaying(
     genre: readString(song.genre),
     art: readString(song.art),
     listeners: listenerCount,
+    songId: readIdentifier(song.id),
     playedAt: parseNumber(nowPlaying.played_at),
     duration: parsePositiveNumber(nowPlaying.duration),
     history,
@@ -83,6 +84,7 @@ function parseSongHistory(value: unknown): PlayedTrack[] {
           readIdentifier(historyEntry.sh_id) ??
           readIdentifier(historyEntry.id) ??
           `${playedAt ?? "unknown"}-${artist ?? ""}-${title ?? text ?? index}`,
+        songId: readIdentifier(song.id),
         playedAt,
         text,
         artist,

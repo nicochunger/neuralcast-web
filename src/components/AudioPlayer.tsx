@@ -86,10 +86,17 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     setHostSelection
   } = useAudioPlayer();
 
-  const companionChannels = useMemo(() => STATIONS.map((station) => ({
-    stationId: station.id, channelId: getHostChannelId(station)
-  })), [getHostChannelId]);
-  const companionCards = useHostCompanions(companionChannels);
+  const companionChannels = useMemo(() => STATIONS.map((station) => {
+    const channelId = getHostChannelId(station);
+    const playback = nowPlaying[station.id];
+    const observations = playback.hostChannelId === channelId ? [
+      ...(playback.songId && playback.playedAt !== undefined ? [{ song_id: playback.songId, played_at: playback.playedAt, current: true }] : []),
+      ...(playback.history ?? []).slice(0, 8).flatMap((track) => track.songId && track.playedAt !== undefined
+        ? [{ song_id: track.songId, played_at: track.playedAt, current: false }] : [])
+    ] : [];
+    return { stationId: station.id, channelId, observations };
+  }), [getHostChannelId, nowPlaying]);
+  const companionCards = useHostCompanions(companionChannels, currentTime);
 
   const [showAdminControls, setShowAdminControls] = useState(isAdmin);
   const [isAdminUser, setIsAdminUser] = useState(isAdmin);
@@ -670,6 +677,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
         <HostCompanionModal
           station={STATIONS.find((station) => station.id === activeOverlay.stationId)!}
           card={activeOverlay.card}
+          currentTime={currentTime}
           onDismiss={() => setActiveOverlay(null)}
         />
       ) : null}

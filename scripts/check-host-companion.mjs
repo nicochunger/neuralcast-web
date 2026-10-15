@@ -16,10 +16,18 @@ const card = {
 let calls = 0;
 let backendPayload = { card };
 let backendStatus = 200;
+let receivedPlayback;
 const backend = createServer((request, response) => {
   calls++;
   assert.equal(request.headers.authorization, "Bearer offline-test-token");
-  assert.equal(request.url, "/admin/host-channels/neuralforge-fr/companion");
+  const requested = new URL(request.url, "http://fixture");
+  if (requested.pathname === "/admin/host-channels/neuralforge-fr/episodes/42/art/music") {
+    response.writeHead(200, { "Content-Type": "image/jpeg" });
+    response.end(Buffer.from([255, 216, 255, 217]));
+    return;
+  }
+  assert.equal(requested.pathname, "/admin/host-channels/neuralforge-fr/companion");
+  receivedPlayback = requested.searchParams.get("playback");
   response.writeHead(backendStatus, { "Content-Type": "application/json" });
   response.end(JSON.stringify(backendPayload));
 });
@@ -66,9 +74,32 @@ try {
   const failed = await fetch(route);
   assert.equal(failed.status, 503);
   assert.deepEqual(await failed.json(), { card: null });
+  backendStatus = 200;
+  const observations = [{ song_id: "episode-song", played_at: now - 60, current: true }];
+  const episode = { ...card, id: "episode-42-start", archetype: "episode", expected_end: now + 240, expires_at: now + 1440,
+    content: { title: "A musical journey", summary: "The episode premise", key_points: [], items: [] },
+    episode: { media_id: "42", duration: 300, chapters: [
+      { kind: "commentary", id: "opening", title: "Opening", summary: "Introduction", start: 0, end: 20, sources: [] },
+      { kind: "music", id: "music", title: "Song", artist: "Artist", album: "Album", rationale: "Why it fits", start: 20, end: 280, art_url: "/api/episode-art/neuralforge-fr/42/music" },
+      { kind: "commentary", id: "closing", title: "Closing", summary: "Conclusion", start: 280, end: 300, key_points: [], sources: [] }
+    ] }
+  };
+  backendPayload = { card: episode };
+  const episodeRoute = `${route}&playback=${encodeURIComponent(JSON.stringify(observations))}`;
+  assert.deepEqual(await (await fetch(episodeRoute)).json(), { card: episode });
+  assert.deepEqual(JSON.parse(receivedPlayback), observations);
+  backendPayload = { card: { ...episode, episode: { ...episode.episode, chapters: [{ ...episode.episode.chapters[0], start: -1 }] } } };
+  assert.deepEqual(await (await fetch(episodeRoute)).json(), { card: null });
+  backendPayload = { card: { ...episode, episode: { ...episode.episode, chapters: [{ ...episode.episode.chapters[1], art_url: "https://untrusted.example/image" }] } } };
+  assert.deepEqual(await (await fetch(episodeRoute)).json(), { card: null });
+  assert.equal((await fetch(`${route}&playback={}`)).status, 400);
+  assert.equal((await fetch(`${base}/api/episode-art/unknown/42/music`)).status, 404);
+  const artwork = await fetch(`${base}/api/episode-art/neuralforge-fr/42/music`);
+  assert.equal(artwork.status, 200);
+  assert.equal(artwork.headers.get("content-type"), "image/jpeg");
+  assert.equal((await artwork.arrayBuffer()).byteLength, 4);
   console.log("Host companion production-route checks passed (offline fixture).");
 } finally {
-  app.kill("SIGTERM");
-  await once(app, "exit");
+  if (app.exitCode === null) { app.kill("SIGTERM"); await once(app, "exit"); }
   await new Promise((resolve) => backend.close(resolve));
 }

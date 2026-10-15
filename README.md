@@ -100,3 +100,21 @@ production-route check using a local fixture backend. This checks channel
 isolation, server-side authentication, null/malformed responses, and outage
 handling without calling live stations. `npm run check:audio-persistence` verifies
 the persistent audio architecture.
+
+### Authored episode guides
+
+Manually produced episodes use the same Host recap popup; there is no episode
+review page. When an approved episode is identified by its now-playing song ID,
+the popup shows its premise, a chapter timeline, small track cards with embedded
+album-art thumbnails, selection notes, and commentary summaries/sources. It
+highlights the current chapter using measured render offsets and the player's
+existing corrected server clock. Buffering can introduce a small audible offset.
+
+The normalized now-playing/history responses retain `songId`. Companion requests
+forward at most nine channel-specific current/recent observations; no extra
+AzuraCast polling is added. An active episode takes priority over ordinary recaps.
+Its guide remains available for 20 minutes after the end unless a newer eligible
+recap replaces it. Artwork comes through `/api/episode-art/...`, which proxies the
+VPS endpoint server-side without exposing admin credentials. Missing artwork uses
+the station image. Only explicitly approved episodes are published by the backend;
+rendered/uploaded previews never appear in listener guides.

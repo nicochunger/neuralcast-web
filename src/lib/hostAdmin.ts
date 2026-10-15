@@ -1,4 +1,4 @@
-import type { HostCompanion } from "@/types/hostCompanion";
+import type { HostCompanion, PlaybackObservation } from "@/types/hostCompanion";
 import type { HostAdminCapabilities, HostAdminJob, HostAdminOperationCapability, HostAdminScheduleOptions } from "@/types/hostAdmin";
 import type { SchedulePresentationTranslations, StationId, StationSchedulePresentation } from "@/types/radio";
 
@@ -293,8 +293,8 @@ function readPresentationTranslations(value: unknown): SchedulePresentationTrans
   return Object.fromEntries(entries) as SchedulePresentationTranslations;
 }
 
-export async function getHostCompanion(channel: string): Promise<HostCompanion | null> {
-  const payload = await requestHostAdminJson("GET", `/admin/host-channels/${encodeURIComponent(channel)}/companion`);
+export async function getHostCompanion(channel: string, observations: PlaybackObservation[] = []): Promise<HostCompanion | null> {
+  const payload = await requestHostAdminJson("GET", `/admin/host-channels/${encodeURIComponent(channel)}/companion${observations.length ? `?playback=${encodeURIComponent(JSON.stringify(observations))}` : ""}`);
   const card = payload.card;
   if (!card || typeof card !== "object" || Array.isArray(card)) return null;
   const record = card as Record<string, unknown>;
@@ -302,7 +302,7 @@ export async function getHostCompanion(channel: string): Promise<HostCompanion |
       typeof record.expected_start !== "number" || typeof record.expires_at !== "number" ||
       typeof record.expected_end !== "number" ||
       ![record.expected_start, record.expected_end, record.expires_at].every(Number.isFinite) || typeof record.transcript !== "string" ||
-      !["news", "concert_check", "short_story", "album_spotlight", "era_snapshot", "deep_dive"].includes(String(record.archetype))) return null;
+      !["news", "concert_check", "short_story", "album_spotlight", "era_snapshot", "deep_dive", "episode"].includes(String(record.archetype))) return null;
   const content = record.content as Record<string, unknown> | undefined;
   if (!content || typeof content.title !== "string" || typeof content.summary !== "string" ||
       !Array.isArray(content.key_points) || !content.key_points.every((point) => typeof point === "string") ||
@@ -316,5 +316,35 @@ export async function getHostCompanion(channel: string): Promise<HostCompanion |
     if (typeof subject.artist !== "string" || typeof subject.title !== "string" ||
         !Object.values(subject).every((value) => value === null || typeof value === "string")) return null;
   }
+  if (record.archetype === "episode") {
+    const episode = record.episode as Record<string, unknown> | undefined;
+    if (!episode || typeof episode.media_id !== "string" || !/^[a-z0-9_-]{1,80}$/.test(episode.media_id) || typeof episode.duration !== "number" || !Number.isFinite(episode.duration) || episode.duration <= 0 || !Array.isArray(episode.chapters)) return null;
+    let previousEnd = 0;
+    for (const chapter of episode.chapters) {
+      if (!chapter || typeof chapter !== "object" || Array.isArray(chapter)) return null;
+      const part = chapter as Record<string, unknown>;
+      if (!["music", "commentary"].includes(String(part.kind)) || typeof part.id !== "string" || typeof part.title !== "string" ||
+          typeof part.start !== "number" || typeof part.end !== "number" || !Number.isFinite(part.start) || !Number.isFinite(part.end) ||
+          part.start < previousEnd || part.end <= part.start || part.end > episode.duration + .25) return null;
+      for (const key of ["artist", "album", "year", "rationale", "summary", "transcript", "art_url"]) {
+        if (part[key] !== undefined && part[key] !== null && typeof part[key] !== "string") return null;
+      }
+      if (part.art_url && part.art_url !== `/api/episode-art/${encodeURIComponent(channel)}/${encodeURIComponent(episode.media_id)}/${part.id}`) return null;
+      if (part.key_points !== undefined && (!Array.isArray(part.key_points) || !part.key_points.every((value) => typeof value === "string"))) return null;
+      if (part.sources !== undefined && (!Array.isArray(part.sources) || !part.sources.every((value) => value && typeof value === "object" && typeof value.url === "string" && typeof value.claim === "string"))) return null;
+      previousEnd = part.end;
+    }
+  }
   return card as HostCompanion;
+}
+
+export async function getEpisodeArtwork(channel: string, mediaId: string, chapterId: string) {
+  const baseUrl = process.env.HOST_ADMIN_BASE_URL?.trim();
+  const token = process.env.HOST_ADMIN_TOKEN?.trim();
+  if (!baseUrl || !token) throw new Error("Host admin API is not configured.");
+  const response = await fetch(`${baseUrl.replace(/\/+$/, "")}/admin/host-channels/${encodeURIComponent(channel)}/episodes/${encodeURIComponent(mediaId)}/art/${encodeURIComponent(chapterId)}`, {
+    headers: { Authorization: `Bearer ${token}` }, cache: "no-store", signal: AbortSignal.timeout(NETWORK_TIMEOUT_MS)
+  });
+  if (!response.ok || !response.headers.get("content-type")?.startsWith("image/jpeg")) throw new Error("Artwork unavailable");
+  return response.arrayBuffer();
 }

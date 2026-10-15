@@ -18,6 +18,10 @@ type TranslationKey =
   | "common.language"
   | "host.language"
   | "companion.label"
+  | "companion.episode"
+  | "companion.episodeProgress"
+  | "companion.episodeEnded"
+  | "companion.playingChapter"
   | "companion.button"
   | "companion.available"
   | "companion.unavailable"
@@ -195,6 +199,10 @@ const englishMessages: Record<TranslationKey, string> = {
     "common.language": "Language",
     "host.language": "Host language",
     "companion.label": "From the host",
+    "companion.episode": "Radio episode",
+    "companion.episodeProgress": "Episode progress",
+    "companion.episodeEnded": "Episode finished",
+    "companion.playingChapter": "Playing now",
     "companion.button": "Host recap",
     "companion.available": "Open recent host recap",
     "companion.unavailable": "No recent host recap",
@@ -387,6 +395,10 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "common.language": "Idioma",
     "host.language": "Idioma del host",
     "companion.label": "Lo que contó el host",
+    "companion.episode": "Episodio de radio",
+    "companion.episodeProgress": "Progreso del episodio",
+    "companion.episodeEnded": "Episodio finalizado",
+    "companion.playingChapter": "Sonando ahora",
     "companion.button": "Resumen del host",
     "companion.available": "Abrir resumen reciente del host",
     "companion.unavailable": "No hay un resumen reciente del host",
@@ -577,6 +589,10 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "common.language": "Langue",
     "host.language": "Langue de l’animateur",
     "companion.label": "À propos de ce passage",
+    "companion.episode": "Émission",
+    "companion.episodeProgress": "Progression de l’émission",
+    "companion.episodeEnded": "Émission terminée",
+    "companion.playingChapter": "En cours",
     "companion.button": "Résumé du passage",
     "companion.available": "Ouvrir le résumé récent",
     "companion.unavailable": "Aucun résumé récent",

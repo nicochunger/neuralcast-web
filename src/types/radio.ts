@@ -38,6 +38,7 @@ export interface StationNowPlaying {
   genre?: string;
   art?: string;
   listeners?: number;
+  songId?: string;
   playedAt?: number;
   duration?: number;
   history: PlayedTrack[];
@@ -52,6 +53,7 @@ export interface StationNowPlayingState extends Partial<StationNowPlaying> {
 
 export interface PlayedTrack {
   id: string;
+  songId?: string;
   playedAt?: number;
   text?: string;
   artist?: string;
