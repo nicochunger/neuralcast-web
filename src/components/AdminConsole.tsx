@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AdminTestStreamPlayer } from "@/components/AdminTestStreamPlayer";
+import { AdminDiscovery } from "@/components/AdminDiscovery";
 import { AdminListeners } from "@/components/AdminListeners";
 import { useEffect, useMemo, useState } from "react";
 import type { HostAdminCapabilities, HostAdminJob, HostAdminOperationCapability } from "@/types/hostAdmin";
@@ -417,7 +418,8 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
           ["host", "/admin", "01", "AI host", "Create a radio moment"],
           ["schedule", "/admin/schedule", "02", "Scheduling", "Shape the week ahead"],
           ["listeners", "/admin/listeners", "03", "Listeners", "Know your audience"],
-          ["preview", "/admin/preview", "04", "Stream preview", "Listen before going live"]
+          ["preview", "/admin/preview", "04", "Stream preview", "Listen before going live"],
+          ["discovery", "/admin/discovery", "05", "Discovery", "Find your next favorites"]
         ].map(([id, href, number, label, description]) => <Link key={id} href={href} className={`adminNavItem ${section === id ? "isActive" : ""}`} aria-current={section === id ? "page" : undefined}><span>{number}</span><div><strong>{label}</strong><small>{description}</small></div></Link>)}
         <p className="adminSidebarNote">NeuralCast / Control room</p>
       </nav>
@@ -425,12 +427,12 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       <section className="adminHero">
         <div>
           <p className="sectionEyebrow">{t("admin.controlRoom")}</p>
-          <h2>{{ host: "Make the airwaves yours.", schedule: "A rhythm for every day.", listeners: "On the other side of the stream.", preview: "Your private listening room." }[section]}</h2>
-          <p className="adminLead">{{ host: "Craft an AI host segment. Follow every step as it comes to life.", schedule: "Build your station’s next chapter, one week at a time.", listeners: "Live connections and listening history, directly from AzuraCast.", preview: "Check the test stream in a dedicated preview player." }[section]}</p>
+          <h2>{{ host: "Make the airwaves yours.", schedule: "A rhythm for every day.", listeners: "On the other side of the stream.", preview: "Your private listening room.", discovery: "Your next discovery starts here." }[section]}</h2>
+          <p className="adminLead">{{ host: "Craft an AI host segment. Follow every step as it comes to life.", schedule: "Build your station’s next chapter, one week at a time.", listeners: "Live connections and listening history, directly from AzuraCast.", preview: "Check the test stream in a dedicated preview player.", discovery: "Five suggestions. Your ears, your decisions, your station." }[section]}</p>
         </div>
       </section>
 
-      {section === "listeners" ? <AdminListeners /> : section === "preview" ? <AdminTestStreamPlayer /> : !isHostAdminConfigured ? (
+      {section === "discovery" && isHostAdminConfigured ? <AdminDiscovery /> : section === "listeners" ? <AdminListeners /> : section === "preview" ? <AdminTestStreamPlayer /> : !isHostAdminConfigured ? (
         <section className="adminPanel adminConsoleStack">
           <h3>{t("admin.hostOrchestrator")}</h3>
           <p>{t("admin.hostNotConfigured")}</p>

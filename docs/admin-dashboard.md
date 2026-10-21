@@ -40,3 +40,31 @@ Verified against upstream source:
 
 The production installation's API permissions, retention, and response data still
 need a live authenticated check. No job was submitted during implementation.
+
+## Music discovery
+
+The Discovery tab provides five private audition recordings per station. Select
+Yes or No and optionally explain either decision. Save feedback preserves a draft;
+Process feedback saves and freezes all five decisions before launching a background
+job. Only accepted recordings are added to station catalogs. Rejected auditions
+are removed and written reasoning refines later recommendations. No additional
+search or download runs while feedback is processed.
+
+Generate suggestions starts a separate discovery job, or resumes failed preparation.
+It is unavailable while a batch awaits review/processing. Weekly jobs also skip
+pending batches. Job status is recovered from the backend after a page reload.
+Preparation and processing failures can be retried without duplicating additions.
+
+The server-only discovery helper uses existing HOST_ADMIN_BASE_URL/TOKEN settings.
+The `/api/admin/discovery/[station]/[...action]` proxy checks the admin session on
+all operations, including GET/HEAD audio, validates its station and route allowlist,
+and checks Origin on mutations. It forwards byte ranges and streams audio without
+revealing backend credentials or URLs. Private responses use no-store caching.
+Audition audio elements are independent of live radio and pause only other audition
+players. Unsaved feedback is never overwritten by polling; save before navigating.
+
+Backend setup, weekly cron, retention, and recovery are documented in the NeuralCast
+repository's `docs/music_discovery.md`. Deploy both applications for the feature.
+
+Run `npm run check:discovery` for offline proxy authorization, feedback forwarding,
+byte-range, cache, and error-isolation checks.
