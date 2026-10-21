@@ -63,6 +63,14 @@ Import this repository into Vercel with the Next.js framework preset.
 
 HTTPS is required for PWA installation and browser media behavior; Vercel provides it automatically.
 
+## Paused host streams
+
+The French NeuralForge stream is temporarily paused. Its definition remains in
+`PAUSED_HOST_CHANNELS`, while the public player and admin listener controls offer
+only active channels from `STATIONS`. Existing saved French host preferences fall
+back to Spanish; the French interface language remains available. Re-enable the
+backend channel, cron, and station first, then restore it to `hostChannels`.
+
 ## Public Endpoints Used
 
 - `https://neuralcast.duckdns.org/listen/neuralcast/radio.mp3`

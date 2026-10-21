@@ -19,7 +19,10 @@ export async function GET(request: Request, context: RouteContext) {
   try {
     const requestedChannelId = new URL(request.url).searchParams.get("channel") ?? undefined;
     const hostChannel =
-      getHostChannel(station, requestedChannelId) ?? getDefaultHostChannel(station);
+      requestedChannelId ? getHostChannel(station, requestedChannelId) : getDefaultHostChannel(station);
+    if (!hostChannel) {
+      return NextResponse.json({ error: "Unknown host channel." }, { status: 404 });
+    }
     const status = await fetchNowPlaying(station, hostChannel);
     return NextResponse.json(status, {
       headers: {

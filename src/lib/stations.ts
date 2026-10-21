@@ -23,6 +23,9 @@ const neuralForgeFrench: StationHostChannel = {
   streamUrl: `${AZURACAST_BASE_URL}/listen/neuralforge_fr/radio.mp3`
 };
 
+// Retain paused stream definitions for a later restart; do not offer them for playback.
+export const PAUSED_HOST_CHANNELS: readonly StationHostChannel[] = [neuralForgeFrench];
+
 export const STATIONS: readonly Station[] = [
   {
     id: "neuralcast",
@@ -46,7 +49,7 @@ export const STATIONS: readonly Station[] = [
     backgroundImage: "/images/neuralforge-bg.webp",
     artworkImage: "/images/neuralforge-art.webp",
     accentColor: "#b55748",
-    hostChannels: [neuralForgeSpanish, neuralForgeFrench],
+    hostChannels: [neuralForgeSpanish],
     defaultHostChannelId: neuralForgeSpanish.id,
     openRotationThreshold: 10
   }

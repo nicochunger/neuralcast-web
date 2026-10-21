@@ -8,6 +8,7 @@
     "check:audio-persistence": "node scripts/check-audio-persistence.mjs",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "check:host-channels": "node scripts/check-host-channels.mjs",
     "check:host-companion": "node scripts/check-host-companion.mjs",
     "check:episode-playback": "node scripts/check-episode-playback.cjs"
   },
