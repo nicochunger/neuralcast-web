@@ -451,26 +451,29 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
               {stationGroups.length ? (
                 <div className="adminSection">
                   <h4>Station</h4>
-                  <div className="adminStationCards" role="radiogroup" aria-label="Station">
+                  <div className="adminStationCards" role="group" aria-label="Station and host language">
                     {stationGroups.map(group => (
-                      <button key={group.id} type="button" role="radio" aria-checked={selectedStationGroup?.id === group.id}
-                        className={`adminStationCard ${selectedStationGroup?.id === group.id ? "isSelected" : ""}`}
-                        onClick={() => setForceArchetypeStationId(group.targets.find(target => target.id === forceArchetypeStationId)?.id ?? group.targets[0].id)}>
-                        <strong>{group.name}</strong>
-                        <span>{group.targets.length === 1 ? group.targets[0].language : `${group.targets.length} host languages`}</span>
-                      </button>
+                      <div key={group.id} className={`adminStationCard ${selectedStationGroup?.id === group.id ? "isSelected" : ""}`} role="group" aria-label={group.name}>
+                        <button type="button" className="adminStationCardTitle"
+                          aria-pressed={selectedStationGroup?.id === group.id}
+                          onClick={() => setForceArchetypeStationId(group.targets.find(target => target.id === forceArchetypeStationId)?.id ?? group.targets[0].id)}>
+                          <strong>{group.name}</strong>
+                          <span>Host language</span>
+                        </button>
+                        <div className="adminChipRow">
+                          {group.targets.map(target => (
+                            <button key={target.id} type="button"
+                              className={`adminChip ${forceArchetypeStationId === target.id ? "adminChipActive" : ""}`}
+                              aria-label={`${group.name} · ${target.language}`}
+                              aria-pressed={forceArchetypeStationId === target.id}
+                              onClick={() => setForceArchetypeStationId(target.id)}>
+                              {target.language}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     ))}
                   </div>
-                  {selectedStationGroup && selectedStationGroup.targets.some(target => target.language !== "Station default") ? (
-                    <div className="adminStationLanguages">
-                      <h5>Host language</h5>
-                      <div className="adminChipRow" role="radiogroup" aria-label={`${selectedStationGroup.name} host language`}>
-                        {selectedStationGroup.targets.map(target => (
-                          <button key={target.id} type="button" className={`adminChip ${forceArchetypeStationId === target.id ? "adminChipActive" : ""}`} role="radio" aria-checked={forceArchetypeStationId === target.id} onClick={() => setForceArchetypeStationId(target.id)}>{target.language}</button>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
                 </div>
               ) : null}
 
