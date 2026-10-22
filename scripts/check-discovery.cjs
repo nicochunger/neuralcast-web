@@ -49,7 +49,18 @@ const request = (method = "GET", headers = {}, body) => new Request("https://rad
   assert.equal(streamed.headers.get("content-range"), "bytes 0-7/20");
   assert.equal(streamed.headers.get("cache-control"), "private, no-store");
   assert.equal(calls.at(-1).init.headers.get("Range"), "bytes=0-7");
+  const coverContext = context("neuralforge", ["batches", "batch-a", "artwork", "song-1"]);
+  backend = async () => new Response("cover", { headers: { "Content-Type": "image/png", "Content-Length": "5" } });
+  const cover = await exportsObject.GET(request(), coverContext);
+  assert.equal(cover.status, 200);
+  assert.equal(await cover.text(), "cover");
+  assert.equal(cover.headers.get("content-type"), "image/png");
+  assert.equal(cover.headers.get("cache-control"), "private, no-store");
+  assert.equal(calls.at(-1).route, "neuralforge/batches/batch-a/artwork/song-1");
+  backend = async () => new Response(null, { headers: { "Content-Type": "image/png", "Content-Length": "5" } });
+  assert.equal((await exportsObject.HEAD(request("HEAD"), coverContext)).headers.get("content-length"), "5");
   session = null;
+  assert.equal((await exportsObject.GET(request(), coverContext)).status, 401);
   assert.equal((await exportsObject.GET(request(), audioContext)).status, 401);
   session = { user: { isAdmin: true } };
   backend = async () => new Response(null, { status: 416, headers: { "Content-Range": "bytes */20" } });

@@ -11,8 +11,8 @@
 }
 .panel button { font: inherit; color: inherit; background: #38475b; border: 1px solid #7c8ea6; border-radius: .65rem; padding: .7rem 1rem; cursor: pointer; }
 .panel button:disabled { opacity: .45; cursor: default; }
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 1.1rem; }
-.card { display: grid; align-content: start; gap: 1rem; padding: 1.3rem; border: 1px solid #616b7b60; border-radius: 1rem; min-width: 0; background: #777e8b08; }
+.cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.1rem; }
+.card { display: grid; grid-template-columns: 140px minmax(0, 1fr) minmax(220px, .65fr); align-items: start; align-content: start; gap: 1rem; padding: 1.3rem; border: 1px solid #616b7b60; border-radius: 1rem; min-width: 0; background: #777e8b08; }
 .card h3 { margin: .6rem 0 .4rem; font-size: 1.35rem; }
 .card p { margin: 0; line-height: 1.55; }
 .card audio { width: 100%; }
@@ -26,3 +26,18 @@
 .error { color: #ffb8ad; }
 .card a { overflow-wrap: anywhere; }
 .logs { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 18rem; overflow: auto; }
+
+.song { display: grid; gap: .85rem; min-width: 0; }
+.cover { width: 100%; aspect-ratio: 1; overflow: hidden; border-radius: .6rem; background: #181c24; }
+.cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.coverPlaceholder { display: grid; place-items: center; height: 100%; padding: .75rem; box-sizing: border-box; text-align: center; font-size: .8rem; color: #a7b0be; }
+.listeningNote { border-inline-start: 2px solid #d4b875; padding-inline-start: .75rem; }
+@media (max-width: 1000px) {
+  .card { grid-template-columns: 110px minmax(0, 1fr); }
+  .card fieldset { grid-column: 2; }
+}
+@media (max-width: 600px) {
+  .card { grid-template-columns: minmax(0, 1fr); padding: 1rem; }
+  .cover { width: 120px; }
+  .card fieldset { grid-column: 1; }
+}

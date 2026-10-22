@@ -1,14 +1,24 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import styles from "./AdminDiscovery.module.css";
 
 type Feedback = { accepted: boolean; reasoning: string };
-type Candidate = { id: string; artist: string; title: string; album: string; year: string; playlist: string; rationale: string; uncertainty: string; research_urls: string[] };
+type Candidate = { id: string; artist: string; title: string; album: string; year: string; playlist: string; rationale: string; artist_background?: string; listening_note?: string; research_urls: string[] };
 type Batch = { id: string; status: "preparing" | "review" | "submitted" | "processed"; candidates: Candidate[]; auditions: Record<string, unknown>; feedback: Record<string, Feedback>; revision: number; error: string | null; promoted: string[]; editorial: { placements: { candidate_id: string; playlist: string }[]; preference_updates: { text: string; scope: string }[] } | null };
 type Job = { job_id: string; status: string; log_tail?: string };
 type View = { station: string; batch: Batch | null; job?: Job | null };
 const errorMessage = (p: { error?: unknown; detail?: unknown }) => typeof p.error === "string" ? p.error : typeof p.detail === "string" ? p.detail : "The request failed. Reload and try again.";
+
+function AlbumCover({ src, album }: { src: string; album: string }) {
+  const [missing, setMissing] = useState(false);
+  return <div className={styles.cover}>
+    {missing ? <span className={styles.coverPlaceholder}>No cover available</span> :
+      <Image src={src} alt={`${album} album cover`} width={160} height={160}
+        unoptimized onError={() => setMissing(true)} />}
+  </div>;
+}
 
 export function AdminDiscovery() {
   const [station, setStation] = useState("neuralforge");
@@ -134,20 +144,24 @@ export function AdminDiscovery() {
       const entry = feedback[candidate.id];
       const available = candidate.id in batch.auditions && batch.status !== "processed";
       const playlist = batch.editorial?.placements.find(p => p.candidate_id === candidate.id)?.playlist ?? candidate.playlist;
-      return <article className={styles.card} key={candidate.id}>
+      return <article className={styles.card} key={`${batch.id}:${candidate.id}`}>
+        <AlbumCover key={batch.status} src={`${base}/batches/${batch.id}/artwork/${candidate.id}`} album={candidate.album} />
+        <div className={styles.song}>
         <div><span className={styles.playlist}>{playlist}</span><h3>{candidate.title}</h3><p>{candidate.artist} · {candidate.album} · {candidate.year}</p></div>
         <p>{candidate.rationale}</p>
-        {candidate.uncertainty && <p className={styles.muted}>Worth checking: {candidate.uncertainty}</p>}
+        {candidate.artist_background && <p className={styles.muted}>{candidate.artist_background}</p>}
+        {candidate.listening_note && <p className={styles.listeningNote}>Recording note: {candidate.listening_note}</p>}
         {available && <audio controls preload="none" aria-label={`Audition ${candidate.artist} — ${candidate.title}`}
           src={`${base}/batches/${batch.id}/audio/${candidate.id}`}
           onPlay={event => players.current?.querySelectorAll("audio").forEach(audio => { if (audio !== event.currentTarget) audio.pause(); })} />}
+        <details><summary>Research sources</summary><ul>{candidate.research_urls.filter(url => /^https?:\/\//i.test(url)).map(url => <li key={url}><a href={url} target="_blank" rel="noreferrer">{url}</a></li>)}</ul></details>
+        </div>
         <fieldset disabled={!editable}><legend>Add this song?</legend><div className={styles.decisions}>
           {[true, false].map(accepted => <label key={String(accepted)}><input type="radio" name={`decision-${candidate.id}`}
             checked={entry?.accepted === accepted} onChange={() => edit(candidate.id, { accepted, reasoning: entry?.reasoning ?? "" })} />{accepted ? "Yes" : "No"}</label>)}
         </div><label>Your reasoning<textarea rows={3} maxLength={4000} value={entry?.reasoning ?? ""}
           placeholder="What did you enjoy, or why did it miss? Optional."
           disabled={!editable || !entry} onChange={event => entry && edit(candidate.id, { ...entry, reasoning: event.target.value })} /></label></fieldset>
-        <details><summary>Research sources</summary><ul>{candidate.research_urls.filter(url => /^https?:\/\//i.test(url)).map(url => <li key={url}><a href={url} target="_blank" rel="noreferrer">{url}</a></li>)}</ul></details>
       </article>;
     })}</div>
     {batch && ["review", "submitted"].includes(batch.status) && <div className={styles.actions}>
