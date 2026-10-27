@@ -6,7 +6,7 @@ import styles from "./AdminDiscovery.module.css";
 
 type Feedback = { accepted: boolean; reasoning: string };
 type Candidate = { id: string; artist: string; title: string; album: string; year: string; playlist: string; rationale: string; artist_background?: string; listening_note?: string; research_urls: string[] };
-type Batch = { id: string; status: "preparing" | "review" | "submitted" | "processed"; candidates: Candidate[]; auditions: Record<string, unknown>; feedback: Record<string, Feedback>; revision: number; error: string | null; promoted: string[]; editorial: { placements: { candidate_id: string; playlist: string }[]; preference_updates: { text: string; scope: string }[] } | null };
+type Batch = { id: string; created_at: string; status: "preparing" | "review" | "submitted" | "processed"; candidates: Candidate[]; auditions: Record<string, unknown>; feedback: Record<string, Feedback>; revision: number; error: string | null; promoted: string[]; editorial: { placements: { candidate_id: string; playlist: string }[]; preference_updates: { text: string; scope: string }[] } | null };
 type Job = { job_id: string; status: string; log_tail?: string };
 type View = { station: string; batch: Batch | null; job?: Job | null };
 const errorMessage = (p: { error?: unknown; detail?: unknown }) => typeof p.error === "string" ? p.error : typeof p.detail === "string" ? p.detail : "The request failed. Reload and try again.";
@@ -130,7 +130,12 @@ export function AdminDiscovery() {
       <button type="button" disabled={busy || loading || running || dirty || batch?.status === "review" || batch?.status === "submitted"}
         onClick={() => void run("generate")}>{batch?.status === "preparing" ? "Retry preparation" : "Generate suggestions"}</button>
     </div>
-    <p>Listen privately, choose Yes or No, and explain what worked or missed. Weekly suggestions pause until this batch is processed.</p>
+    <p>Automatic discovery runs every Sunday at {station === "neuralforge" ? "11:00" : "12:00"} Europe/Zurich time (CET/CEST).</p>
+    <p>A new batch is skipped if suggestions were already generated that week, or the current batch still awaits review or processing. After processing, you can also use Generate suggestions. Completed results remain visible until a new batch replaces them.</p>
+    {batch?.created_at && <p>Current batch started: <time dateTime={batch.created_at}>{new Intl.DateTimeFormat("en-GB", {
+      dateStyle: "long", timeStyle: "short", timeZone: "Europe/Zurich"
+    }).format(new Date(batch.created_at))}</time> (Europe/Zurich).</p>}
+    <p>Listen privately, choose Yes or No, and explain what worked or missed.</p>
     {loading && <p role="status">Loading your listening room…</p>}
     {error && <p role="alert" className={styles.error}>{error}</p>}
     {notice && <p role="status">{notice}</p>}
