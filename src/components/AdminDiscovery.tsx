@@ -131,7 +131,7 @@ export function AdminDiscovery() {
         onClick={() => void run("generate")}>{batch?.status === "preparing" ? "Retry preparation" : "Generate suggestions"}</button>
     </div>
     <p>Automatic discovery runs every Sunday at {station === "neuralforge" ? "11:00" : "12:00"} Europe/Zurich time (CET/CEST).</p>
-    <p>A new batch is skipped if suggestions were already generated that week, or the current batch still awaits review or processing. After processing, you can also use Generate suggestions. Completed results remain visible until a new batch replaces them.</p>
+    <p>Each Sunday brings a new batch once the previous batch has been reviewed and processed, even if it was generated earlier that week. If a review or processing is still pending, automatic discovery waits until the following Sunday. After processing, you can also use Generate suggestions at any time. Completed results remain visible until a new batch replaces them.</p>
     {batch?.created_at && <p>Current batch started: <time dateTime={batch.created_at}>{new Intl.DateTimeFormat("en-GB", {
       dateStyle: "long", timeStyle: "short", timeZone: "Europe/Zurich"
     }).format(new Date(batch.created_at))}</time> (Europe/Zurich).</p>}
