@@ -2373,7 +2373,7 @@ img {
   gap: 3px;
 }
 
-.adminTestStreamCopy span {
+.adminTestStreamCopy > span {
   color: var(--muted);
   font-size: 0.88rem;
 }
@@ -4347,3 +4347,21 @@ img {
 .productNavigationTab[aria-current="page"] { color: var(--ink); background: color-mix(in srgb, var(--lime) 17%, var(--surface)); border-color: var(--lime); box-shadow: inset 0 -2px 0 var(--lime); }
 .productNavigationTab:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 @media (max-width: 540px) { .productNavigationTab { padding: 12px 10px; font-size: .95rem; } }
+
+/* Shared admin status language: blue activity, green success, amber changes, red errors. */
+.adminStateBadge,
+.adminStateNotice {
+  --admin-state-color: #b9c2cf;
+  color: var(--admin-state-color);
+  border: 1px solid color-mix(in srgb, var(--admin-state-color), transparent 65%);
+  background: color-mix(in srgb, var(--admin-state-color), #181c24 94%);
+  font-size: .82rem;
+  line-height: 1.5;
+}
+:is(.adminStateBadge, .adminStateNotice)[data-tone="running"] { --admin-state-color: #b6cceb; }
+:is(.adminStateBadge, .adminStateNotice)[data-tone="success"] { --admin-state-color: #c5dfce; }
+:is(.adminStateBadge, .adminStateNotice)[data-tone="warning"] { --admin-state-color: #ebce93; }
+:is(.adminStateBadge, .adminStateNotice)[data-tone="error"] { --admin-state-color: #ffb8ad; }
+.adminStateBadge { display: inline-flex; align-items: center; gap: .5rem; width: fit-content; border-radius: 2rem; padding: .3rem .7rem; font-weight: 600; }
+.adminStateBadge::before { content: ""; flex: 0 0 .4rem; height: .4rem; border-radius: 50%; background: currentColor; }
+.adminStateNotice { margin: 0; padding: .75rem 1rem; border-inline-start: 3px solid var(--admin-state-color); border-radius: .5rem; overflow-wrap: anywhere; }

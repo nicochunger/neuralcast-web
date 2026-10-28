@@ -12,18 +12,17 @@
 .panel button { font: inherit; color: inherit; background: #38475b; border: 1px solid #7c8ea6; border-radius: .65rem; padding: .7rem 1rem; cursor: pointer; }
 .panel button:disabled { opacity: .45; cursor: default; }
 .cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.1rem; }
-.card { display: grid; grid-template-columns: 140px minmax(0, 1fr) minmax(220px, .65fr); align-items: start; align-content: start; gap: 1rem; padding: 1.3rem; border: 1px solid #616b7b60; border-radius: 1rem; min-width: 0; background: #777e8b08; }
+.card { display: grid; grid-template-columns: 140px minmax(0, 1fr); align-items: start; align-content: start; gap: 1rem; padding: 1.3rem; border: 1px solid #616b7b60; border-radius: 1rem; min-width: 0; background: #777e8b08; }
 .card h3 { margin: .6rem 0 .4rem; font-size: 1.35rem; }
 .card p { margin: 0; line-height: 1.55; }
 .card audio { width: 100%; }
-.card fieldset { display: grid; gap: 1rem; border: 0; padding: 0; min-width: 0; }
+.card fieldset { grid-column: 2; display: grid; gap: 1rem; border: 0; padding: 0; min-width: 0; }
 .card legend { margin-bottom: .6rem; }
 .decisions { display: flex; gap: 1.5rem; }
 .decisions label { display: flex; align-items: center; }
 .panel textarea { width: 100%; box-sizing: border-box; resize: vertical; }
 .playlist { font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; opacity: .7; }
 .muted { opacity: .7; }
-.error { color: #ffb8ad; }
 .card a { overflow-wrap: anywhere; }
 .logs { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 18rem; overflow: auto; }
 
@@ -34,7 +33,6 @@
 .listeningNote { border-inline-start: 2px solid #d4b875; padding-inline-start: .75rem; }
 @media (max-width: 1000px) {
   .card { grid-template-columns: 110px minmax(0, 1fr); }
-  .card fieldset { grid-column: 2; }
 }
 @media (max-width: 600px) {
   .card { grid-template-columns: minmax(0, 1fr); padding: 1rem; }
@@ -55,17 +53,33 @@
 .activity { min-width: 0; padding: 1.2rem; border: 1px solid #7c8ea660; border-inline-start: 3px solid #8faacf; border-radius: .8rem; background: #8faacf0a; }
 .activityHeader { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; }
 .activityHeader h3 { margin: 0; font-size: 1rem; }
-.statusBadge { display: inline-flex; align-items: center; gap: .5rem; border: 1px solid #8faacf60; border-radius: 2rem; padding: .3rem .7rem; color: #d0dcec; background: #8faacf14; font-size: .75rem; font-weight: 600; }
-.statusActive::before { content: ""; width: .45rem; height: .45rem; border-radius: 50%; background: #a9c7ef; }
 .batchDate { margin: .6rem 0 0; color: #a7b0be; font-size: .8rem; line-height: 1.6; }
 .activityMessages { display: grid; gap: .6rem; margin-top: .9rem; }
 .activityMessages p { margin: 0; line-height: 1.6; font-size: .9rem; }
-.notice { color: #c5dfce; }
-.jobStatus { color: #b6cceb; }
-.activity .error { margin: .9rem 0 0; padding: .8rem 1rem; border: 1px solid #ffb8ad40; border-radius: .5rem; background: #ffb8ad08; line-height: 1.6; }
 @media (max-width: 600px) {
   .toolbar { align-items: stretch; }
   .toolbar > label, .toolbar > button { width: 100%; }
   .schedule, .activity { padding: 1rem; }
   .scheduleTime span { display: block; }
 }
+
+.reviewProgress { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; font-size: .9rem; }
+.reviewProgress > div > span { color: #b9c2cf; }
+.reviewProgress progress { width: 100%; height: .4rem; border: 0; border-radius: 1rem; overflow: hidden; accent-color: #a9c7ef; background: #38475b; }
+.reviewProgress progress::-webkit-progress-bar { background: #38475b; }
+.reviewProgress progress::-webkit-progress-value { background: #a9c7ef; }
+.reviewProgress progress::-moz-progress-bar { background: #a9c7ef; }
+.actions { position: sticky; bottom: calc(100px + env(safe-area-inset-bottom)); z-index: 9; padding: 1rem; border: 1px solid #7c8ea6; border-radius: .8rem; background: #181c24; box-shadow: 0 8px 28px #0005; align-items: center; }
+.actionSummary { display: grid; gap: .4rem; flex: 1 1 16rem; font-size: .85rem; }
+.actionSummary span, .saveHint { color: #b9c2cf; font-size: .8rem; line-height: 1.5; }
+.actionButtons { display: flex; align-items: center; flex-wrap: wrap; gap: .65rem; }
+.saveHint { flex-basis: 100%; }
+.panel :is(button, input, textarea, summary):focus-visible { outline: 2px solid #a9c7ef; outline-offset: 3px; }
+@media (max-width: 600px) {
+  .actions { bottom: calc(110px + env(safe-area-inset-bottom)); gap: .65rem; padding: .8rem; }
+  .actionButtons { width: 100%; }
+  .actionButtons button { flex: 1; }
+  .actionButtons > span { flex-basis: 100%; justify-content: center; }
+}
+
+.activity > :global(.adminStateNotice) { margin-top: .9rem; }

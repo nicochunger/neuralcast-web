@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AdminStatusNotice } from "./AdminStatus";
 import { STATIONS } from "@/lib/stations";
 
 type Listener = {
@@ -54,7 +55,7 @@ export function AdminListeners() {
       <label className="adminField"><span>Time range</span><select value={range} onChange={event => setRange(event.target.value)}><option value="live">Live now</option><option value="1">Last 24 hours</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select></label>
       <button className="adminGhostButton" disabled={loading} onClick={() => setRevision(value => value + 1)}>{loading ? "Refreshing…" : "Refresh"}</button>
     </section>
-    <p className="adminReportStatus" role="status">{error || (report ? `${range === "live" ? "Live report · Refreshes every 15 seconds" : "Historical report · Unique listeners within the selected period"} · Updated ${new Date(report.fetchedAt).toLocaleTimeString("en-GB")}` : "Connecting to AzuraCast…")}{error && report ? " Showing the last successful report; retrying automatically." : ""}</p>
+    <AdminStatusNotice tone={error ? "error" : loading ? "running" : "neutral"}>{error || (report ? `${range === "live" ? "Live report · Refreshes every 15 seconds" : "Historical report · Unique listeners within the selected period"} · Updated ${new Date(report.fetchedAt).toLocaleTimeString("en-GB")}` : "Connecting to AzuraCast…")}{error && report ? " Showing the last successful report; retrying automatically." : ""}</AdminStatusNotice>
     {report ? <>
       <div className="adminMetricGrid">
         <Metric label={range === "live" ? "Listening now" : "Unique listeners"} value={String(listeners.length)} detail={range === "live" ? "Connected to this channel" : "As grouped by AzuraCast"} />

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { AdminStatusBadge, AdminStatusNotice, adminJobTone } from "./AdminStatus";
 import styles from "./AdminDiscovery.module.css";
 
 type Feedback = { accepted: boolean; reasoning: string };
@@ -38,6 +39,8 @@ export function AdminDiscovery() {
   const batch = view?.batch;
   const running = job?.status === "running" || job?.status === "accepted";
   const editable = batch?.status === "review" && !busy && !running;
+  const reviewed = batch?.candidates.filter(candidate => feedback[candidate.id]).length ?? 0;
+  const accepted = batch?.candidates.filter(candidate => feedback[candidate.id]?.accepted).length ?? 0;
   const complete = batch?.candidates.length === 5 && batch.candidates.every(c => feedback[c.id]);
 
   useEffect(() => {
@@ -140,26 +143,31 @@ export function AdminDiscovery() {
     </div>
     <div className={styles.activity} aria-label="Discovery activity" aria-busy={loading || running}>
       <div className={styles.activityHeader}><h3>Current proposal</h3>
-        <span className={`${styles.statusBadge} ${running || loading ? styles.statusActive : ""}`}>
-          {loading ? "Loading" : running ? "Working" : batch?.status === "review" ? "Ready for review" : batch?.status === "processed" ? "Complete" : batch?.status === "submitted" ? "Feedback submitted" : batch?.status === "preparing" ? "Preparing" : "Not started"}
-        </span>
+        <AdminStatusBadge tone={error || batch?.error || job?.status === "failed" ? "error" : loading || running ? "running" : adminJobTone(batch?.status ?? "")}>
+          {error || batch?.error || job?.status === "failed" ? "Needs attention" : loading ? "Loading" : running ? "Working" : batch?.status === "review" ? "Ready for review" : batch?.status === "processed" ? "Complete" : batch?.status === "submitted" ? "Feedback submitted" : batch?.status === "preparing" ? "Preparing" : "Not started"}
+        </AdminStatusBadge>
       </div>
       {batch?.created_at && <p className={styles.batchDate}>Started <time dateTime={batch.created_at}>{new Intl.DateTimeFormat("en-GB", {
         dateStyle: "long", timeStyle: "short", timeZone: "Europe/Zurich"
       }).format(new Date(batch.created_at))}</time> · Europe/Zurich</p>}
-      <div className={styles.activityMessages} role="status" aria-live="polite">
+      <div className={styles.activityMessages}>
         {loading && <p>Loading your listening room…</p>}
-        {notice && <p className={styles.notice}>{notice}</p>}
-        {job && <p className={styles.jobStatus}>{running ? "Working in the background. You can leave and return later." : `Latest job: ${job.status}`}</p>}
+        {notice && <AdminStatusNotice tone="success">{notice}</AdminStatusNotice>}
+        {job && <AdminStatusNotice tone={adminJobTone(job.status)}>{running ? "Working in the background. You can leave and return later." : `Latest job: ${job.status}`}</AdminStatusNotice>}
         {!loading && !batch && <p>No suggestions yet. Generate your first five to start.</p>}
         {batch?.status === "preparing" && <p>Preparing recordings. Feedback opens when all five are ready.</p>}
         {batch?.status === "review" && <p>Listen to the songs below, then save your feedback or process all five decisions.</p>}
         {batch?.status === "submitted" && <p>Feedback is frozen. If processing failed, retry below to resume without duplicates.</p>}
         {batch?.status === "processed" && <p>Review complete: {batch.promoted.length} accepted song(s) added. Audition copies have been removed.</p>}
       </div>
-      {error && <p role="alert" className={styles.error}>{error}</p>}
-      {batch?.error && <p role="alert" className={styles.error}>{batch.error}</p>}
+      {error && <AdminStatusNotice tone="error">{error}</AdminStatusNotice>}
+      {batch?.error && <AdminStatusNotice tone="error">{batch.error}</AdminStatusNotice>}
     </div>
+    {batch && batch.status !== "preparing" && <div className={styles.reviewProgress}>
+      <div role="status"><strong>{reviewed} of {batch.candidates.length} reviewed</strong><span> · {accepted} accepted</span></div>
+      {batch.status === "review" && <AdminStatusBadge tone={dirty ? "warning" : "neutral"}>{dirty ? "Unsaved changes" : "All changes saved"}</AdminStatusBadge>}
+      <progress value={reviewed} max={batch.candidates.length || 5} aria-label="Songs reviewed" />
+    </div>}
     <div className={styles.cards} ref={players}>{batch?.candidates.map(candidate => {
       const entry = feedback[candidate.id];
       const available = candidate.id in batch.auditions && batch.status !== "processed";
@@ -184,11 +192,18 @@ export function AdminDiscovery() {
           disabled={!editable || !entry} onChange={event => entry && edit(candidate.id, { ...entry, reasoning: event.target.value })} /></label></fieldset>
       </article>;
     })}</div>
-    {batch && ["review", "submitted"].includes(batch.status) && <div className={styles.actions}>
-      {batch.status === "review" && <button type="button" disabled={!editable || !dirty} onClick={() => void run("save")}>Save feedback</button>}
-      <button type="button" disabled={busy || running || (batch.status === "review" && !complete)} onClick={() => void run("process")}>
-        {batch.status === "submitted" ? "Retry processing" : "Process feedback"}</button>
-      {batch.status === "review" && !complete && <span>Choose Yes or No for all five songs before processing.</span>}
+    {batch && ["review", "submitted"].includes(batch.status) && <div className={styles.actions} role="region" aria-label="Review actions">
+      <div className={styles.actionSummary}>
+        <strong>{reviewed} of {batch.candidates.length} reviewed · {accepted} accepted</strong>
+        <span id="discovery-action-hint">{busy ? "Saving your feedback…" : running ? "Processing in the background. Actions will be available when it finishes." : batch.status === "submitted" ? "Retry processing to resume without duplicates." : !complete ? "Choose Yes or No for all five songs before processing." : "Process feedback to add accepted songs to the station."}</span>
+      </div>
+      <div className={styles.actionButtons}>
+        {batch.status === "review" && <AdminStatusBadge tone={dirty ? "warning" : "neutral"}>{dirty ? "Unsaved changes" : "All changes saved"}</AdminStatusBadge>}
+        {batch.status === "review" && <button type="button" disabled={!editable || !dirty} aria-describedby="discovery-save-hint" onClick={() => void run("save")}>Save feedback</button>}
+        <button type="button" disabled={busy || running || (batch.status === "review" && !complete)} aria-describedby="discovery-action-hint" onClick={() => void run("process")}>
+          {batch.status === "submitted" ? "Retry processing" : "Process feedback"}</button>
+      </div>
+      {batch.status === "review" && <span id="discovery-save-hint" className={styles.saveHint}>{dirty ? "Save your decisions to finish reviewing later." : "No unsaved changes to save."}</span>}
     </div>}
     {batch?.editorial && <details open={batch.status === "processed"}><summary>What your feedback taught the station</summary><ul>
       {batch.editorial.preference_updates.map((update, index) => <li key={index}>{update.text} <small>({update.scope})</small></li>)}

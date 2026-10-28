@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AdminStatusBadge, AdminStatusNotice, adminJobTone } from "./AdminStatus";
 import { usePathname } from "next/navigation";
 import { AdminTestStreamPlayer } from "@/components/AdminTestStreamPlayer";
 import { AdminDiscovery } from "@/components/AdminDiscovery";
@@ -440,9 +441,9 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
       ) : (
         <div className="adminWorkGrid"><div className="adminConsoleStack">
           {capabilitiesStatusMessage && (isLoadingCapabilities || isCapabilitiesStatusError) ? (
-            <p className={`adminStatusNotice ${isCapabilitiesStatusError ? "adminStatusNoticeError" : ""}`} role="status">
+            <AdminStatusNotice tone={isCapabilitiesStatusError ? "error" : "running"}>
               {capabilitiesStatusMessage}
-            </p>
+            </AdminStatusNotice>
           ) : null}
 
           {section === "host" && supportsOperation(HOST_ADMIN_OPERATION_FORCE_ARCHETYPE) ? (
@@ -757,9 +758,9 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
           ) : null}
 
           {message ? (
-            <p className={`playerError ${isAdminErrorMessage(message) ? "" : "adminMessageSuccess"}`}>
+            <AdminStatusNotice tone={isAdminErrorMessage(message) ? "error" : "success"}>
               {message}
-            </p>
+            </AdminStatusNotice>
           ) : null}
 
           </div>
@@ -767,7 +768,7 @@ export function AdminConsole({ isHostAdminConfigured }: AdminConsoleProps) {
             <div className="adminActivityHeading"><span className={`adminLiveDot ${isPollingJob ? "isLive" : ""}`} /><h3>Job activity</h3><span>{isPollingJob ? "Following live" : "Ready"}</span></div>
             {activeJob ? <>
               <div className="adminActivityTools"><small>{lastUpdated ? `Updated ${lastUpdated}` : "Waiting for first update"}</small><button type="button" className="adminGhostButton" onClick={() => { setIsPollingJob(true); setPollRevision(value => value + 1); }}>Reconnect</button></div>
-              {pollError ? <p className="adminStatusNotice adminStatusNoticeError" role="status">{pollError}</p> : null}
+              {pollError ? <AdminStatusNotice tone="error">{pollError}</AdminStatusNotice> : null}
               <HostAdminJobPanel job={activeJob} isPolling={isPollingJob} />
             </> : <div className="adminActivityEmpty"><span aria-hidden="true">⌁</span><h4>A front-row seat to your next job.</h4><p>Queue a segment or generate a schedule. Progress and logs will appear here automatically.</p></div>}
           </aside>
@@ -807,9 +808,9 @@ function HostAdminJobPanel({ job, isPolling }: { job: HostAdminJob; isPolling: b
             {stationLabel(job.station)} · {toOperationLabel(job.operation, t)}
           </p>
         </div>
-        <span className={`adminJobBadge adminJobBadge${toStatusClassName(job.status)}`}>
+        <AdminStatusBadge tone={adminJobTone(job.status)}>
           {isPolling && !isTerminalJobStatus(job.status) ? t("admin.polling") : statusLabel}
-        </span>
+        </AdminStatusBadge>
       </div>
 
       {job.archetype ? <p>{t("admin.archetypeLine", { value: toArchetypeLabel(job.archetype) })}</p> : null}
@@ -939,19 +940,6 @@ function toStatusLabel(value: string, t: AdminText) {
       return t("admin.statusSucceeded");
     default:
       return t("admin.statusFailed");
-  }
-}
-
-function toStatusClassName(value: string) {
-  switch (value.toLowerCase()) {
-    case "accepted":
-      return "Accepted";
-    case "running":
-      return "Running";
-    case "succeeded":
-      return "Succeeded";
-    default:
-      return "Failed";
   }
 }
 

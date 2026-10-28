@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { AdminStatusBadge, AdminStatusNotice } from "./AdminStatus";
 import { adminText as t } from "@/lib/adminCopy";
 
 const STREAM_URL =
@@ -49,11 +50,11 @@ export function AdminTestStreamPlayer() {
     <section className="adminTestStream" aria-label={t("admin.englishTestStream")}>
       <div className="adminTestStreamCopy">
         <strong>{t("admin.englishTestStream")}</strong>
-        <span>
-          {playerState === "error"
-            ? t("admin.testStreamError")
-            : t("admin.englishTestStreamDescription")}
-        </span>
+        <span>{t("admin.englishTestStreamDescription")}</span>
+        <div role="status"><AdminStatusBadge tone={playerState === "error" ? "error" : playerState === "loading" ? "running" : playerState === "playing" ? "success" : "neutral"}>
+          {playerState === "error" ? "Playback failed" : playerState === "loading" ? "Connecting" : playerState === "playing" ? "Playing" : "Ready to preview"}
+        </AdminStatusBadge></div>
+        {playerState === "error" && <AdminStatusNotice tone="error">{t("admin.testStreamError")}</AdminStatusNotice>}
       </div>
       <div className="adminTestStreamActions">
         <button
