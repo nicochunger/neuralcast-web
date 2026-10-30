@@ -26,14 +26,17 @@ export function EpisodeGuide({ card, currentTime = 0, fallbackArtwork, position,
             <ChapterArtwork src={chapter.art_url} fallback={fallbackArtwork} />
             <div><h3>{chapter.title}</h3><strong>{chapter.artist}</strong>{chapter.album ? <span>{chapter.album}{chapter.year ? ` · ${chapter.year}` : ""}</span> : null}</div>
           </div> : <h3>{chapter.title}</h3>}
-          <p>{chapter.kind === "music" ? chapter.rationale : chapter.summary}</p>
-          {chapter.key_points?.length ? <ul className={styles.points}>{chapter.key_points.map((point, index) => <li key={index}>{point}</li>)}</ul> : null}
-          {chapter.sources?.length ? <div className={styles.chapterSources}>{chapter.sources.flatMap((source, index) => {
-            let url: URL;
-            try { url = new URL(source.url); } catch { return []; }
-            if (!["http:", "https:"].includes(url.protocol) || url.username) return [];
-            return <a key={index} href={url.href} target="_blank" rel="noopener noreferrer" title={source.claim}>{url.hostname} ↗</a>;
-          })}</div> : null}
+          {((chapter.kind === "music" ? chapter.rationale : chapter.summary) || chapter.key_points?.length || chapter.sources?.length) ? <details className={styles.chapterDetails}>
+            <summary>{t("episodes.chapterDetails")}</summary>
+            <p>{chapter.kind === "music" ? chapter.rationale : chapter.summary}</p>
+            {chapter.key_points?.length ? <ul className={styles.points}>{chapter.key_points.map((point, index) => <li key={index}>{point}</li>)}</ul> : null}
+            {chapter.sources?.length ? <div className={styles.chapterSources}>{chapter.sources.flatMap((source, index) => {
+              let url: URL;
+              try { url = new URL(source.url); } catch { return []; }
+              if (!["http:", "https:"].includes(url.protocol) || url.username) return [];
+              return <a key={index} href={url.href} target="_blank" rel="noopener noreferrer" title={source.claim}>{url.hostname} ↗</a>;
+            })}</div> : null}
+          </details> : null}
         </li>;
       })}
     </ol>

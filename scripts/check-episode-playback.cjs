@@ -37,10 +37,9 @@ assert.equal(await page.getByText('Both stations',{exact:true}).count(),0);
 const firstRow=page.getByRole('listitem').filter({has:page.getByRole('heading',{name:/A musical journey/})});
 assert.equal(await firstRow.locator('h3 [aria-label="Episode 1"]').textContent(),'#1 · ');
 assert.equal(await firstRow.getByRole('button').count(),0);
-assert.equal(await page.getByRole('heading',{name:'Podcasts',exact:true}).count(),0);
-const sharedTitle=page.getByRole('heading',{name:'Real music. A voice of its own.',exact:true});
-assert.ok((await sharedTitle.boundingBox()).y < (await page.getByRole('navigation',{name:'Listen',exact:true}).boundingBox()).y);
-assert.ok(await firstRow.locator('img').evaluate(img=>Math.abs(img.getBoundingClientRect().height-img.closest('a').getBoundingClientRect().height)<=2));
+assert.equal(await page.getByRole('heading',{name:'Podcasts',exact:true}).count(),1);
+assert.equal(await page.getByRole('heading',{name:'Real music. A voice of its own.',exact:true}).count(),0);
+assert.ok(await firstRow.locator('img').evaluate(img=>Math.abs(img.getBoundingClientRect().height-img.getBoundingClientRect().width)<=1));
 const secondRow=page.getByRole('listitem').filter({has:page.getByRole('heading',{name:/A second journey/})});
 assert.equal(await secondRow.locator('h3 [aria-label="Episode 2"]').textContent(),'#2 · ');
 if(process.env.EPISODE_SCREENSHOT_DIR) await page.screenshot({path:`${process.env.EPISODE_SCREENSHOT_DIR}/podcasts-desktop.png`,fullPage:true});
@@ -56,6 +55,12 @@ assert.equal(await page.getByRole('listitem').locator('h3 [aria-label="Episode 1
 await series.getByRole('link',{name:'NeuralForge Podcasts',exact:true}).click();await page.getByRole('heading',{name:'A musical journey'}).click();
 await page.getByRole('region',{name:'A musical journey',exact:true}).getByRole('button',{name:'Play',exact:true}).waitFor();assert.equal(await page.locator('#neuralcast-episode-audio').evaluate(audio=>audio.paused),true);assert.equal(await page.getByRole('button',{name:/Listen live/}).count(),0);await page.evaluate(()=>window.__liveElement=document.querySelector('#neuralcast-persistent-audio'));
 const episodePlayer=page.getByRole('region',{name:'A musical journey',exact:true});
+const chapterDetails=page.locator('aside details').first();
+assert.equal(await chapterDetails.locator('p').isVisible(),false);
+await chapterDetails.locator('summary').focus();await page.keyboard.press('Enter');
+assert.equal(await chapterDetails.locator('p').isVisible(),true);
+await page.keyboard.press('Enter');assert.equal(await chapterDetails.locator('p').isVisible(),false);
+
 assert.equal(await episodePlayer.getByRole('button',{name:/Mute|Unmute|Start over/}).count(),0);
 assert.equal(await episodePlayer.evaluate(element=>getComputedStyle(element).backgroundImage),'none');
 const playWidth=(await episodePlayer.getByRole('button',{name:'Play',exact:true}).boundingBox()).width;
@@ -96,5 +101,5 @@ await page.locator('dialog').getByRole('button',{name:'Jump to Conclusion',exact
 assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await page.locator('dialog img').evaluate(img=>img.decode());await page.evaluate(() => window.scrollTo(0, 0)); if (process.env.EPISODE_SCREENSHOT_DIR) await page.screenshot({path:`${process.env.EPISODE_SCREENSHOT_DIR}/episode-mobile.png`,fullPage:true});await page.keyboard.press('Escape');assert.equal(await page.locator('dialog[open]').count(),0);
 for(const width of [320,800,1440]){await page.setViewportSize({width,height:950});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);}
 assert.deepEqual(errors,[]);unavailable=true;await page.goto(base+'/episodes');await page.getByText('Episodes are temporarily unavailable. Please try again shortly.',{exact:true}).waitFor();
-console.log('Episode browser checks passed: shared title hierarchy, inline numbering, full-height artwork, explicit episode navigation, independent podcast selection, playback, chapter seeking/highlighting, persistent navigation, exclusive live/episode playback, transcript, reload resume, mobile dialog, responsive layouts, service failure.');
+console.log('Episode browser checks passed: podcast heading, inline numbering, square artwork, keyboard chapter disclosure, explicit episode navigation, independent podcast selection, playback, chapter seeking/highlighting, persistent navigation, exclusive live/episode playback, transcript, reload resume, mobile dialog, responsive layouts, service failure.');
 }finally{if(browser)await browser.close();app.kill('SIGTERM');await once(app,'exit');await new Promise(r=>fixture.close(r));}})().catch(e=>{console.error(e);process.exit(1)});

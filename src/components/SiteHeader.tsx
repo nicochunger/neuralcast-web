@@ -103,7 +103,7 @@ export function SiteHeader({ extraActions, englishOnly = false, podcastStation }
         </div>
       </div>
     </header>
-    {pathname === "/" || pathname === "/episodes" ? <div className="listeningIntroduction">
+    {pathname === "/" ? <div className="listeningIntroduction">
       <h2>{t("stations.introTitle")}</h2><p>{t("stations.introDescription")}</p>
     </div> : null}
       <nav className="productNavigation" aria-label={englishOnly ? "Listen" : t("nav.listen")}>
