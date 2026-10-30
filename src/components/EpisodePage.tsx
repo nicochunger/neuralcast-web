@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { EpisodeControls } from "@/components/EpisodeControls";
 import { EpisodeGuide } from "@/components/EpisodeGuide";
@@ -14,9 +14,7 @@ import styles from "./Episodes.module.css";
 export function EpisodePage({ episode }: { episode: PublishedEpisode }) {
   const { t, locale } = useI18n();
   const player = useEpisodePlayer();
-  const [showGuide, setShowGuide] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
-  const dialog = useRef<HTMLDialogElement>(null);
   const station = STATIONS.find((item) => item.id === episode.station)!;
   const selected = player.episode?.id === episode.id && player.episode.station === episode.station && player.episode.revision === episode.revision;
   const position = selected ? player.position : 0;
@@ -30,10 +28,6 @@ export function EpisodePage({ episode }: { episode: PublishedEpisode }) {
     if (selected && player.active) player.seek(seconds);
     else { void player.play(episode, seconds); }
   };
-  useEffect(() => {
-    if (showGuide && !dialog.current?.open) dialog.current?.showModal();
-    else if (!showGuide && dialog.current?.open) dialog.current.close();
-  }, [showGuide]);
   const guide = <EpisodeGuide card={card} position={position} fallbackArtwork={station.artworkImage} onSeek={seek} />;
   return <div className="appShell"><SiteHeader podcastStation={episode.station} /><main className={styles.page}>
     <Link className={styles.back} href={`/episodes?station=${episode.station}`}>← {t("episodes.back")}</Link>
@@ -50,16 +44,19 @@ export function EpisodePage({ episode }: { episode: PublishedEpisode }) {
             </div>
             <p className={styles.playerDescription}>{episode.description}</p>
             <EpisodeControls episode={episode} />
-            <button className={styles.mobileGuideButton} type="button" onClick={() => setShowGuide(true)}>{t("episodes.guide")} ↗</button>
           </div>
         </section>
-        <button className={styles.transcriptToggle} type="button" aria-expanded={showTranscript} onClick={() => setShowTranscript((value) => !value)}>{t(showTranscript ? "companion.hideTranscript" : "companion.readTranscript")}</button>
-        {showTranscript ? <div className={styles.transcript}>{episode.transcript}</div> : null}
       </article>
-      <aside className={styles.desktopGuide} aria-label={t("episodes.guide")}><h2>{t("episodes.guide")}</h2>{guide}</aside>
+      <aside className={styles.guideColumn} aria-label={t("episodes.guide")}><h2>{t("episodes.guide")}</h2>{guide}</aside>
+      <section className={styles.transcriptSection} aria-labelledby="transcript-title">
+        <div className={styles.transcriptHeader}>
+          <h2 id="transcript-title">{t("episodes.transcript")}</h2>
+          <button className={styles.transcriptToggle} type="button" aria-expanded={showTranscript} aria-controls="episode-transcript" onClick={() => setShowTranscript((value) => !value)}>{t(showTranscript ? "companion.hideTranscript" : "companion.readTranscript")}</button>
+        </div>
+        <div id="episode-transcript" className={styles.transcript} hidden={!showTranscript}>
+          {episode.transcript?.split(/\r?\n+/).filter((paragraph) => paragraph.trim()).map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+        </div>
+      </section>
     </div>
-    <dialog ref={dialog} className={styles.guideDialog} onCancel={() => setShowGuide(false)} onClick={(event) => { if (event.target === event.currentTarget) setShowGuide(false); }} aria-labelledby="episode-guide-title">
-      <div className={styles.dialogContent}><div className={styles.dialogHeader}><h2 id="episode-guide-title">{t("episodes.guide")}</h2><button type="button" onClick={() => setShowGuide(false)} aria-label={t("episodes.closeGuide")}>✕</button></div>{guide}</div>
-    </dialog>
   </main></div>;
 }

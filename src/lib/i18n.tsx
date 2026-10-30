@@ -26,6 +26,7 @@ type TranslationKey =
   | "episodes.unavailable"
   | "episodes.open"
   | "episodes.listen"
+  | "episodes.transcript"
   | "episodes.guide"
   | "episodes.closeGuide"
   | "episodes.jumpTo"
@@ -240,6 +241,7 @@ const englishMessages: Record<TranslationKey, string> = {
     "episodes.open": "View episode",
     "episodes.listen": "Listen to episode",
     "episodes.guide": "Episode guide",
+    "episodes.transcript": "Transcript",
     "episodes.closeGuide": "Close episode guide",
     "episodes.jumpTo": "Jump to",
     "episodes.pause": "Pause",
@@ -466,6 +468,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "episodes.open": "Ver episodio",
     "episodes.listen": "Escuchar episodio",
     "episodes.guide": "Guía del episodio",
+    "episodes.transcript": "Transcripción",
     "episodes.closeGuide": "Cerrar guía del episodio",
     "episodes.jumpTo": "Ir a",
     "episodes.pause": "Pausar",
@@ -690,6 +693,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "episodes.open": "Voir l’épisode",
     "episodes.listen": "Écouter l’épisode",
     "episodes.guide": "Guide de l’épisode",
+    "episodes.transcript": "Transcription",
     "episodes.closeGuide": "Fermer le guide",
     "episodes.jumpTo": "Aller à",
     "episodes.pause": "Pause",

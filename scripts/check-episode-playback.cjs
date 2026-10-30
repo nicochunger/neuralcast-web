@@ -8,7 +8,7 @@ song.writeUInt32LE(16, 16); song.writeUInt16LE(1, 20); song.writeUInt16LE(1, 22)
 song.writeUInt32LE(8000, 24); song.writeUInt32LE(16000, 28); song.writeUInt16LE(2, 32);
 song.writeUInt16LE(16, 34); song.write('data', 36); song.writeUInt32LE(samples * 2, 40);
 for (let i = 0; i < samples; i++) song.writeInt16LE(Math.round(500 * Math.sin(i * Math.PI * 440 / 8000)), 44 + i * 2);
-const episode={id:'test-journey',station:'neuralforge',channel:'neuralforge-es',language:'es-AR',title:'A musical journey',description:'Discover the stories behind the music.',published_at:'2026-10-15T12:00:00Z',duration:40,revision:'a'.repeat(64),audio_url:'/public/episodes/neuralforge/test-journey/audio',transcript:'An introduction. A conclusion.',chapters:[
+const episode={id:'test-journey',station:'neuralforge',channel:'neuralforge-es',language:'es-AR',title:'A musical journey',description:'Discover the stories behind the music.',published_at:'2026-10-15T12:00:00Z',duration:40,revision:'a'.repeat(64),audio_url:'/public/episodes/neuralforge/test-journey/audio',transcript:'An introduction.\n\nA conclusion.',chapters:[
 {id:'intro',kind:'commentary',start:0,end:10,title:'Introduction',summary:'Meet the host.',sources:[{url:'https://example.org/articles/a-long-source-url?ref=episode',claim:'Background on the host.'},{url:'javascript:alert(1)',claim:'Invalid source'},{url:'https://example.net/another-article',claim:'More background.'}],transcript:'An introduction.'},
 {id:'song',kind:'music',start:10,end:30,title:'Test song',artist:'Test artist',rationale:'A musical example.',art_url:'/public/episodes/neuralforge/test-journey/art/song'},
 {id:'outro',kind:'commentary',start:30,end:40,title:'Conclusion',summary:'The closing story.',transcript:'A conclusion.'}]};
@@ -138,16 +138,38 @@ await page.waitForFunction(()=>document.querySelector('#neuralcast-episode-audio
 await page.getByRole('link',{name:'Podcasts',exact:true}).click();await page.getByRole('heading',{name:/A musical journey/}).click();
 await page.getByRole('region',{name:'A musical journey',exact:true}).getByRole('button',{name:'Play',exact:true}).waitFor();
 await page.getByRole('region',{name:'A musical journey',exact:true}).getByRole('button',{name:'Play',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('#neuralcast-episode-audio').paused&&document.querySelector('#neuralcast-persistent-audio').paused);
-await page.getByRole('button',{name:/Read.*transcript/}).click();await page.getByText('An introduction. A conclusion.',{exact:true}).waitFor();
+const transcript=page.getByRole('region',{name:'Transcript',exact:true});
+const transcriptToggle=transcript.getByRole('button',{name:'Read full transcript',exact:true});
+assert.equal(await transcriptToggle.getAttribute('aria-expanded'),'false');
+await transcriptToggle.focus();await page.keyboard.press('Enter');
+assert.equal(await transcript.getByRole('button',{name:'Hide transcript',exact:true}).getAttribute('aria-expanded'),'true');
+assert.equal(await transcript.locator('#episode-transcript p').count(),2);
+await transcript.getByText('An introduction.',{exact:true}).waitFor();
+await transcript.getByText('A conclusion.',{exact:true}).waitFor();
+assert.equal(await page.locator('#neuralcast-episode-audio').evaluate(a=>a.paused),false);
 await page.getByRole('button',{name:'Pause',exact:true}).click();await page.evaluate(() => window.scrollTo(0, 0)); if (process.env.EPISODE_SCREENSHOT_DIR) await page.screenshot({path:`${process.env.EPISODE_SCREENSHOT_DIR}/episode-desktop.png`,fullPage:true});
 await page.reload();await page.getByRole('region',{name:'A musical journey',exact:true}).getByRole('button',{name:'Play',exact:true}).click();await page.waitForFunction(()=>document.querySelector('#neuralcast-episode-audio').currentTime>=10);
 await page.setViewportSize({width:390,height:844});
 await page.mouse.move(0,0);await page.getByRole('link',{name:/All episodes/}).focus();
 if(process.env.EPISODE_SCREENSHOT_DIR) await page.screenshot({path:`${process.env.EPISODE_SCREENSHOT_DIR}/episode-mobile-player.png`,fullPage:true});
-await page.getByRole('button',{name:/^Episode guide/}).click();await page.locator('dialog[open]').waitFor();
-await page.locator('dialog').getByRole('button',{name:'Jump to Conclusion',exact:true}).click();await page.waitForFunction(()=>document.querySelector('#neuralcast-episode-audio').currentTime>=30);
-assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await page.locator('dialog img').evaluate(img=>img.decode());await page.evaluate(() => window.scrollTo(0, 0)); if (process.env.EPISODE_SCREENSHOT_DIR) await page.screenshot({path:`${process.env.EPISODE_SCREENSHOT_DIR}/episode-mobile.png`,fullPage:true});await page.keyboard.press('Escape');assert.equal(await page.locator('dialog[open]').count(),0);
+assert.equal(await guide.isVisible(),true);
+assert.equal(await page.locator('dialog').count(),0);
+const playerBounds=await episodePlayer.boundingBox(), guideBounds=await guide.boundingBox();
+assert.ok(guideBounds.y>=playerBounds.y+playerBounds.height);
+await guide.getByRole('button',{name:'Jump to Conclusion',exact:true}).click();
+await page.waitForFunction(()=>document.querySelector('#neuralcast-episode-audio').currentTime>=30);
+assert.equal(await guide.locator('li[aria-current="step"]').getByRole('heading').textContent(),'Conclusion');
+const transcriptBounds=await transcript.boundingBox(), fullGuideBounds=await guide.boundingBox();
+assert.ok(transcriptBounds.y>=fullGuideBounds.y+fullGuideBounds.height);
+await transcript.getByRole('button',{name:'Read full transcript',exact:true}).click();
+await transcript.getByText('A conclusion.',{exact:true}).waitFor();
+await transcript.getByRole('button',{name:'Hide transcript',exact:true}).click();
+assert.equal(await transcript.locator('#episode-transcript').isVisible(),false);
+assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+await guide.locator('img').evaluate(img=>img.decode());
+await page.evaluate(() => window.scrollTo(0, 0));
+if(process.env.EPISODE_SCREENSHOT_DIR) await page.screenshot({path:`${process.env.EPISODE_SCREENSHOT_DIR}/episode-mobile.png`,fullPage:true});
 for(const width of [320,390,800,801,1440]){await page.setViewportSize({width,height:950});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);}
 assert.deepEqual(errors,[]);unavailable=true;await page.goto(base+'/episodes');await page.getByText('Episodes are temporarily unavailable. Please try again shortly.',{exact:true}).waitFor();
-console.log('Episode browser checks passed: podcast heading, inline numbering, square artwork, visible chapter details, compact source links, explicit episode navigation, independent podcast selection, playback, paused/playing 15-second skips, skip boundaries, cancellable buffering, consistent player colors, chapter seeking/highlighting, persistent navigation, exclusive live/episode playback, transcript, reload resume, mobile dialog, responsive layouts, service failure.');
+console.log('Episode browser checks passed: podcast heading, inline numbering, square artwork, visible chapter details, compact source links, explicit episode navigation, independent podcast selection, playback, paused/playing 15-second skips, skip boundaries, cancellable buffering, consistent player colors, chapter seeking/highlighting, persistent navigation, exclusive live/episode playback, transcript paragraphs and keyboard toggle, reload resume, inline mobile chapters, responsive layouts, service failure.');
 }finally{if(browser)await browser.close();app.kill('SIGTERM');await once(app,'exit');await new Promise(r=>fixture.close(r));}})().catch(e=>{console.error(e);process.exit(1)});
