@@ -17,7 +17,6 @@ type TranslationKey =
   | "podcasts.selectSeries"
   | "podcasts.series"
   | "podcasts.episodeNumber"
-  | "episodes.chapterDetails"
   | "episodes.currentChapter"
   | "episodes.liveInvite"
   | "episodes.retry"
@@ -228,7 +227,6 @@ const englishMessages: Record<TranslationKey, string> = {
     "podcasts.series": "Podcast series",
     "podcasts.episodeNumber": "Episode {number}",
     "episodes.currentChapter": "Current chapter",
-    "episodes.chapterDetails": "Chapter details",
     "episodes.liveInvite": "Keep exploring with our live radio and its AI host.",
     "episodes.retry": "Try again",
     "episodes.title": "Episodes",
@@ -451,7 +449,6 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "podcasts.series": "Serie de podcast",
     "podcasts.episodeNumber": "Episodio {number}",
     "episodes.currentChapter": "Capítulo actual",
-    "episodes.chapterDetails": "Detalles del capítulo",
     "episodes.liveInvite": "Seguí explorando con nuestra radio en vivo y su host de IA.",
     "episodes.retry": "Volver a intentar",
     "episodes.title": "Episodios",
@@ -672,7 +669,6 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "podcasts.series": "Série de podcasts",
     "podcasts.episodeNumber": "Épisode {number}",
     "episodes.currentChapter": "Chapitre actuel",
-    "episodes.chapterDetails": "Détails du chapitre",
     "episodes.liveInvite": "Poursuivez la découverte avec notre radio en direct et son animateur IA.",
     "episodes.retry": "Réessayer",
     "episodes.title": "Épisodes",

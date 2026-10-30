@@ -31,7 +31,7 @@
 .seriesOption:focus-visible, .episodeRow:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
 .empty { border: 1px dashed var(--line-strong); border-radius: 18px; padding: 32px; line-height: 1.7; }
 .back { display: inline-block; margin-bottom: 28px; color: var(--muted); text-decoration: none; }
-.detailGrid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 36px; align-items: start; }
+.detailGrid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 36px; align-items: start; }
 .mainColumn { min-width: 0; }
 .playerCard { border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-soft); overflow: hidden; --station-card-title: var(--ink); --station-card-text: var(--ink); --station-card-muted: var(--muted); --station-card-art-border: var(--line); --station-card-art-shadow: var(--shadow-soft); }
 .playerCardContent { position: relative; display: grid; gap: 22px; padding: 26px; color: var(--station-card-title); }
