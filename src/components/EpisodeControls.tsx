@@ -1,5 +1,5 @@
 "use client";
-import type { CSSProperties } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import type { PublishedEpisode } from "@/types/episode";
 import { useEpisodePlayer } from "@/context/EpisodePlayerContext";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
@@ -10,7 +10,6 @@ import styles from "./Episodes.module.css";
 export function EpisodeControls({ episode, compact = false }: { episode: PublishedEpisode; compact?: boolean }) {
   const player = useEpisodePlayer();
   const { t } = useI18n();
-  const { volume, setVolume } = useAudioPlayer();
   const selected = player.episode?.station === episode.station && player.episode.id === episode.id && player.episode.revision === episode.revision;
   const position = selected ? player.position : 0;
   const playing = selected && player.active && ["playing", "buffering"].includes(player.state);
@@ -27,17 +26,14 @@ export function EpisodeControls({ episode, compact = false }: { episode: Publish
         </button>
         <button type="button" className={styles.primary} onClick={() => playing ? player.pause() : void player.play(episode)} aria-label={playing ? t("episodes.pause") : t("common.play")}>
           {buffering ? <svg className={styles.spinner} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="9" opacity=".25" /><path d="M12 3a9 9 0 0 1 9 9" /></svg> : <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">{playing ? <path d="M6 4h4v16H6zm8 0h4v16h-4z" /> : <path d="m7 4 13 8-13 8z" />}</svg>}
-          {buffering ? t("common.loading") : playing ? t("episodes.pause") : t("common.play")}
+          <span className={styles.primaryLabel}>{buffering ? t("common.loading") : playing ? t("episodes.pause") : t("common.play")}</span>
         </button>
         <button type="button" className={styles.skip} disabled={!selected || !player.active} onClick={() => skip(15)} aria-label={t("episodes.forward")} title={t("episodes.forward")}>
           <SkipIcon forward />
         </button>
       </div>
       <span className={styles.playbackStatus} role="status">{buffering ? t("episodes.buffering") : ""}</span>
-      {!compact ? <div className={styles.volume}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z" /><path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14" /></svg>
-        <input type="range" min={0} max={1} step={0.01} value={volume} onChange={(event) => setVolume(Number(event.target.value))} aria-label={t("player.volume")} />
-      </div> : null}
+      {!compact ? <EpisodeVolumeControls /> : null}
     </div>
     <div className="trackProgress">
       <div className={styles.seekControl}>
@@ -59,5 +55,62 @@ function SkipIcon({ forward = false }: { forward?: boolean }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <g transform={forward ? "translate(24 0) scale(-1 1)" : undefined}><path d="M4 8a9 9 0 1 1-1 8M4 3v5h5" /></g>
     <text x="12" y="16" textAnchor="middle" fill="currentColor" stroke="none" fontSize="9" fontWeight="700">15</text>
+  </svg>;
+}
+
+function EpisodeVolumeControls() {
+  const { volume, setVolume } = useAudioPlayer();
+  const { t } = useI18n();
+  const [open, setOpen] = useState(false);
+  const panelId = useId();
+  const sliderId = useId();
+  const wrapper = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const slider = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    slider.current?.focus();
+    const outside = (event: PointerEvent) => {
+      if (!wrapper.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        trigger.current?.focus();
+      }
+    };
+    const blur = (event: FocusEvent) => {
+      if (!wrapper.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", escape);
+    document.addEventListener("focusin", blur);
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      document.removeEventListener("keydown", escape);
+      document.removeEventListener("focusin", blur);
+    };
+  }, [open]);
+  return <>
+    <div className={styles.volume}>
+      <VolumeIcon muted={volume === 0} />
+      <input type="range" min={0} max={1} step={0.01} value={volume} onChange={(event) => setVolume(Number(event.target.value))} aria-label={t("player.volume")} />
+    </div>
+    <div className={styles.mobileVolume} ref={wrapper}>
+      <button type="button" className={styles.volumeTrigger} ref={trigger} aria-label={t("player.volume")} aria-expanded={open} aria-controls={panelId} onClick={() => setOpen((value) => !value)}>
+        <VolumeIcon muted={volume === 0} />
+      </button>
+      {open ? <div id={panelId} className={styles.volumePopover} role="group" aria-label={t("player.volume")}>
+        <label htmlFor={sliderId}>{t("player.volume")} <output>{Math.round(volume * 100)}%</output></label>
+        <input ref={slider} id={sliderId} aria-label={t("player.volume")} type="range" min={0} max={1} step={0.01} value={volume} onChange={(event) => setVolume(Number(event.target.value))} />
+      </div> : null}
+    </div>
+  </>;
+}
+
+function VolumeIcon({ muted }: { muted: boolean }) {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M11 5 6 9H3v6h3l5 4V5Z" />
+    {muted ? <path d="m16 9 6 6m0-6-6 6" /> : <path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14" />}
   </svg>;
 }
