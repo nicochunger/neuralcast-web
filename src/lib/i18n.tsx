@@ -29,6 +29,9 @@ type TranslationKey =
   | "episodes.guide"
   | "episodes.closeGuide"
   | "episodes.jumpTo"
+  | "episodes.rewind"
+  | "episodes.forward"
+  | "episodes.buffering"
   | "episodes.pause"
   | "episodes.resume"
   | "episodes.restart"
@@ -240,6 +243,9 @@ const englishMessages: Record<TranslationKey, string> = {
     "episodes.closeGuide": "Close episode guide",
     "episodes.jumpTo": "Jump to",
     "episodes.pause": "Pause",
+    "episodes.rewind": "Rewind 15 seconds",
+    "episodes.forward": "Forward 15 seconds",
+    "episodes.buffering": "Buffering audio…",
     "episodes.resume": "Play / resume",
     "episodes.restart": "Start over",
     "episodes.seek": "Playback position",
@@ -463,6 +469,9 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "episodes.closeGuide": "Cerrar guía del episodio",
     "episodes.jumpTo": "Ir a",
     "episodes.pause": "Pausar",
+    "episodes.rewind": "Retroceder 15 segundos",
+    "episodes.forward": "Avanzar 15 segundos",
+    "episodes.buffering": "Cargando audio…",
     "episodes.resume": "Reproducir / continuar",
     "episodes.restart": "Desde el principio",
     "episodes.seek": "Posición de reproducción",
@@ -684,6 +693,9 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "episodes.closeGuide": "Fermer le guide",
     "episodes.jumpTo": "Aller à",
     "episodes.pause": "Pause",
+    "episodes.rewind": "Reculer de 15 secondes",
+    "episodes.forward": "Avancer de 15 secondes",
+    "episodes.buffering": "Chargement audio…",
     "episodes.resume": "Lire / reprendre",
     "episodes.restart": "Recommencer",
     "episodes.seek": "Position de lecture",

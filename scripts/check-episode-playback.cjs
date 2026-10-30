@@ -70,6 +70,8 @@ await source.focus();assert.equal(await source.evaluate(el=>el===document.active
 
 assert.equal(await episodePlayer.getByRole('button',{name:/Mute|Unmute|Start over/}).count(),0);
 assert.equal(await episodePlayer.evaluate(element=>getComputedStyle(element).backgroundImage),'none');
+assert.equal(await episodePlayer.getByRole('button',{name:'Rewind 15 seconds',exact:true}).isDisabled(),true);
+assert.equal(await episodePlayer.getByRole('button',{name:'Forward 15 seconds',exact:true}).isDisabled(),true);
 const playWidth=(await episodePlayer.getByRole('button',{name:'Play',exact:true}).boundingBox()).width;
 await episodePlayer.getByRole('button',{name:'Play',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('#neuralcast-episode-audio').paused);
 assert.equal((await episodePlayer.getByRole('button',{name:'Pause',exact:true}).boundingBox()).width,playWidth);
@@ -86,11 +88,47 @@ const seekSlider=episodePlayer.getByRole('slider',{name:'Playback position',exac
 const seekBounds=await seekSlider.boundingBox();
 await seekSlider.click({position:{x:seekBounds.width/2,y:seekBounds.height/2}});
 await page.waitForFunction(()=>{const position=document.querySelector('#neuralcast-episode-audio').currentTime;return position>=19&&position<=22;});
+// Skip while paused without restarting audio, including both timeline boundaries.
+await episodePlayer.getByRole('button',{name:'Pause',exact:true}).click();
+await seekSlider.focus();await seekSlider.press('Home');
+await episodePlayer.getByRole('button',{name:'Rewind 15 seconds',exact:true}).click();
+assert.equal(await page.locator('#neuralcast-episode-audio').evaluate(a=>a.currentTime),0);
+await episodePlayer.getByRole('button',{name:'Forward 15 seconds',exact:true}).click();
+await page.waitForFunction(()=>document.querySelector('#neuralcast-episode-audio').currentTime===15);
+assert.equal(await page.locator('#neuralcast-episode-audio').evaluate(a=>a.paused),true);
+await seekSlider.focus();await seekSlider.press('End');
+await episodePlayer.getByRole('button',{name:'Forward 15 seconds',exact:true}).click();
+assert.equal(await page.locator('#neuralcast-episode-audio').evaluate(a=>a.currentTime),40);
+await episodePlayer.getByRole('button',{name:'Rewind 15 seconds',exact:true}).click();
+await page.waitForFunction(()=>document.querySelector('#neuralcast-episode-audio').currentTime===25);
+await episodePlayer.getByRole('button',{name:'Play',exact:true}).click();
+await page.waitForFunction(()=>!document.querySelector('#neuralcast-episode-audio').paused);
+await episodePlayer.getByRole('button',{name:'Rewind 15 seconds',exact:true}).click();
+await page.waitForFunction(()=>{const a=document.querySelector('#neuralcast-episode-audio');return !a.paused&&a.currentTime>=10&&a.currentTime<12;});
+await episodePlayer.getByRole('button',{name:'Forward 15 seconds',exact:true}).click();
+await page.waitForFunction(()=>{const a=document.querySelector('#neuralcast-episode-audio');return !a.paused&&a.currentTime>=25&&a.currentTime<28;});
+// Exercise the media waiting event and ensure buffering can still be paused.
+await page.waitForFunction(()=>{const a=document.querySelector('#neuralcast-episode-audio');return !a.seeking&&a.readyState>=3;});
+await page.locator('#neuralcast-episode-audio').evaluate(a=>a.dispatchEvent(new Event('waiting')));
+await episodePlayer.getByRole('status').getByText('Buffering audio…',{exact:true}).waitFor();
+assert.equal(await episodePlayer.getByRole('button',{name:'Pause',exact:true}).textContent(),'Loading');
+assert.equal((await episodePlayer.getByRole('button',{name:'Pause',exact:true}).boundingBox()).width,playWidth);
+await episodePlayer.getByRole('button',{name:'Pause',exact:true}).click();
+assert.equal(await page.locator('#neuralcast-episode-audio').evaluate(a=>a.paused),true);
+await episodePlayer.getByRole('button',{name:'Play',exact:true}).click();
+await page.waitForFunction(()=>!document.querySelector('#neuralcast-episode-audio').paused);
+const playerColor=await episodePlayer.getByRole('button',{name:'Pause',exact:true}).evaluate(el=>getComputedStyle(el).backgroundColor);
+assert.ok((await bar.evaluate(el=>getComputedStyle(el).backgroundImage)).includes(playerColor));
 await page.getByRole('button',{name:'Jump to Test song',exact:true}).click();await page.waitForFunction(()=>document.querySelector('#neuralcast-episode-audio').currentTime>=10);
 assert.equal(await page.locator('li[aria-current="step"]').first().getByRole('heading').textContent(),'Test song');
 await page.getByRole('button',{name:'Pause',exact:true}).click();const paused=await page.locator('#neuralcast-episode-audio').evaluate(a=>a.currentTime);await page.waitForTimeout(350);assert.equal(await page.locator('#neuralcast-episode-audio').evaluate(a=>a.currentTime),paused);
 await page.getByRole('region',{name:'A musical journey',exact:true}).getByRole('button',{name:'Play',exact:true}).click();await page.getByRole('link',{name:/All episodes/}).click();await page.waitForURL(base+'/episodes?station=neuralforge');
 assert.equal(await page.evaluate(()=>document.querySelector('#neuralcast-persistent-audio')===window.__liveElement),true);assert.equal(await page.locator('#neuralcast-episode-audio').evaluate(a=>a.paused),false);
+const mini=page.getByRole('complementary',{name:'A musical journey',exact:true});
+assert.equal(await mini.getByRole('button',{name:'Rewind 15 seconds',exact:true}).isEnabled(),true);
+assert.equal(await mini.getByRole('button',{name:'Forward 15 seconds',exact:true}).isEnabled(),true);
+const miniColor=await mini.getByRole('button',{name:'Pause',exact:true}).evaluate(el=>getComputedStyle(el).backgroundColor);
+assert.ok((await mini.locator('.trackProgressBar').evaluate(el=>getComputedStyle(el).backgroundImage)).includes(miniColor));
 await page.getByRole('link',{name:'A musical journey ↗',exact:true}).click();await page.waitForURL(base+'/episodes/neuralforge/test-journey');
 await page.getByRole('link',{name:'Live radio',exact:true}).click();await page.waitForURL(base+'/');
 await page.getByRole('heading',{name:'Real music. A voice of its own.',exact:true}).waitFor();
@@ -103,10 +141,13 @@ await page.getByRole('region',{name:'A musical journey',exact:true}).getByRole('
 await page.getByRole('button',{name:/Read.*transcript/}).click();await page.getByText('An introduction. A conclusion.',{exact:true}).waitFor();
 await page.getByRole('button',{name:'Pause',exact:true}).click();await page.evaluate(() => window.scrollTo(0, 0)); if (process.env.EPISODE_SCREENSHOT_DIR) await page.screenshot({path:`${process.env.EPISODE_SCREENSHOT_DIR}/episode-desktop.png`,fullPage:true});
 await page.reload();await page.getByRole('region',{name:'A musical journey',exact:true}).getByRole('button',{name:'Play',exact:true}).click();await page.waitForFunction(()=>document.querySelector('#neuralcast-episode-audio').currentTime>=10);
-await page.setViewportSize({width:390,height:844});await page.getByRole('button',{name:/^Episode guide/}).click();await page.locator('dialog[open]').waitFor();
+await page.setViewportSize({width:390,height:844});
+await page.mouse.move(0,0);await page.getByRole('link',{name:/All episodes/}).focus();
+if(process.env.EPISODE_SCREENSHOT_DIR) await page.screenshot({path:`${process.env.EPISODE_SCREENSHOT_DIR}/episode-mobile-player.png`,fullPage:true});
+await page.getByRole('button',{name:/^Episode guide/}).click();await page.locator('dialog[open]').waitFor();
 await page.locator('dialog').getByRole('button',{name:'Jump to Conclusion',exact:true}).click();await page.waitForFunction(()=>document.querySelector('#neuralcast-episode-audio').currentTime>=30);
 assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await page.locator('dialog img').evaluate(img=>img.decode());await page.evaluate(() => window.scrollTo(0, 0)); if (process.env.EPISODE_SCREENSHOT_DIR) await page.screenshot({path:`${process.env.EPISODE_SCREENSHOT_DIR}/episode-mobile.png`,fullPage:true});await page.keyboard.press('Escape');assert.equal(await page.locator('dialog[open]').count(),0);
-for(const width of [320,800,1440]){await page.setViewportSize({width,height:950});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);}
+for(const width of [320,390,800,801,1440]){await page.setViewportSize({width,height:950});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);}
 assert.deepEqual(errors,[]);unavailable=true;await page.goto(base+'/episodes');await page.getByText('Episodes are temporarily unavailable. Please try again shortly.',{exact:true}).waitFor();
-console.log('Episode browser checks passed: podcast heading, inline numbering, square artwork, visible chapter details, compact source links, explicit episode navigation, independent podcast selection, playback, chapter seeking/highlighting, persistent navigation, exclusive live/episode playback, transcript, reload resume, mobile dialog, responsive layouts, service failure.');
+console.log('Episode browser checks passed: podcast heading, inline numbering, square artwork, visible chapter details, compact source links, explicit episode navigation, independent podcast selection, playback, paused/playing 15-second skips, skip boundaries, cancellable buffering, consistent player colors, chapter seeking/highlighting, persistent navigation, exclusive live/episode playback, transcript, reload resume, mobile dialog, responsive layouts, service failure.');
 }finally{if(browser)await browser.close();app.kill('SIGTERM');await once(app,'exit');await new Promise(r=>fixture.close(r));}})().catch(e=>{console.error(e);process.exit(1)});
