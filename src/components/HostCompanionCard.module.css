@@ -59,8 +59,9 @@
 .chapterDetails { margin-top: 8px; font-size: .85rem; }
 .chapterDetails p { margin: 4px 0 12px; }
 .chapterDetails .points { color: var(--guide-muted, var(--muted)); }
-.chapterSources { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
-.chapterSources a { display: inline-flex; align-items: center; gap: 4px; min-height: 24px; color: var(--guide-muted, var(--muted)); font-size: .75rem; text-underline-offset: 3px; }
+.chapterSources { color: var(--guide-muted, var(--muted)); font-size: .75rem; line-height: 24px; }
+.chapterSources > span { white-space: nowrap; }
+.chapterSources a { display: inline-block; min-width: 24px; min-height: 24px; text-align: center; color: var(--guide-muted, var(--muted)); font-size: .75rem; text-underline-offset: 3px; }
 .chapterSources a:hover { color: var(--guide-ink, var(--ink)); }
 .chapterSeek { min-height: 44px; border: 0; background: transparent; color: var(--guide-ink, var(--ink)); cursor: pointer; font: inherit; font-variant-numeric: tabular-nums; padding: 6px 0; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
 .chapterSeek:focus-visible, .chapterSources a:focus-visible { outline: 2px solid var(--guide-accent, var(--focus)); outline-offset: 3px; border-radius: 3px; }

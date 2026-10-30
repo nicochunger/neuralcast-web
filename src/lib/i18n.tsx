@@ -59,6 +59,7 @@ type TranslationKey =
   | "companion.era"
   | "companion.deepDive"
   | "companion.eventLink"
+  | "companion.sources"
   | "companion.source"
   | "companion.readTranscript"
   | "companion.hideTranscript"
@@ -267,6 +268,7 @@ const englishMessages: Record<TranslationKey, string> = {
     "companion.deepDive": "Deep dive",
     "companion.eventLink": "Event details",
     "companion.source": "Read source",
+    "companion.sources": "Sources",
     "companion.readTranscript": "Read full transcript",
     "companion.hideTranscript": "Hide transcript",
     "host.auto": "Station default",
@@ -489,6 +491,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "companion.deepDive": "En profundidad",
     "companion.eventLink": "Ver evento",
     "companion.source": "Leer fuente",
+    "companion.sources": "Fuentes",
     "companion.readTranscript": "Leer transcripción completa",
     "companion.hideTranscript": "Ocultar transcripción",
     "host.auto": "Predeterminado de la emisora",
@@ -709,6 +712,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "companion.deepDive": "En profondeur",
     "companion.eventLink": "Voir l’événement",
     "companion.source": "Lire la source",
+    "companion.sources": "Sources",
     "companion.readTranscript": "Lire la transcription complète",
     "companion.hideTranscript": "Masquer la transcription",
     "host.auto": "Par défaut de la station",

@@ -20,6 +20,12 @@ export function EpisodeGuide({ card, currentTime = 0, fallbackArtwork, position,
     <ol className={styles.chapters}>
       {card.episode.chapters.map((chapter) => {
         const active = !finished && elapsed >= chapter.start && elapsed < chapter.end;
+        const sources = (chapter.sources ?? []).flatMap((source) => {
+          let url: URL;
+          try { url = new URL(source.url); } catch { return []; }
+          if (!["http:", "https:"].includes(url.protocol) || url.username) return [];
+          return [{ url, claim: source.claim }];
+        });
         return <li key={chapter.id} className={`${styles.chapter} ${active ? styles.currentChapter : ""}`} aria-current={active ? "step" : undefined}>
           <div className={styles.chapterTime}>{onSeek ? <button className={styles.chapterSeek} type="button" onClick={() => onSeek(chapter.start)} aria-label={`${t("episodes.jumpTo")} ${chapter.title}`}>{formatTrackTime(chapter.start)} ↗</button> : <span>{formatTrackTime(chapter.start)}</span>}{active ? <strong>{t(position !== undefined ? "episodes.currentChapter" : "companion.playingChapter")}</strong> : null}</div>
           {chapter.kind === "music" ? <div className={styles.chapterTrack}>
@@ -29,12 +35,12 @@ export function EpisodeGuide({ card, currentTime = 0, fallbackArtwork, position,
           {((chapter.kind === "music" ? chapter.rationale : chapter.summary) || chapter.key_points?.length || chapter.sources?.length) ? <div className={styles.chapterDetails}>
             <p>{chapter.kind === "music" ? chapter.rationale : chapter.summary}</p>
             {chapter.key_points?.length ? <ul className={styles.points}>{chapter.key_points.map((point, index) => <li key={index}>{point}</li>)}</ul> : null}
-            {chapter.sources?.length ? <div className={styles.chapterSources}>{chapter.sources.flatMap((source, index) => {
-              let url: URL;
-              try { url = new URL(source.url); } catch { return []; }
-              if (!["http:", "https:"].includes(url.protocol) || url.username) return [];
-              return <a key={index} href={url.href} target="_blank" rel="noopener noreferrer" title={`${source.claim ? source.claim + " · " : ""}${url.hostname}`} aria-label={`${t("companion.source")} ${index + 1}: ${source.claim || url.hostname}`}>{t("companion.source")}{chapter.sources!.length > 1 ? ` ${index + 1}` : ""} <span aria-hidden="true">↗</span></a>;
-            })}</div> : null}
+            {sources.length ? <div className={styles.chapterSources}>
+              {t("companion.sources")}:{" "}
+              {sources.map((source, index) => <span key={index}>
+                {index > 0 ? ", " : null}<a href={source.url.href} target="_blank" rel="noopener noreferrer" title={`${source.claim ? source.claim + " · " : ""}${source.url.hostname}`} aria-label={`${t("companion.source")} ${index + 1}: ${source.claim || source.url.hostname}`}>{index + 1}</a>
+              </span>)}
+            </div> : null}
           </div> : null}
         </li>;
       })}

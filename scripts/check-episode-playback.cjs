@@ -9,7 +9,7 @@ song.writeUInt32LE(8000, 24); song.writeUInt32LE(16000, 28); song.writeUInt16LE(
 song.writeUInt16LE(16, 34); song.write('data', 36); song.writeUInt32LE(samples * 2, 40);
 for (let i = 0; i < samples; i++) song.writeInt16LE(Math.round(500 * Math.sin(i * Math.PI * 440 / 8000)), 44 + i * 2);
 const episode={id:'test-journey',station:'neuralforge',channel:'neuralforge-es',language:'es-AR',title:'A musical journey',description:'Discover the stories behind the music.',published_at:'2026-10-15T12:00:00Z',duration:40,revision:'a'.repeat(64),audio_url:'/public/episodes/neuralforge/test-journey/audio',transcript:'An introduction. A conclusion.',chapters:[
-{id:'intro',kind:'commentary',start:0,end:10,title:'Introduction',summary:'Meet the host.',sources:[{url:'https://example.org/articles/a-long-source-url?ref=episode',claim:'Background on the host.'},{url:'javascript:alert(1)',claim:'Invalid source'}],transcript:'An introduction.'},
+{id:'intro',kind:'commentary',start:0,end:10,title:'Introduction',summary:'Meet the host.',sources:[{url:'https://example.org/articles/a-long-source-url?ref=episode',claim:'Background on the host.'},{url:'javascript:alert(1)',claim:'Invalid source'},{url:'https://example.net/another-article',claim:'More background.'}],transcript:'An introduction.'},
 {id:'song',kind:'music',start:10,end:30,title:'Test song',artist:'Test artist',rationale:'A musical example.',art_url:'/public/episodes/neuralforge/test-journey/art/song'},
 {id:'outro',kind:'commentary',start:30,end:40,title:'Conclusion',summary:'The closing story.',transcript:'A conclusion.'}]};
 const newer={...episode,id:'next-journey',title:'A second journey',published_at:'2026-10-16T12:00:00Z'};
@@ -60,7 +60,11 @@ assert.equal(await guide.getByText('Meet the host.',{exact:true}).isVisible(),tr
 assert.equal(await guide.locator('details').count(),0);
 const source=guide.getByRole('link',{name:'Read source 1: Background on the host.',exact:true});
 assert.equal(await source.getAttribute('href'),'https://example.org/articles/a-long-source-url?ref=episode');
-assert.equal((await source.textContent()).trim(),'Read source 1 ↗');
+assert.equal((await source.textContent()).trim(),'1');
+const secondSource=guide.getByRole('link',{name:'Read source 2: More background.',exact:true});
+assert.equal(await secondSource.textContent(),'2');
+assert.equal(await secondSource.getAttribute('href'),'https://example.net/another-article');
+assert.match(await source.locator('..').locator('..').textContent(),/Sources:\s*1\s*,\s*2/);
 assert.equal(await guide.locator('a[href^="javascript:"]').count(),0);
 await source.focus();assert.equal(await source.evaluate(el=>el===document.activeElement),true);
 
