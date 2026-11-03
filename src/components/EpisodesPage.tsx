@@ -42,7 +42,6 @@ export function EpisodesPage({ episodes, stationId, unavailable = false }: {
             <h3><span className={styles.episodeNumber} aria-label={t("podcasts.episodeNumber", { number: String(number) })}>#{number}<span className={styles.numberSeparator} aria-hidden="true"> · </span></span>{episode.title}</h3>
             <p className={styles.rowMetadata}><time dateTime={episode.published_at}>{new Date(episode.published_at).toLocaleDateString(locale, { timeZone: "UTC", day: "numeric", month: "short", year: "numeric" })}</time> · {formatTrackTime(episode.duration)} · {new Intl.DisplayNames([locale], { type: "language" }).of(episode.language.split("-")[0])}</p>
             <p className={styles.rowDescription}>{episode.description}</p>
-            <span className={styles.rowListen}>{t("episodes.open")} <span aria-hidden="true">→</span></span>
           </div>
         </Link>
       </li>)}
