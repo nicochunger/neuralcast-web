@@ -28,7 +28,7 @@ export function EpisodePage({ episode }: { episode: PublishedEpisode }) {
     if (selected && player.active) player.seek(seconds);
     else { void player.play(episode, seconds); }
   };
-  const guide = <EpisodeGuide card={card} position={position} fallbackArtwork={station.artworkImage} onSeek={seek} />;
+  const guide = <EpisodeGuide card={card} position={position} fallbackArtwork={station.podcastArtworkImage} onSeek={seek} />;
   return <div className="appShell"><SiteHeader podcastStation={episode.station} /><main className={styles.page}>
     <Link className={styles.back} href={`/episodes?station=${episode.station}`}>← {t("episodes.back")}</Link>
     <div className={styles.detailGrid}>
@@ -39,7 +39,7 @@ export function EpisodePage({ episode }: { episode: PublishedEpisode }) {
           <div className={styles.playerCardContent}>
             <div className={styles.playerTopline}><strong>{station.name}</strong><span>{t("nav.podcasts")}</span></div>
             <div className={styles.playerIdentity}>
-              <img src={station.artworkImage} alt="" width={112} height={112} />
+              <img src={station.podcastArtworkImage} alt="" width={112} height={112} />
               <div><h1 id="episode-title">{episode.title}</h1><p>{new Intl.DisplayNames([locale], { type: "language" }).of(episode.language.split("-")[0])} · <time dateTime={episode.published_at}>{new Date(episode.published_at).toLocaleDateString(locale, { timeZone: "UTC" })}</time></p></div>
             </div>
             <p className={styles.playerDescription}>{episode.description}</p>

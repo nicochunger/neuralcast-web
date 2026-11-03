@@ -14,6 +14,7 @@ export interface Station {
   timeZone: string;
   backgroundImage: string;
   artworkImage: string;
+  podcastArtworkImage: string;
   accentColor: string;
   hostChannels: readonly StationHostChannel[];
   defaultHostChannelId: string;

@@ -120,7 +120,7 @@ export function EpisodePlayerProvider({ children }: { children: ReactNode }) {
     if (!active || !episode || !("mediaSession" in navigator)) return;
     const session = navigator.mediaSession;
     const station = STATIONS.find((item) => item.id === episode.station)!;
-    if ("MediaMetadata" in window) session.metadata = new MediaMetadata({ title: episode.title, artist: station.name, album: t("episodes.title"), artwork: [{ src: new URL(station.artworkImage, location.origin).href }] });
+    if ("MediaMetadata" in window) session.metadata = new MediaMetadata({ title: episode.title, artist: station.name, album: t("episodes.title"), artwork: [{ src: new URL(station.podcastArtworkImage, location.origin).href }] });
     session.playbackState = state === "playing" ? "playing" : "paused";
     const actions: Partial<Record<MediaSessionAction, MediaSessionActionHandler>> = {
       play: () => { void play(episode); }, pause, stop: pause,
