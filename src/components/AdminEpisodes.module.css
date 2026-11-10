@@ -105,3 +105,27 @@
   .approvalActions { grid-template-columns: minmax(0, 1fr); }
   .scheduleControls { align-items: stretch; flex-direction: column; }
 }
+
+.activityCard, .activityStrip { border: 1px solid var(--line-strong); border-left: 3px solid var(--episode-accent); border-radius: 10px; background: var(--panel-bg, var(--surface)); padding: 1rem; min-width: 0; overflow-wrap: anywhere; }
+.activityCard { margin-top: 1rem; scroll-margin-top: 200px; }
+.activityCard p { margin: .5rem 0; font-size: .85rem; }
+.activityCard details { margin-top: 1rem; font-size: .85rem; }
+.activityHeading { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: .5rem 1rem; }
+.activityHeading strong { display: flex; align-items: center; gap: .6rem; font-size: .95rem; }
+.activityHeading p { margin: .35rem 0 0; color: var(--muted); font-size: .85rem; }
+.elapsed { color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.activityDot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--episode-accent); }
+.activityActive { animation: episodePulse 1.4s ease-in-out infinite; }
+.activitySteps { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; padding: 0; margin: 1rem 0; }
+.activitySteps li { display: flex; align-items: center; gap: .5rem; padding: .45rem .6rem; border: 1px solid var(--line); border-radius: 6px; font-size: .78rem; color: var(--muted); }
+.activitySteps li[data-state=running] { border-color: var(--episode-accent); color: var(--ink); }
+.activitySteps li[data-state=succeeded] { color: #7ac8a2; }
+.activitySteps li[data-state=failed], .activityError { color: #f0b4b4; }
+.activityFailed { border-left-color: #e48484; }
+.activityStrip { position: sticky; top: var(--episode-header-offset, 110px); z-index: 4; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .65rem; box-shadow: var(--shadow-soft); }
+.activityStrip .activityHeading { flex: 1; min-width: 0; }
+.activityStrip .activityHeading p { max-width: 65ch; }
+.activityStrip button { flex: none; font-size: .8rem; }
+.workspace :is([id="episode-review"], [id="episode-ideas"], [id="episode-suggestions"], [id="episode-audio-review"]) { scroll-margin-top: 220px; }
+@keyframes episodePulse { 50% { opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { .activityActive { animation: none; } }

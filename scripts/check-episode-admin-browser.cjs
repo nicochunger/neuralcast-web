@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),{createServer}=require('node:http'),{
 const {encode}=require('next-auth/jwt');
 const {chromium}=require(process.env.EPISODE_PLAYWRIGHT_MODULE||'playwright');
 const secret='offline-episode-admin-secret',token='offline-admin-token';
-let phase='empty',feedback={overall:'',sections:{},research:false},revision=1,job=null,ideas=[],actions=[],briefRefined=false;
+let phase='empty',feedback={overall:'',sections:{},research:false},revision=1,job=null,ideas=[],actions=[],briefRefined=false,retries=0;
 const before='Bienvenidos. Una historia sobre las voces que cambian una banda.',after='Bienvenidos. Hay voces que cambian nuestra manera de escuchar.';
 const segments=()=>[{id:'opening',kind:'commentary',role:'opening',script:phase==='written'?before:after,companion:{title:'Una voz'}},{id:'song',kind:'music',artist:'Test artist',title:'Test song'},{id:'closing',kind:'commentary',role:'closing',script:'Gracias por acompañarnos.',companion:{title:'Hasta pronto'}}];
 const episode=()=>phase==='empty'?null:{id:'test-story',status:phase==='brief'?'brief_review':phase==='audio'?'audio_review':phase==='published'?'published':'manuscript_review',revision:String(revision).padStart(64,'a'),episode_number:null,concept_hash:'a'.repeat(64),concept_approved:phase!=='brief',proposal:{title:'Una voz que cambia',premise:briefRefined?'La decisión personal detrás de una voz nueva.':'La identidad de una banda cuando cambia su cantante.',outline:['Las personas','Una decisión'],target_seconds:1800,commentary_budget_seconds:600},brief:{instructions:'Conservar las canciones completas.',initial_research:[]},songs:[{id:'song',kind:'music',artist:'Test artist',title:'Test song',rationale:'Una canción para la historia.'}],segments:phase==='brief'?[]:segments(),feedback,blockers:[],changes:phase==='revised'?[{segment_id:'opening',explanation:'Se amplió el comienzo.'}]:[],timing:{spoken_words:250,estimated_total_seconds:1800},audio:['audio','published'].includes(phase)?{revision:'b'.repeat(64),render_hash:'c'.repeat(64),duration:20,current:true,chapters:[{id:'opening',title:'Una voz',kind:'commentary',start:0,end:10},{id:'closing',title:'Hasta pronto',kind:'commentary',start:10,end:20}]}:null,history:phase==='brief'?[]:[{id:'saved-run',kind:'editorial',created_at:'2026-11-09T12:00:00Z',manuscript_hash:'d'.repeat(64)}]};
@@ -17,12 +17,17 @@ const fixture=createServer(async(req,res)=>{
  if(route==='/admin/capabilities'){res.end(JSON.stringify({stations:['neuralforge','neuralcast'],host_channels:[],archetypes:[],operations:{}}));return;}
  if(route.endsWith('/audio/'+'b'.repeat(64))){res.setHeader('Content-Type','audio/wav');res.setHeader('Accept-Ranges','bytes');res.end(wav);return;}
  if(route.includes('/history/')){res.end(JSON.stringify({segments:[{...segments()[0],script:before},...segments().slice(1)]}));return;}
+ if(route.endsWith('/retry')){assert.equal(body.request_id,job.episode_options.request_id);retries++;job={...job,job_id:job.job_id+'-retry',status:'running',finished_at:null,progress:{...job.progress,current:'Fact review',error:null,steps:job.progress.steps.map(s=>({...s,status:s.status==='failed'?'running':s.status}))}};res.end(JSON.stringify({job_id:job.job_id,request_id:body.request_id}));return;}
  if(route.endsWith('/feedback')){assert.equal(body.revision,episode().revision);feedback={overall:body.overall,sections:body.sections,research:body.research};revision++;res.end(JSON.stringify(episode()));return;}
  if(route.endsWith('/actions')){
   actions.push(body);const id='request-'+actions.length;
   if(body.action==='ideas')ideas=[{id:'idea-1',title:'Una voz que cambia',premise:'La identidad de una banda.',angle:'Personas, decisiones y canciones.',artists:['Test artist']}];
   if(body.action==='develop'){if(body.episode_id){assert.equal(body.episode_id,'test-story');assert.equal(body.topic,'Keep the theme, but focus more on the personal conflict.');assert.equal(body.target_minutes,30);briefRefined=true;}phase='brief';}if(body.action==='write')phase='written';if(body.action==='revise')phase='revised';if(body.action==='render')phase='audio';if(body.action==='publish'){assert.equal(body.render_hash,'c'.repeat(64));phase='published';}
-  revision++;job={job_id:id,status:'succeeded',episode_options:{request_id:id},result:{episode_id:phase==='empty'?undefined:'test-story'},log_tail:'Completed fixture operation.'};
+  const action=body.action==='develop'&&body.episode_id?'refine_brief':body.action;
+  const ids=action==='write'?['write','factual_support','narrative_continuity','conversational_voice','edit']:action==='render'?['narration','mix','upload']:['work'];
+  const labels={write:'Research and draft',factual_support:'Fact review',narrative_continuity:'Story review',conversational_voice:'Voice review',edit:'Final edit',narration:'Generating voice',mix:'Assembling audio',upload:'Uploading private preview',work:'Working on the request'};
+  revision++;job={job_id:id,status:'running',accepted_at:new Date().toISOString(),started_at:new Date().toISOString(),episode_options:{request_id:id},result:{episode_id:phase==='empty'?undefined:'test-story'},progress:{action,episode_id:body.episode_id??(body.action==='develop'?'test-story':null),current:labels[ids[0]],steps:ids.map((key,i)=>({id:key,label:labels[key],status:i?'pending':'running'}))},log_tail:'Running fixture operation.'};
+
   res.end(JSON.stringify({job_id:id,request_id:id}));return;
  }
  const e=episode();res.end(JSON.stringify({revision:'f'.repeat(64),weekly_enabled:false,target_minutes:30,ideas,episodes:e?[{id:e.id,title:e.proposal.title,status:e.status,episode_number:null,managed:true}]:[],episode:url.searchParams.has('episode_id')?e:null,job}));
@@ -41,10 +46,18 @@ const fixture=createServer(async(req,res)=>{
   page=await context.newPage();page.on('response',async r=>{if(r.url().includes('/api/admin/episodes/')&&r.status()>=400)console.error('Admin response',r.status(),await r.text());});const errors=[];page.on('pageerror',e=>errors.push(String(e)));
   await page.route('**/api/nowplaying/**',r=>r.fulfill({json:{}}));await page.route('**/api/host-companion/**',r=>r.fulfill({json:{}}));
   await page.goto(base+'/admin/episodes');await page.getByRole('heading',{name:'Episodes',exact:true}).waitFor();
-  await page.getByRole('button',{name:'Suggest topics',exact:true}).click();await page.getByRole('button',{name:'Use this idea'}).waitFor();await page.getByRole('button',{name:'Use this idea'}).click();
+  async function finish(action){
+    await page.locator(`#episode-operation[data-action="${action}"]`).waitFor();
+    assert.equal(await page.getByRole('button',{name:'View progress',exact:true}).count(),1);
+    assert.ok(await page.locator('#episode-operation').getByText(/Elapsed/).count());
+    job.status='succeeded';job.finished_at=new Date().toISOString();job.progress.steps.forEach(s=>s.status='succeeded');job.log_tail='Completed fixture operation.';
+    await page.waitForFunction(()=>!document.querySelector('#episode-operation')?.textContent.includes('Work continues in the background.'));
+  }
+  await page.getByRole('button',{name:'Suggest topics',exact:true}).click();await finish('ideas');
+  await page.getByRole('button',{name:'Use this idea'}).waitFor();await page.getByRole('button',{name:'Use this idea'}).click();
   const topicButtons=await Promise.all(['Suggest topics','Develop my idea'].map(name=>page.getByRole('button',{name,exact:true}).boundingBox()));
   assert.ok(Math.abs((topicButtons[0].y+topicButtons[0].height)-(topicButtons[1].y+topicButtons[1].height))<2,'Topic buttons should align');
-  await page.getByRole('button',{name:'Develop my idea'}).click();await page.getByRole('button',{name:'Approve brief & generate manuscript'}).waitFor();
+  await page.getByRole('button',{name:'Develop my idea'}).click();await finish('develop');await page.getByRole('button',{name:'Approve brief & generate manuscript'}).waitFor();
   const createdActions=actions.length;
   await page.reload();await page.getByLabel('Feedback on this brief',{exact:true}).waitFor();
   assert.equal(actions.length,createdActions,'Opening an existing brief must not regenerate it');
@@ -63,16 +76,38 @@ const fixture=createServer(async(req,res)=>{
   assert.ok(Math.abs(mobileTopicButtons[0].y-mobileTopicButtons[1].y)<2&&Math.abs(mobileTopicButtons[0].height-mobileTopicButtons[1].height)<2,'Mobile topic buttons should align and have equal height');
   if(process.env.EPISODE_SCREENSHOT_DIR)await page.screenshot({path:process.env.EPISODE_SCREENSHOT_DIR+'/episode-brief-mobile.png',fullPage:true});
   await page.setViewportSize({width:1440,height:1050});
-  await page.getByRole('button',{name:'Apply feedback',exact:true}).click();await page.getByText('La decisión personal detrás de una voz nueva.',{exact:true}).waitFor();
+  await page.getByRole('button',{name:'Apply feedback',exact:true}).click();await finish('refine_brief');await page.getByText('La decisión personal detrás de una voz nueva.',{exact:true}).waitFor();
   assert.equal(await page.getByLabel('Feedback on this brief',{exact:true}).inputValue(),'');
   assert.equal(actions.at(-1).episode_id,'test-story','Feedback must update the selected episode');
-  await page.getByRole('button',{name:'Approve brief & generate manuscript'}).click();await page.getByLabel('Overall feedback',{exact:true}).waitFor();
+  await page.getByRole('button',{name:'Approve brief & generate manuscript'}).click();
+  await page.locator('#episode-operation[data-action="write"]').waitFor();
+  const submitted=actions.length;await page.reload();await page.locator('#episode-operation[data-action="write"]').waitFor();
+  assert.equal(actions.length,submitted,'Reloading must reconnect to the running job without submitting another');
+  job.progress.steps.forEach(s=>s.status=s.id==='write'?'succeeded':s.id==='edit'?'pending':'running');job.progress.current='Fact review, Story review, Voice review';
+  await page.getByRole('button',{name:'View progress',exact:true}).click();
+  await page.waitForFunction(()=>document.querySelector('#episode-operation')?.textContent.includes('Fact review, Story review, Voice review'));
+  assert.equal(await page.locator('#episode-operation li[data-state="running"]').count(),3);
+  const strip=page.getByLabel('Current operation',{exact:true});await page.evaluate(()=>scrollTo(0,document.body.scrollHeight));
+  const stripBounds=await strip.boundingBox();assert.ok(stripBounds.y>=0&&stripBounds.y<250,'Operation summary must remain visible while scrolling');
+  if(process.env.EPISODE_SCREENSHOT_DIR)await page.screenshot({path:process.env.EPISODE_SCREENSHOT_DIR+'/episode-running-desktop.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  if(process.env.EPISODE_SCREENSHOT_DIR)await page.screenshot({path:process.env.EPISODE_SCREENSHOT_DIR+'/episode-running-mobile.png',fullPage:true});
+  await page.setViewportSize({width:1440,height:1050});
+  job.status='failed';job.finished_at=new Date().toISOString();job.progress.current='Failed during Fact review';job.progress.error='Fact review could not finish; completed stages were retained.';job.progress.steps.forEach(s=>s.status=s.id==='factual_support'?'failed':s.id==='edit'?'pending':'succeeded');
+  await page.locator('#episode-operation').getByText('Fact review could not finish; completed stages were retained.',{exact:true}).waitFor();
+  const retryResponse=page.waitForResponse(r=>r.url().endsWith('/retry')&&r.request().method()==='POST');
+  await page.getByRole('button',{name:'Retry saved operation',exact:true}).click();await retryResponse;
+  await page.waitForFunction(()=>document.querySelector('#episode-operation')?.textContent.includes('Work continues in the background.'));
+  assert.equal(retries,1);assert.equal(actions.length,submitted,'Retry must resume the saved request');
+  assert.equal(await page.locator('#episode-operation li[data-state="succeeded"]').count(),3);
+  await finish('write');await page.locator('#episode-operation').getByRole('button',{name:'Read manuscript',exact:true}).click();
+  await page.getByLabel('Overall feedback',{exact:true}).waitFor();
   await page.getByLabel('Overall feedback',{exact:true}).fill('Start broader; keep the story.');
-  await page.getByRole('button',{name:'Save feedback',exact:true}).click();await page.getByText('Feedback saved.',{exact:true}).waitFor();
-  await page.getByRole('button',{name:'Apply feedback',exact:true}).click();await page.getByText(after,{exact:true}).waitFor();
+  await page.getByRole('button',{name:'Save feedback',exact:true}).click();await page.locator('#episode-operation').getByText('Feedback saved.',{exact:true}).waitFor();
+  await page.getByRole('button',{name:'Apply feedback',exact:true}).click();await finish('revise');await page.getByText(after,{exact:true}).waitFor();
   await page.getByText('Revision notes',{exact:true}).click();await page.getByText('Se amplió el comienzo.',{exact:false}).waitFor();
   await page.getByLabel('Compare with a saved manuscript').selectOption('editorial:saved-run');await page.getByText(before,{exact:true}).waitFor();
-  await page.getByRole('button',{name:'Approve manuscript & render',exact:true}).click();await page.getByRole('heading',{name:'Recording for review'}).waitFor();
+  await page.getByRole('button',{name:'Approve manuscript & render',exact:true}).click();await finish('render');await page.getByRole('heading',{name:'Recording for review'}).waitFor();
   await page.locator('#neuralcast-persistent-audio').evaluate(async(a,data)=>{a.src=URL.createObjectURL(new Blob([Uint8Array.from(atob(data),c=>c.charCodeAt(0))],{type:'audio/wav'}));a.loop=true;await a.play();},wav.toString('base64'));
   await page.locator('section[aria-label="Audio review"] audio').evaluate(a=>a.play());await page.waitForFunction(()=>!document.querySelector('section[aria-label="Audio review"] audio').paused);
   assert.equal(await page.locator('#neuralcast-persistent-audio').evaluate(a=>a.paused),false);
@@ -80,7 +115,7 @@ const fixture=createServer(async(req,res)=>{
   await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   if(process.env.EPISODE_SCREENSHOT_DIR)await page.screenshot({path:process.env.EPISODE_SCREENSHOT_DIR+'/episode-admin-mobile.png',fullPage:true});
   await page.setViewportSize({width:1440,height:1050});if(process.env.EPISODE_SCREENSHOT_DIR)await page.screenshot({path:process.env.EPISODE_SCREENSHOT_DIR+'/episode-admin-desktop.png',fullPage:true});
-  await page.getByRole('button',{name:'Publish reviewed audio',exact:true}).click();await page.getByRole('link',{name:'Open published episode'}).waitFor();
+  await page.getByRole('button',{name:'Publish reviewed audio',exact:true}).click();await finish('publish');await page.getByRole('link',{name:'Open published episode'}).waitFor();
   assert.equal(await page.getByRole('button',{name:'Apply feedback',exact:true}).count(),0);
   assert.equal(await page.evaluate(()=>window.originalLive===document.querySelector('#neuralcast-persistent-audio')),true);
   assert.equal(await page.locator('#neuralcast-persistent-audio').evaluate(a=>a.paused),false);
