@@ -139,3 +139,48 @@
 .reviewActions { position:sticky; bottom:85px; padding:1rem; background:var(--panel-bg,var(--surface)); border:1px solid var(--line); z-index:3; }
 .publication { margin:1.5rem 0; padding:1rem; border:1px solid var(--line); }
 .audioReview .chapters { max-height: 110px; overflow: auto; }
+
+/* Consistent spacing for review sections and their supporting controls. */
+.reviewPanel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; align-content: start; }
+.reviewPanel > :is(p, nav, details, article, section, label, .activityCard) { margin-block: 0; }
+.reviewPanel > button { justify-self: start; }
+.reviewToolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .85rem 1.5rem; padding-bottom: 1.15rem; border-bottom: 1px solid var(--line); }
+.reviewToolbar .muted { margin: 0; font-size: .85rem; }
+.episodeHeading { display: grid; gap: .7rem; }
+.episodeHeading h3, .episodeHeading .muted { margin: 0; }
+.episodeHeading h3 { font-size: 1.3rem; line-height: 1.5; }
+.episodeSidebar { display: grid; gap: 1rem; align-content: start; }
+.episodeSidebar > :is(h3, label) { margin: 0; }
+.episodeSidebar > button { justify-self: start; }
+.workspace select { appearance: none; padding-inline-end: 2.8rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; }
+.header > label { min-width: 160px; margin: 0; }
+.passage { padding: 1.25rem; }
+.passage > :is(button, details, .passageEditor) { margin-top: 1rem; }
+.passage > .script { margin: 1rem 0; }
+.passageEditor { display: grid; gap: .85rem; }
+.passageEditor .actions { margin: 0; }
+.workspace details[open] > summary { margin-bottom: 1rem; }
+.workspace details > :is(p, ul, ol) { line-height: 1.75; }
+.workspace :is(details, .briefSection) :is(ul, ol) > li + li { margin-top: .45rem; }
+.workspace summary { padding-block: .2rem; }
+.ideaBody { padding-top: 0; }
+.ideas { margin-top: 1.25rem; }
+.audioReview > button { margin-top: .9rem; }
+.audioReview .chapters { margin-bottom: 0; }
+.publication img { display: block; margin: 1.1rem 0; border-radius: 8px; }
+.publication > p { margin: .85rem 0; }
+.approvalActions, .reviewActions { gap: .85rem; }
+.schedule { display: block; padding: 1.25rem; border: 1px solid var(--line); border-radius: 12px; margin: 0; }
+.schedule > :is(div, label, p) { margin-top: 1rem; }
+@media (max-width: 600px) {
+  .reviewPanel { gap: 1.1rem; }
+  .reviewToolbar { align-items: flex-start; flex-direction: column; gap: .85rem; }
+  .passage { padding: 1rem; }
+  .episodeHeading h3 { font-size: 1.15rem; }
+}
+
+.reviewPanel > * { min-width: 0; max-width: 100%; box-sizing: border-box; }
+.workspace label { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+.workspace select { width: 100%; min-width: 0; }
+.workspace details > textarea + button { margin-top: .85rem; }
+.schedule > .muted { margin-top: 1rem; }
