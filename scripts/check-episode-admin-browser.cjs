@@ -21,7 +21,7 @@ const fixture=createServer(async(req,res)=>{
  if(route.endsWith('/feedback')){assert.equal(body.revision,episode().revision);feedback={overall:body.overall,sections:body.sections,research:body.research};revision++;res.end(JSON.stringify(episode()));return;}
  if(route.endsWith('/actions')){
   actions.push(body);const id='request-'+actions.length;
-  if(body.action==='ideas')ideas=[{id:'idea-1',title:'Una voz que cambia',premise:'La identidad de una banda.',angle:'Personas, decisiones y canciones.',artists:['Test artist']}];
+  if(body.action==='ideas')ideas=[{id:'idea-1',title:'Una voz que cambia',premise:'La identidad de una banda.',angle:'Personas, decisiones y canciones.',artists:['Test artist']},{id:'idea-2',title:'Otra forma de escuchar',premise:'Una decisión musical.',angle:'Escenarios y canciones.',artists:['Another artist']},{id:'idea-3',title:'El siguiente capítulo',premise:'Una historia conectada.',angle:'Recuerdos y nuevos caminos.',artists:['Third artist']}];
   if(body.action==='develop'){if(body.episode_id){assert.equal(body.episode_id,'test-story');assert.equal(body.topic,'Keep the theme, but focus more on the personal conflict.');assert.equal(body.target_minutes,30);briefRefined=true;}phase='brief';}if(body.action==='write')phase='written';if(body.action==='revise')phase='revised';if(body.action==='render')phase='audio';if(body.action==='publish'){assert.equal(body.render_hash,'c'.repeat(64));phase='published';}
   const action=body.action==='develop'&&body.episode_id?'refine_brief':body.action;
   const ids=action==='write'?['write','factual_support','narrative_continuity','conversational_voice','edit']:action==='render'?['narration','mix','upload']:['work'];
@@ -54,7 +54,15 @@ const fixture=createServer(async(req,res)=>{
     await page.waitForFunction(()=>!document.querySelector('#episode-operation')?.textContent.includes('Work continues in the background.'));
   }
   await page.getByRole('button',{name:'Suggest topics',exact:true}).click();await finish('ideas');
-  await page.getByRole('button',{name:'Use this idea'}).waitFor();await page.getByRole('button',{name:'Use this idea'}).click();
+  const suggestions=page.locator('#episode-suggestions details');
+  assert.equal(await suggestions.count(),3);
+  assert.equal(await page.locator('#episode-suggestions details[open]').count(),0,'Ideas should start collapsed');
+  await suggestions.first().locator('summary').focus();await page.keyboard.press('Enter');
+  await suggestions.first().getByRole('button',{name:'Use this idea'}).waitFor();
+  const rows=await suggestions.evaluateAll(items=>items.map(item=>{const r=item.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,bottom:r.bottom};}));
+  assert.ok(rows.every((row,i)=>Math.abs(row.x-rows[0].x)<1&&Math.abs(row.width-rows[0].width)<1&&(!i||row.y>=rows[i-1].bottom)),'Ideas must stack vertically');
+  await suggestions.first().locator('summary').click();assert.equal(await page.locator('#episode-suggestions details[open]').count(),0);
+  await suggestions.first().locator('summary').click();await suggestions.first().getByRole('button',{name:'Use this idea'}).click();
   const topicButtons=await Promise.all(['Suggest topics','Develop my idea'].map(name=>page.getByRole('button',{name,exact:true}).boundingBox()));
   assert.ok(Math.abs((topicButtons[0].y+topicButtons[0].height)-(topicButtons[1].y+topicButtons[1].height))<2,'Topic buttons should align');
   await page.getByRole('button',{name:'Develop my idea'}).click();await finish('develop');await page.getByRole('button',{name:'Approve brief & generate manuscript'}).waitFor();
@@ -121,6 +129,6 @@ const fixture=createServer(async(req,res)=>{
   assert.equal(await page.locator('#neuralcast-persistent-audio').evaluate(a=>a.paused),false);
   assert.deepEqual(actions.map(a=>a.action),['ideas','develop','develop','write','revise','render','publish']);
   assert.ok(actions.find(a=>a.action==='render').revision);assert.equal(errors.length,0,errors.join('\n'));
-  console.log('Episode admin browser journey passed: ideas → saved brief → specific brief feedback → manuscript feedback → comparison → private audio → exact publication approval; mobile layout and persistent live audio verified.');
+  console.log('Episode admin browser journey passed: ideas → saved brief → specific brief feedback → manuscript feedback → comparison → private audio → exact publication approval; collapsible stacked ideas, mobile layout and persistent live audio verified.');
  }catch(e){console.error('Fixture phase',phase,'actions',actions);if(page){console.error((await page.locator('body').innerText()).slice(-7000));await page.screenshot({path:'/tmp/episode-admin-failure.png',fullPage:true});}throw e;}finally{await browser?.close();app.kill('SIGTERM');fixture.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

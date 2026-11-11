@@ -109,7 +109,7 @@ export function AdminEpisodes(){
     <p className={styles.muted}>Suggests topics and writes one approved queued brief. It waits while a manuscript or recording needs your review.</p>
     {progressAt("schedule")}
    </section>
-   <div id="episode-suggestions" tabIndex={-1} className={styles.ideas}>{view?.ideas.map(idea=><article className={styles.idea} key={idea.id}><h4>{idea.title}</h4><p>{idea.premise}</p><p className={styles.muted}>{idea.angle}</p><small>{idea.artists.join(" · ")}</small><p><button disabled={disabled} onClick={()=>setTopic(`${idea.title}\n\n${idea.premise}\n\n${idea.angle}`)}>Use this idea</button></p></article>)}</div>
+   <div id="episode-suggestions" tabIndex={-1} className={styles.ideas}>{view?.ideas.map(idea=><details className={styles.idea} key={idea.id}><summary>{idea.title}</summary><div className={styles.ideaBody}><p>{idea.premise}</p><p className={styles.muted}>{idea.angle}</p><small>{idea.artists.join(" · ")}</small><div className={styles.actions}><button disabled={disabled} onClick={()=>setTopic(`${idea.title}\n\n${idea.premise}\n\n${idea.angle}`)}>Use this idea</button></div></div></details>)}</div>
   </section>
 
   <div className={styles.columns}><aside className={styles.panel}><h3>Your episodes</h3><div className={styles.list}>{view?.episodes.map(e=><button disabled={busy||unsaved} key={e.id} className={`${styles.episode} ${selected===e.id?styles.selected:""}`} onClick={()=>{setSelected(e.id);setError(null);}}><span>{e.episode_number?`${String(e.episode_number).padStart(3,"0")} · `:""}{e.title}</span><span className={styles.badge}>{label(e.status)}</span></button>)}</div>{view&&!view.episodes.length&&<p className={styles.muted}>Develop an idea to begin.</p>}</aside>

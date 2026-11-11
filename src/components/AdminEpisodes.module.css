@@ -63,9 +63,12 @@
 .workspace .selected { border-color: var(--episode-accent); background: #b99b7012; }
 .badge { display: inline-block; width: fit-content; font-size: .72rem; letter-spacing: .04em; text-transform: uppercase; color: var(--episode-accent); }
 .panel > .badge { margin-bottom: .6rem; }
-.ideas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 1rem; }
-.idea { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; padding: 1rem; }
-.idea p:last-child { margin: auto 0 0; padding-top: 1rem; }
+.ideas { display: grid; grid-template-columns: minmax(0, 1fr); gap: .75rem; }
+.idea { border: 1px solid var(--line); border-radius: 12px; padding: 1rem; min-width: 0; }
+.idea summary { font-weight: 600; }
+.ideaBody { display: grid; gap: .75rem; padding-top: 1rem; }
+.ideaBody p, .ideaBody .actions { margin: 0; }
+.ideaBody small { color: var(--muted); }
 .schedule { display: grid; gap: .75rem; margin: 1.4rem 0; padding: 1rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .schedule .muted { margin: .25rem 0 0; font-size: .85rem; }
 .scheduleControls { justify-content: space-between; }
