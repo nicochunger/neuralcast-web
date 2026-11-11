@@ -138,3 +138,4 @@
 .audioReview { position:sticky; top:180px; z-index:2; background:var(--panel-bg,var(--surface)); padding:1rem; border:1px solid var(--line); border-radius:10px; }
 .reviewActions { position:sticky; bottom:85px; padding:1rem; background:var(--panel-bg,var(--surface)); border:1px solid var(--line); z-index:3; }
 .publication { margin:1.5rem 0; padding:1rem; border:1px solid var(--line); }
+.audioReview .chapters { max-height: 110px; overflow: auto; }
