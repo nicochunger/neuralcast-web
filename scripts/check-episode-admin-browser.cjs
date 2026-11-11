@@ -3,26 +3,28 @@ const assert=require('node:assert/strict'),{createServer}=require('node:http'),{
 const {encode}=require('next-auth/jwt');
 const {chromium}=require(process.env.EPISODE_PLAYWRIGHT_MODULE||'playwright');
 const secret='offline-episode-admin-secret',token='offline-admin-token';
-let phase='empty',feedback={overall:'',sections:{},research:false},revision=1,job=null,ideas=[],actions=[],briefRefined=false,retries=0;
+let phase='empty',feedback={overall:'',sections:{},research:false},revision=1,job=null,ideas=[],actions=[],briefRefined=false,retries=0,archived=false,editedOpening=null;
 const before='Bienvenidos. Una historia sobre las voces que cambian una banda.',after='Bienvenidos. Hay voces que cambian nuestra manera de escuchar.';
-const segments=()=>[{id:'opening',kind:'commentary',role:'opening',script:phase==='written'?before:after,companion:{title:'Una voz'}},{id:'song',kind:'music',artist:'Test artist',title:'Test song'},{id:'closing',kind:'commentary',role:'closing',script:'Gracias por acompañarnos.',companion:{title:'Hasta pronto'}}];
-const episode=()=>phase==='empty'?null:{id:'test-story',status:phase==='brief'?'brief_review':phase==='audio'?'audio_review':phase==='published'?'published':'manuscript_review',revision:String(revision).padStart(64,'a'),episode_number:null,concept_hash:'a'.repeat(64),concept_approved:phase!=='brief',proposal:{title:'Una voz que cambia',premise:briefRefined?'La decisión personal detrás de una voz nueva.':'La identidad de una banda cuando cambia su cantante.',outline:['Las personas','Una decisión'],target_seconds:1800,commentary_budget_seconds:600},brief:{instructions:'Conservar las canciones completas.',initial_research:[]},songs:[{id:'song',kind:'music',artist:'Test artist',title:'Test song',rationale:'Una canción para la historia.'}],segments:phase==='brief'?[]:segments(),feedback,blockers:[],changes:phase==='revised'?[{segment_id:'opening',explanation:'Se amplió el comienzo.'}]:[],timing:{spoken_words:250,estimated_total_seconds:1800},audio:['audio','published'].includes(phase)?{revision:'b'.repeat(64),render_hash:'c'.repeat(64),duration:20,current:true,chapters:[{id:'opening',title:'Una voz',kind:'commentary',start:0,end:10},{id:'closing',title:'Hasta pronto',kind:'commentary',start:10,end:20}]}:null,history:phase==='brief'?[]:[{id:'saved-run',kind:'editorial',created_at:'2026-11-09T12:00:00Z',manuscript_hash:'d'.repeat(64)}]};
+const segments=()=>[{id:'opening',kind:'commentary',role:'opening',script:editedOpening||(phase==='written'?before:after),companion:{title:'Una voz'}},{id:'song',kind:'music',artist:'Test artist',title:'Test song'},{id:'closing',kind:'commentary',role:'closing',script:'Gracias por acompañarnos.',companion:{title:'Hasta pronto'}}];
+const episode=()=>phase==='empty'?null:{id:'test-story',archived,production_notes:['Verify the chosen recording.'],listening_notes:[{segment_id:'opening',note:'Check the opening pacing.'}],voice_directions:'',status:phase==='brief'?'brief_review':phase==='audio'?'audio_review':phase==='published'?'published':'manuscript_review',revision:String(revision).padStart(64,'a'),episode_number:null,concept_hash:'a'.repeat(64),concept_approved:phase!=='brief',proposal:{title:'Una voz que cambia',premise:briefRefined?'La decisión personal detrás de una voz nueva.':'La identidad de una banda cuando cambia su cantante.',outline:['Las personas','Una decisión'],target_seconds:1800,commentary_budget_seconds:600},brief:{instructions:'Conservar las canciones completas.',initial_research:[]},songs:[{id:'song',kind:'music',artist:'Test artist',title:'Test song',rationale:'Una canción para la historia.'}],segments:phase==='brief'?[]:segments(),feedback,blockers:[],changes:phase==='revised'?[{segment_id:'opening',explanation:'Se amplió el comienzo.'}]:[],timing:{spoken_words:250,estimated_total_seconds:1800},audio:['audio','published'].includes(phase)?{revision:'b'.repeat(64),render_hash:'c'.repeat(64),duration:20,current:true,chapters:[{id:'opening',title:'Una voz',kind:'commentary',start:0,end:10},{id:'closing',title:'Hasta pronto',kind:'commentary',start:10,end:20}]}:null,history:phase==='brief'?[]:[{id:'saved-run',kind:'editorial',created_at:'2026-11-09T12:00:00Z',manuscript_hash:'d'.repeat(64)}]};
 const wav=Buffer.alloc(44+8000*20*2);wav.write('RIFF');wav.writeUInt32LE(wav.length-8,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(1,22);wav.writeUInt32LE(8000,24);wav.writeUInt32LE(16000,28);wav.writeUInt16LE(2,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(wav.length-44,40);
 const fixture=createServer(async(req,res)=>{
  try{
  if(req.headers.authorization!==`Bearer ${token}`){res.writeHead(401);res.end('{}');return;}
  const url=new URL(req.url,'http://fixture');const route=url.pathname;
+ if(route.endsWith('/cover')){res.setHeader('Content-Type','image/png');res.end(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a6ioAAAAASUVORK5CYII=','base64'));return;}
  let raw='';for await(const chunk of req)raw+=chunk;const body=raw?JSON.parse(raw):{};
  res.setHeader('Content-Type','application/json');
  if(route==='/admin/capabilities'){res.end(JSON.stringify({stations:['neuralforge','neuralcast'],host_channels:[],archetypes:[],operations:{}}));return;}
  if(route.endsWith('/audio/'+'b'.repeat(64))){res.setHeader('Content-Type','audio/wav');res.setHeader('Accept-Ranges','bytes');res.end(wav);return;}
  if(route.includes('/history/')){res.end(JSON.stringify({segments:[{...segments()[0],script:before},...segments().slice(1)]}));return;}
+ if(route.endsWith('/review')){if(body.segment_id)editedOpening=body.script;else if(body.archived!==undefined)archived=body.archived;revision++;res.end(JSON.stringify(episode()));return;}
  if(route.endsWith('/retry')){assert.equal(body.request_id,job.episode_options.request_id);retries++;job={...job,job_id:job.job_id+'-retry',status:'running',finished_at:null,progress:{...job.progress,current:'Fact review',error:null,steps:job.progress.steps.map(s=>({...s,status:s.status==='failed'?'running':s.status}))}};res.end(JSON.stringify({job_id:job.job_id,request_id:body.request_id}));return;}
  if(route.endsWith('/feedback')){assert.equal(body.revision,episode().revision);feedback={overall:body.overall,sections:body.sections,research:body.research};revision++;res.end(JSON.stringify(episode()));return;}
  if(route.endsWith('/actions')){
   actions.push(body);const id='request-'+actions.length;
   if(body.action==='ideas')ideas=[{id:'idea-1',title:'Una voz que cambia',premise:'La identidad de una banda.',angle:'Personas, decisiones y canciones.',artists:['Test artist']},{id:'idea-2',title:'Otra forma de escuchar',premise:'Una decisión musical.',angle:'Escenarios y canciones.',artists:['Another artist']},{id:'idea-3',title:'El siguiente capítulo',premise:'Una historia conectada.',angle:'Recuerdos y nuevos caminos.',artists:['Third artist']}];
-  if(body.action==='develop'){if(body.episode_id){assert.equal(body.episode_id,'test-story');assert.equal(body.topic,'Keep the theme, but focus more on the personal conflict.');assert.equal(body.target_minutes,30);briefRefined=true;}phase='brief';}if(body.action==='write')phase='written';if(body.action==='revise')phase='revised';if(body.action==='render')phase='audio';if(body.action==='publish'){assert.equal(body.render_hash,'c'.repeat(64));phase='published';}
+  if(body.action==='develop'){if(body.episode_id){assert.equal(body.episode_id,'test-story');assert.equal(body.topic,'Keep the theme, but focus more on the personal conflict.');assert.equal(body.target_minutes,30);briefRefined=true;}phase='brief';}if(body.action==='write')phase='written';if(body.action==='revise'){phase='revised';editedOpening=null;feedback={overall:'',sections:{},research:false};}if(body.action==='render')phase='audio';if(body.action==='publish'){assert.equal(body.render_hash,'c'.repeat(64));phase='published';}
   const action=body.action==='develop'&&body.episode_id?'refine_brief':body.action;
   const ids=action==='write'?['write','factual_support','narrative_continuity','conversational_voice','edit']:action==='render'?['narration','mix','upload']:['work'];
   const labels={write:'Research and draft',factual_support:'Fact review',narrative_continuity:'Story review',conversational_voice:'Voice review',edit:'Final edit',narration:'Generating voice',mix:'Assembling audio',upload:'Uploading private preview',work:'Working on the request'};
@@ -30,7 +32,7 @@ const fixture=createServer(async(req,res)=>{
 
   res.end(JSON.stringify({job_id:id,request_id:id}));return;
  }
- const e=episode();res.end(JSON.stringify({revision:'f'.repeat(64),weekly_enabled:false,target_minutes:30,ideas,episodes:e?[{id:e.id,title:e.proposal.title,status:e.status,episode_number:null,managed:true}]:[],episode:url.searchParams.has('episode_id')?e:null,job}));
+ const e=episode();res.end(JSON.stringify({revision:'f'.repeat(64),weekly_enabled:false,target_minutes:30,ideas,episodes:e?[{id:e.id,title:e.proposal.title,archived:e.archived,status:e.status,episode_number:null,managed:true}]:[],episode:url.searchParams.has('episode_id')?e:null,job}));
  }catch(e){res.writeHead(500);res.end(JSON.stringify({detail:String(e)}));}
 });
 (async()=>{
@@ -47,12 +49,15 @@ const fixture=createServer(async(req,res)=>{
   await page.route('**/api/nowplaying/**',r=>r.fulfill({json:{}}));await page.route('**/api/host-companion/**',r=>r.fulfill({json:{}}));
   await page.goto(base+'/admin/episodes');await page.getByRole('heading',{name:'Episodes',exact:true}).waitFor();
   async function finish(action){
+    for(let i=0;i<500&&job?.progress?.action!==action;i++)await new Promise(r=>setTimeout(r,10));
+    assert.equal(job?.progress?.action,action);
     await page.locator(`#episode-operation[data-action="${action}"]`).waitFor();
     assert.equal(await page.getByRole('button',{name:'View progress',exact:true}).count(),1);
     assert.ok(await page.locator('#episode-operation').getByText(/Elapsed/).count());
     job.status='succeeded';job.finished_at=new Date().toISOString();job.progress.steps.forEach(s=>s.status='succeeded');job.log_tail='Completed fixture operation.';
     await page.waitForFunction(()=>!document.querySelector('#episode-operation')?.textContent.includes('Work continues in the background.'));
   }
+  await page.getByText('New episode · ideas and topics',{exact:true}).click();
   await page.getByRole('button',{name:'Suggest topics',exact:true}).click();await finish('ideas');
   const suggestions=page.locator('#episode-suggestions details');
   assert.equal(await suggestions.count(),3);
@@ -66,11 +71,14 @@ const fixture=createServer(async(req,res)=>{
   const topicButtons=await Promise.all(['Suggest topics','Develop my idea'].map(name=>page.getByRole('button',{name,exact:true}).boundingBox()));
   assert.ok(Math.abs((topicButtons[0].y+topicButtons[0].height)-(topicButtons[1].y+topicButtons[1].height))<2,'Topic buttons should align');
   await page.getByRole('button',{name:'Develop my idea'}).click();await finish('develop');await page.getByRole('button',{name:'Approve brief & generate manuscript'}).waitFor();
+  await page.getByRole('button',{name:'Archive draft',exact:true}).click();await page.getByRole('button',{name:'Restore draft',exact:true}).waitFor();
+  await page.getByRole('button',{name:'Restore draft',exact:true}).click();await page.getByRole('button',{name:'Archive draft',exact:true}).waitFor();
   const createdActions=actions.length;
   await page.reload();await page.getByLabel('Feedback on this brief',{exact:true}).waitFor();
   assert.equal(actions.length,createdActions,'Opening an existing brief must not regenerate it');
   assert.equal(await page.getByText('La identidad de una banda cuando cambia su cantante.',{exact:true}).count(),1);
   assert.equal(await page.getByRole('button',{name:'Apply feedback',exact:true}).isDisabled(),true);
+  await page.getByText('New episode · ideas and topics',{exact:true}).click();
   await page.getByLabel('Your episode idea',{exact:true}).fill('An unrelated new episode idea');
   await page.getByLabel('Approximate minutes',{exact:true}).fill('45');
   await page.getByLabel('Feedback on this brief',{exact:true}).fill('Keep the theme, but focus more on the personal conflict.');
@@ -110,6 +118,9 @@ const fixture=createServer(async(req,res)=>{
   assert.equal(await page.locator('#episode-operation li[data-state="succeeded"]').count(),3);
   await finish('write');await page.locator('#episode-operation').getByRole('button',{name:'Read manuscript',exact:true}).click();
   await page.getByLabel('Overall feedback',{exact:true}).waitFor();
+  await page.getByRole('button',{name:'Edit passage',exact:true}).first().click();
+  await page.getByLabel('Passage text',{exact:true}).fill('Una historia concreta sobre las voces de una banda.');
+  await page.getByRole('button',{name:'Save correction',exact:true}).click();await page.getByLabel('Passage text',{exact:true}).waitFor({state:'hidden'});await page.getByText('Una historia concreta sobre las voces de una banda.',{exact:true}).waitFor();
   await page.getByLabel('Overall feedback',{exact:true}).fill('Start broader; keep the story.');
   await page.getByRole('button',{name:'Save feedback',exact:true}).click();await page.locator('#episode-operation').getByText('Feedback saved.',{exact:true}).waitFor();
   await page.getByRole('button',{name:'Apply feedback',exact:true}).click();await finish('revise');await page.getByText(after,{exact:true}).waitFor();
@@ -130,5 +141,5 @@ const fixture=createServer(async(req,res)=>{
   assert.deepEqual(actions.map(a=>a.action),['ideas','develop','develop','write','revise','render','publish']);
   assert.ok(actions.find(a=>a.action==='render').revision);assert.equal(errors.length,0,errors.join('\n'));
   console.log('Episode admin browser journey passed: ideas → saved brief → specific brief feedback → manuscript feedback → comparison → private audio → exact publication approval; collapsible stacked ideas, mobile layout and persistent live audio verified.');
- }catch(e){console.error('Fixture phase',phase,'actions',actions);if(page){console.error((await page.locator('body').innerText()).slice(-7000));await page.screenshot({path:'/tmp/episode-admin-failure.png',fullPage:true});}throw e;}finally{await browser?.close();app.kill('SIGTERM');fixture.close();}
+ }catch(e){console.error('Fixture phase',phase,'actions',actions);if(page){console.error('TEXTAREAS',await page.locator('textarea').evaluateAll(xs=>xs.map(x=>({html:x.outerHTML,labels:Array.from(x.labels||[]).map(l=>l.textContent)}))));console.error((await page.locator('body').innerText()).slice(-7000));await page.screenshot({path:'/tmp/episode-admin-failure.png',fullPage:true});}throw e;}finally{await browser?.close();app.kill('SIGTERM');fixture.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

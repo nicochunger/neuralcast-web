@@ -9,16 +9,17 @@ async function proxy(request: Request, context: Context) {
   if (!session?.user?.isAdmin) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   const { station, action } = await context.params;
   if (!["neuralcast", "neuralforge"].includes(station)) return NextResponse.json({ error: "Unknown station." }, { status: 404 });
-  const audio = action.length === 3 && identifier.test(action[0]) && action[1] === "audio" && /^[a-f0-9]{64}$/.test(action[2]);
+  const cover=action.length===1&&action[0]==="cover"&&request.method==="GET";
+  const audio = action.length === 3 && identifier.test(action[0]) && ((action[1] === "audio" && /^[a-f0-9]{64}$/.test(action[2])) || (action[1] === "recording" && identifier.test(action[2])));
   const history = action.length === 4 && identifier.test(action[0]) && action[1] === "history" &&
     ["editorial", "delivery", "revisions"].includes(action[2]) && /^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$/.test(action[3]);
-  const feedback = action.length === 2 && identifier.test(action[0]) && action[1] === "feedback";
+  const feedback = action.length === 2 && identifier.test(action[0]) && ["feedback", "review"].includes(action[1]);
   const allowed = (action.length === 1 && action[0] === "state" && request.method === "GET") ||
-    (action.length === 1 && ["actions", "retry"].includes(action[0]) && request.method === "POST") ||
+    (action.length === 1 && ["actions", "retry", "stop"].includes(action[0]) && request.method === "POST") ||
     (action.length === 1 && action[0] === "schedule" && request.method === "PUT") ||
     (feedback && request.method === "PUT") || (history && request.method === "GET") ||
-    (audio && ["GET", "HEAD"].includes(request.method));
-  if (!allowed) return NextResponse.json({ error: "Unknown operation." }, { status: 404 });
+    (audio && ["GET", "HEAD"].includes(request.method)) || cover;
+  if (!allowed&&!cover) return NextResponse.json({ error: "Unknown operation." }, { status: 404 });
   if (["POST", "PUT"].includes(request.method) && request.headers.get("origin") !== new URL(request.url).origin)
     return NextResponse.json({ error: "Invalid request origin." }, { status: 403 });
   try {
@@ -35,7 +36,7 @@ async function proxy(request: Request, context: Context) {
       if (id) suffix += `?episode_id=${encodeURIComponent(id)}`;
     }
     const upstream = await episodeAdminRequest(`${station}${suffix}`, { method: request.method, body, headers });
-    if (audio && (upstream.ok || upstream.status === 416)) {
+    if ((audio||cover) && (upstream.ok || upstream.status === 416)) {
       const output = new Headers({ "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" });
       for (const key of ["content-type", "content-length", "content-range", "accept-ranges", "etag", "last-modified"]) {
         const value = upstream.headers.get(key); if (value) output.set(key, value);
