@@ -21,7 +21,11 @@ const req=(method='GET',body,headers={},suffix='')=>new Request('https://radio.t
  upstream=async()=>new Response('audio',{status:206,headers:{'Content-Type':'audio/mpeg','Content-Range':'bytes 0-4/20','Accept-Ranges':'bytes'}});
  const audio=await out.GET(req('GET',undefined,{Range:'bytes=0-4'}),ctx(['story','audio','b'.repeat(64)]));
  assert.equal(audio.status,206);assert.equal(await audio.text(),'audio');assert.equal(audio.headers.get('Cache-Control'),'private, no-store');assert.equal(calls.at(-1).init.headers.get('range'),'bytes=0-4');
+ const paired=await out.GET(req('GET',undefined,{Range:'bytes=0-4'}),ctx(['story','comparisons','saved','a','audio','b'.repeat(64)]));
+ assert.equal(paired.status,206);assert.equal(await paired.text(),'audio');assert.equal(calls.at(-1).route,'neuralforge/story/comparisons/saved/a/audio/'+'b'.repeat(64));assert.equal(calls.at(-1).init.headers.get('range'),'bytes=0-4');
+ assert.equal((await out.GET(req(),ctx(['story','comparisons','saved','c','audio','b'.repeat(64)]))).status,404);
  assert.equal((await out.GET(req(),ctx(['story','audio','../escape']))).status,404);
+ upstream=async()=>Response.json({versions:[]});assert.equal((await out.GET(req(),ctx(['story','comparisons','saved']))).status,200);
  upstream=async()=>Response.json({segments:[]});assert.equal((await out.GET(req(),ctx(['story','history','editorial','run-a']))).status,200);
  upstream=async()=>{throw Error('private authentication details');};const failure=await out.GET(req(),ctx());assert.equal(failure.status,502);assert.ok(!(await failure.text()).includes('authentication details'));
  console.log('Episode admin proxy checks passed: authentication, exact feedback, approved paths, Origin, body bounds, private ranges and safe errors.');

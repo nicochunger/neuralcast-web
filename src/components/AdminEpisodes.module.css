@@ -184,3 +184,12 @@
 .workspace select { width: 100%; min-width: 0; }
 .workspace details > textarea + button { margin-top: .85rem; }
 .schedule > .muted { margin-top: 1rem; }
+
+.comparison { border-top: 1px solid var(--border, #555); margin-top: 2rem; padding-top: 1rem; scroll-margin-top: 8rem; }
+.comparisonGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1rem; }
+.comparisonVersion { min-width: 0; border: 1px solid var(--border, #555); border-radius: 12px; padding: 1rem; }
+.comparisonVersion h5 { font-size: 1.15rem; margin: 0 0 .5rem; }
+.comparisonVersion h6 { font-size: 1rem; margin-bottom: .5rem; }
+.comparisonVersion audio { width: 100%; }
+.comparisonVersion details { margin: .75rem 0; }
+@media (max-width: 900px) { .comparisonGrid { grid-template-columns: 1fr; } }
