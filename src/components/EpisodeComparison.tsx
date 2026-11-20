@@ -19,9 +19,9 @@ type Version = {
 type Comparison = { id: string; current_concept: boolean; versions: Version[]; pipelines: Record<string, string> };
 const time = (seconds: number) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
 
-function VersionReview({ version: v, base, episodeId, comparisonId, disabled, revealed, onRender }: {
+function VersionReview({ version: v, base, episodeId, comparisonId, disabled, revealed, onRender, onResolve }: {
   version: Version; base: string; episodeId: string; comparisonId: string; disabled: boolean; revealed: boolean;
-  onRender: () => void;
+  onRender: () => void; onResolve: () => void;
 }) {
   const [draft, setDraft] = useState(false);
   const player = useRef<HTMLAudioElement>(null);
@@ -33,7 +33,7 @@ function VersionReview({ version: v, base, episodeId, comparisonId, disabled, re
     {v.failure && <p role="alert">{v.failure}</p>}
     {v.timing && <p>{v.timing.spoken_words} words · estimated {time(v.timing.estimated_total_seconds)}</p>}
     <p>{v.attempts} attempts · {time(v.elapsed_seconds)} total model time (parallel stages overlap)</p>
-    {!!v.blockers.length && <div role="alert"><strong>Questions to resolve</strong><ul>{v.blockers.map((b, i) => <li key={i}>{b}</li>)}</ul></div>}
+    {!!v.blockers.length && <div role="alert"><strong>The agent needs to resolve these questions</strong><p>It can qualify conflicting accounts or remove unsupported claims. You do not need to research them yourself.</p><button disabled={disabled || !v.manuscript_hash} onClick={onResolve}>Resolve research questions</button><ul>{v.blockers.map((b, i) => <li key={i}>{b}</li>)}</ul></div>}
     {v.audio ? <div><audio ref={player} controls preload="none" src={`${base}/${episodeId}/comparisons/${comparisonId}/${v.id}/audio/${v.audio.revision}`} aria-label={`${v.label} comparison audio`} /><p>Local listening copy · {time(v.audio.duration)}</p><div className={styles.chapters}>{v.audio.chapters.map(chapter => <button key={chapter.id} onClick={() => { if (player.current) { player.current.currentTime = chapter.start; void player.current.play(); } }}>{time(chapter.start)} · {chapter.title}</button>)}</div></div> : <button disabled={disabled || !v.manuscript_hash || !!v.blockers.length} onClick={onRender}>Approve {v.label.toLowerCase()} manuscript & generate audio</button>}
     {(!!v.segments.length || !!v.draft_segments.length) && <>
       <label className={styles.check}><input type="checkbox" checked={showDraft} disabled={!v.segments.length} onChange={e => setDraft(e.target.checked)} />Read initial draft before reviews</label>
@@ -86,7 +86,7 @@ export function EpisodeComparison({ base, episode, disabled, onAction }: {
       <p>Compare the drafts as well as the final edit. Review factual support, story development, voice, transitions and unresolved questions. One paired run is exploratory; repeat with other proposals before choosing a default.</p>
       <button onClick={() => setRevealed(v => !v)}>{revealed ? "Hide pipeline identities" : "Reveal pipeline identities"}</button>
       {revealed && <p>{result.versions.map(v => `${v.label}: ${result.pipelines[v.id] === "hybrid" ? "Codex research/draft and facts, Gemini reviews/edit" : "Gemini Neon for every editorial stage"}. `).join("")}Both use the same speech model.</p>}
-      <div className={styles.comparisonGrid}>{result.versions.map(v => <VersionReview key={`${result.id}:${v.id}`} version={v} base={base} episodeId={episode.id} comparisonId={result.id} disabled={disabled || episode.status === "published"} revealed={revealed} onRender={() => onAction("compare_render", { comparison_id: result.id, variant: v.id, comparison_manuscript_hash: v.manuscript_hash })} />)}</div>
+      <div className={styles.comparisonGrid}>{result.versions.map(v => <VersionReview key={`${result.id}:${v.id}`} version={v} base={base} episodeId={episode.id} comparisonId={result.id} disabled={disabled || episode.status === "published"} revealed={revealed} onResolve={() => onAction("compare_resolve", { comparison_id: result.id, variant: v.id, comparison_manuscript_hash: v.manuscript_hash })} onRender={() => onAction("compare_render", { comparison_id: result.id, variant: v.id, comparison_manuscript_hash: v.manuscript_hash })} />)}</div>
     </>}
   </section>;
 }
