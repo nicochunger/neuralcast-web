@@ -42,12 +42,32 @@ const operations: Record<string, [string, string, string?]> = {
 export function operationText(action: string, complete = false) {
   return operations[action]?.[complete ? 1 : 0] ?? "Episode operation";
 }
-export const jobActive = (job: EpisodeJob | null | undefined) => ["submitting", "running", "accepted"].includes(job?.status ?? "");
+export const jobActive = (job: EpisodeJob | null | undefined) =>
+  ["submitting", "running", "accepted"].includes(job?.status ?? "");
+
 export function pendingJob(action: string, episodeId?: string | null): EpisodeJob {
-  return { job_id: "submitting", local: true, status: "submitting", accepted_at: new Date().toISOString(), progress: { action, episode_id: episodeId, steps: [], current: "Submitting request…" } };
+  return {
+    job_id: "submitting",
+    local: true,
+    status: "submitting",
+    accepted_at: new Date().toISOString(),
+    progress: {
+      action,
+      episode_id: episodeId,
+      steps: [],
+      current: "Submitting request…",
+    },
+  };
 }
 
-export function EpisodeActivity({ job, compact = false, disabled, onShow, onResult, onRetry }: {
+export function EpisodeActivity({
+  job,
+  compact = false,
+  disabled,
+  onShow,
+  onResult,
+  onRetry,
+}: {
   job: EpisodeJob;
   compact?: boolean;
   disabled: boolean;
@@ -57,47 +77,140 @@ export function EpisodeActivity({ job, compact = false, disabled, onShow, onResu
 }) {
   const [now, setNow] = useState(Date.now());
   const strip = useRef<HTMLDivElement>(null);
-  const active = jobActive(job), failed = job.status === "failed";
+  const active = jobActive(job);
+  const failed = job.status === "failed";
   const action = job.progress?.action ?? "";
   const title = failed ? `${operationText(action)} failed` : operationText(action, !active);
+
   useEffect(() => {
     if (!active) return;
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
   }, [active, job.job_id]);
+
   useEffect(() => {
     if (!compact) return;
     const header = document.querySelector(".appHeader");
     if (!header) return;
-    const update = () => strip.current?.style.setProperty("--episode-header-offset", `${header.getBoundingClientRect().height + 8}px`);
-    const observer = new ResizeObserver(update); observer.observe(header); update();
+    const update = () =>
+      strip.current?.style.setProperty(
+        "--episode-header-offset",
+        `${header.getBoundingClientRect().height + 8}px`
+      );
+    const observer = new ResizeObserver(update);
+    observer.observe(header);
+    update();
     return () => observer.disconnect();
   }, [compact]);
+
   const start = Date.parse(job.started_at || job.accepted_at || "");
   const end = job.finished_at ? Date.parse(job.finished_at) : now;
   const seconds = Number.isFinite(start) ? Math.max(0, Math.floor((end - start) / 1000)) : null;
-  const elapsed = seconds === null ? "" : `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+  const elapsed =
+    seconds === null ? "" : `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
   const resultLabel = operations[action]?.[2];
-  return <div ref={strip} tabIndex={compact ? undefined : -1} id={compact ? undefined : "episode-operation"} data-action={action}
-    className={`${compact ? styles.activityStrip : styles.activityCard} ${failed ? styles.activityFailed : ""}`}
-    aria-label={compact ? "Current operation" : "Operation progress"}>
-    <div className={styles.activityHeading}>
-      <div role="status" aria-live="polite"><strong><span className={`${styles.activityDot} ${active ? styles.activityActive : ""}`} aria-hidden="true"/>{title}{active ? "…" : ""}</strong>
-        {(active || failed) && <p>{job.progress?.current || "Preparing the operation"}</p>}</div>
-      {elapsed && <span className={styles.elapsed}>{active ? "Elapsed" : "Duration"} {elapsed}</span>}
-    </div>
-    {compact ? <button disabled={disabled} onClick={active || failed ? onShow : onResult}>{active || failed || !resultLabel ? "View progress" : resultLabel}</button> : <>
-      {active && <p className={styles.muted}>Work continues in the background. You can leave and return to this page.</p>}
-      {!!job.progress?.steps.length && <ol className={styles.activitySteps} aria-label="Operation stages">{job.progress.steps.map(step => <li key={step.id} data-state={step.status} aria-label={`${step.label}: ${step.status}`}>
-        <span aria-hidden="true">{step.status === "succeeded" ? "✓" : step.status === "failed" ? "!" : step.status === "running" ? "●" : "○"}</span>{step.label}
-      </li>)}</ol>}
-      {action === "write" && active && <p className={styles.muted}>Fact, story and voice reviews run in parallel after the draft.</p>}
-      {failed && <p className={styles.activityError}>{job.progress?.error || "This operation did not finish. Completed work is retained."}</p>}
-      <div className={styles.actions}>
-        {failed && job.episode_options?.request_id && <button disabled={disabled} onClick={onRetry}>Retry saved operation</button>}
-        {!active && !failed && resultLabel && <button disabled={disabled} onClick={onResult}>{resultLabel}</button>}
+
+  return (
+    <div
+      ref={strip}
+      tabIndex={compact ? undefined : -1}
+      id={compact ? undefined : "episode-operation"}
+      data-action={action}
+      className={`${compact ? styles.activityStrip : styles.activityCard} ${
+        failed ? styles.activityFailed : ""
+      }`}
+      aria-label={compact ? "Current operation" : "Operation progress"}
+    >
+      <div className={styles.activityHeading}>
+        <div role="status" aria-live="polite" className={styles.activityTitleWrap}>
+          <strong>
+            <span
+              className={`${styles.activityDot} ${active ? styles.activityActive : ""}`}
+              aria-hidden="true"
+            />
+            {title}
+            {active ? "…" : ""}
+          </strong>
+          {(active || failed) && <p>{job.progress?.current || "Preparing the operation"}</p>}
+        </div>
+        {elapsed && (
+          <span className={styles.elapsed}>
+            {active ? "Elapsed" : "Duration"} {elapsed}
+          </span>
+        )}
       </div>
-      {job.log_tail && <details><summary>Show details</summary><pre className={styles.log}>{job.log_tail}</pre></details>}
-    </>}
-  </div>;
+
+      {compact ? (
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={active || failed ? onShow : onResult}
+        >
+          {active || failed || !resultLabel ? "View progress" : resultLabel}
+        </button>
+      ) : (
+        <>
+          {active && (
+            <p className={styles.muted}>
+              Work continues in the background. You can leave and return to this page.
+            </p>
+          )}
+          {!!job.progress?.steps.length && (
+            <ol className={styles.activitySteps} aria-label="Operation stages">
+              {job.progress.steps.map((step) => (
+                <li
+                  key={step.id}
+                  data-state={step.status}
+                  aria-label={`${step.label}: ${step.status}`}
+                >
+                  <span aria-hidden="true">
+                    {step.status === "succeeded"
+                      ? "✓"
+                      : step.status === "failed"
+                        ? "!"
+                        : step.status === "running"
+                          ? "●"
+                          : "○"}
+                  </span>
+                  {step.label}
+                </li>
+              ))}
+            </ol>
+          )}
+          {action === "write" && active && (
+            <p className={styles.muted}>
+              Fact, story and voice reviews run in parallel after the draft.
+            </p>
+          )}
+          {failed && (
+            <p className={styles.activityError}>
+              {job.progress?.error || "This operation did not finish. Completed work is retained."}
+            </p>
+          )}
+          {((failed && job.episode_options?.request_id) || (!active && !failed && resultLabel)) && (
+            <div className={styles.actions}>
+              {failed && job.episode_options?.request_id && (
+                <button type="button" disabled={disabled} onClick={onRetry}>
+                  Retry saved operation
+                </button>
+              )}
+              {!active && !failed && resultLabel && (
+                <button type="button" className={styles.primary} disabled={disabled} onClick={onResult}>
+                  {resultLabel}
+                </button>
+              )}
+            </div>
+          )}
+          {job.log_tail && (
+            <details className={styles.inlineDisclosure}>
+              <summary>Show details</summary>
+              <div className={styles.disclosureBody}>
+                <pre className={styles.log}>{job.log_tail}</pre>
+              </div>
+            </details>
+          )}
+        </>
+      )}
+    </div>
+  );
 }
