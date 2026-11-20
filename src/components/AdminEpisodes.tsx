@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import styles from "./AdminEpisodes.module.css";
 import { EpisodeActivity, EpisodeJob, jobActive, operationText, pendingJob } from "./EpisodeActivity";
-import { EpisodeComparison } from "./EpisodeComparison";
 
 type Segment = {
   id: string;
@@ -26,7 +25,6 @@ type Feedback = {
 };
 
 type Episode = {
-  comparisons?: { id: string }[];
   id: string;
   status: string;
   revision: string;
@@ -102,9 +100,6 @@ const STOPPABLE_ACTIONS = [
   "write",
   "revise",
   "render",
-  "compare",
-  "compare_render",
-  "compare_resolve",
 ];
 
 function difference(before: string, after: string) {
@@ -370,7 +365,7 @@ export function AdminEpisodes() {
 
   async function act(action: string, extra: Record<string, unknown> = {}) {
     if (!view) return;
-    if (["render", "publish", "compare", "compare_render"].includes(action) && hasPendingFeedback) {
+    if (["render", "publish"].includes(action) && hasPendingFeedback) {
       setError("Apply or discard pending feedback before approval.");
       return;
     }
@@ -597,13 +592,11 @@ export function AdminEpisodes() {
       return;
     }
     if (["ideas", "weekly", "develop"].includes(action ?? "")) setShowNew(true);
-    const target = ["compare", "compare_render", "compare_resolve"].includes(action ?? "")
-      ? "episode-comparison"
-      : ["ideas", "weekly"].includes(action ?? "")
-        ? "episode-suggestions"
-        : action === "render"
-          ? "episode-audio-review"
-          : "episode-review";
+    const target = ["ideas", "weekly"].includes(action ?? "")
+      ? "episode-suggestions"
+      : action === "render"
+        ? "episode-audio-review"
+        : "episode-review";
     goToResult(id, target);
   }
 
@@ -1582,14 +1575,6 @@ export function AdminEpisodes() {
                   )}
                 </>
               )}
-
-              <EpisodeComparison
-                key={`${station}:${episode.id}`}
-                base={base}
-                episode={episode}
-                disabled={disabled || unsaved || hasPendingFeedback}
-                onAction={(action, extra) => void act(action, extra)}
-              />
             </>
           )}
           {progressAt("episode")}

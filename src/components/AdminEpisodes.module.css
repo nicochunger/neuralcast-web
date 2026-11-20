@@ -1199,67 +1199,6 @@
   background: color-mix(in srgb, var(--paper, #101317), transparent 20%);
 }
 
-/* ── Pipeline comparison ── */
-.comparison {
-  display: grid;
-  gap: 1rem;
-  margin-top: 0.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--line);
-  scroll-margin-top: 8rem;
-}
-
-.comparisonIntro {
-  display: grid;
-  gap: 0.5rem;
-}
-
-.comparisonControls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 0.85rem;
-}
-
-.comparisonResults {
-  display: grid;
-  gap: 0.85rem;
-}
-
-.comparisonGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.comparisonVersion {
-  display: grid;
-  gap: 0.85rem;
-  align-content: start;
-  min-width: 0;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 1.1rem;
-  background: var(--episode-card-bg);
-}
-
-.comparisonVersion h5 {
-  font-size: 1.05rem;
-}
-
-.comparisonVersion h6 {
-  font-size: 0.94rem;
-  margin-bottom: 0.35rem;
-}
-
-.comparisonMeta,
-.comparisonAudio,
-.comparisonDetails,
-.comparisonSegment {
-  display: grid;
-  gap: 0.55rem;
-}
-
 /* ── Scroll margins ── */
 .workspace
   :is(
@@ -1317,10 +1256,6 @@
   .workspace .episode {
     flex: 0 0 min(240px, 78vw);
     scroll-snap-align: start;
-  }
-
-  .comparisonGrid {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 
