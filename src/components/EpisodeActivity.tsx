@@ -176,7 +176,7 @@ export function EpisodeActivity({
           )}
           {action === "write" && active && (
             <p className={styles.muted}>
-              Fact, story and voice reviews run in parallel after the draft.
+              Research, drafting, editorial review, final editing and factual drift checks run in sequence.
             </p>
           )}
           {failed && (
