@@ -65,9 +65,12 @@ type Episode = {
 
 type Job = EpisodeJob;
 
+type AutomationMode = "off" | "draft_only" | "auto_publish";
+
 type View = {
   revision: string;
   weekly_enabled: boolean;
+  automation_mode?: AutomationMode;
   target_minutes: number;
   ideas: { id: string; title: string; premise: string; angle: string; artists: string[] }[];
   episodes: {
@@ -484,7 +487,7 @@ export function AdminEpisodes() {
     }
   }
 
-  async function weekly(enabled: boolean) {
+  async function weekly(mode: AutomationMode) {
     if (!view) return;
     setBusy(true);
     setError(null);
@@ -492,7 +495,8 @@ export function AdminEpisodes() {
     try {
       await request("schedule", "PUT", {
         revision: view.revision,
-        enabled,
+        enabled: mode !== "off",
+        mode,
         target_minutes: weeklyMinutes,
       });
       finishActivity();
@@ -1666,26 +1670,37 @@ export function AdminEpisodes() {
             </p>
           </div>
           <div className={styles.scheduleControls}>
-            <label className={styles.check}>
-              <input
-                type="checkbox"
-                checked={view?.weekly_enabled ?? false}
+            <label className={styles.durationField}>
+              Automation mode
+              <select
+                value={
+                  view?.automation_mode ?? (view?.weekly_enabled ? "draft_only" : "off")
+                }
                 disabled={disabled || !view || unsaved}
-                onChange={(e) => void weekly(e.target.checked)}
-              />
-              <span>Enable weekly preparation</span>
+                onChange={(e) => void weekly(e.target.value as AutomationMode)}
+              >
+                <option value="off">Off (manual only)</option>
+                <option value="draft_only">Draft only (stop for review)</option>
+                <option value="auto_publish">Auto-publish (full end-to-end)</option>
+              </select>
             </label>
             <button
               type="button"
               disabled={disabled || !view || unsaved || weeklyMinutes === view.target_minutes}
-              onClick={() => void weekly(view!.weekly_enabled)}
+              onClick={() =>
+                void weekly(
+                  view!.automation_mode ?? (view!.weekly_enabled ? "draft_only" : "off")
+                )
+              }
             >
               {buttonText("schedule", "Save weekly settings")}
             </button>
           </div>
           <p className={styles.muted}>
-            Suggests topics and writes one approved queued brief. It waits while a manuscript or
-            recording needs your review.
+            {((view?.automation_mode ?? (view?.weekly_enabled ? "draft_only" : "off")) ===
+            "auto_publish")
+              ? "Runs ideas, develops the top pick (or your queued brief), writes, renders, and publishes automatically when there are no blockers."
+              : "Generates ideas, develops the top pick (or your queued brief), and stops at manuscript review. Waits while an episode needs your review."}
           </p>
           <label className={styles.durationField}>
             Weekly episode duration
