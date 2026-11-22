@@ -15,10 +15,10 @@ export function formatEpisodeTitle(
     return episode.title;
   }
   const prefix = formatEpisodeNumber(episode.episode_number);
-  if (episode.title.startsWith(`${prefix} `) || episode.title === prefix) {
+  if (episode.title.startsWith(`${prefix} - `) || episode.title.startsWith(`${prefix} `) || episode.title === prefix) {
     return episode.title;
   }
-  return `${prefix} ${episode.title}`;
+  return `${prefix} - ${episode.title}`;
 }
 
 export function episodeSourceBase(): string {
