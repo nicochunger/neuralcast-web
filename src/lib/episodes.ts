@@ -1,12 +1,38 @@
 import type { PublishedEpisode } from "@/types/episode";
+import type { StationId } from "@/types/radio";
 import { isStationId } from "@/lib/stations";
 
 const identifier = /^[a-z0-9][a-z0-9_-]{0,79}$/;
+
+export function formatEpisodeNumber(number: number): string {
+  return `#${String(number).padStart(3, "0")}`;
+}
+
+export function formatEpisodeTitle(
+  episode: Pick<PublishedEpisode, "title" | "episode_number">
+): string {
+  if (typeof episode.episode_number !== "number" || !Number.isInteger(episode.episode_number) || episode.episode_number < 1) {
+    return episode.title;
+  }
+  const prefix = formatEpisodeNumber(episode.episode_number);
+  if (episode.title.startsWith(`${prefix} `) || episode.title === prefix) {
+    return episode.title;
+  }
+  return `${prefix} ${episode.title}`;
+}
 
 export function episodeSourceBase(): string {
   const base = process.env.HOST_ADMIN_BASE_URL?.trim();
   if (!base) throw new Error("Episode service is not configured");
   return `${base.replace(/\/$/, "")}/`;
+}
+
+export function podcastFeedUrl(station: StationId): string | undefined {
+  try {
+    return new URL(`public/podcasts/${station}/feed.xml`, episodeSourceBase()).href;
+  } catch {
+    return undefined;
+  }
 }
 
 // Metadata is fetched by the Next server; audio and artwork travel directly from VPS to listener.

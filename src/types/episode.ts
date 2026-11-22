@@ -6,6 +6,7 @@ export interface PublishedEpisode {
   station: StationId;
   channel: string;
   language: string;
+  episode_number?: number;
   title: string;
   description: string;
   published_at: string;

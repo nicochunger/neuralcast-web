@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getEpisodes } from "@/lib/episodes";
+import { getEpisodes, podcastFeedUrl } from "@/lib/episodes";
 import { isStationId } from "@/lib/stations";
 import { EpisodesPage } from "@/components/EpisodesPage";
 
@@ -12,8 +12,10 @@ export default async function Page({ searchParams }: Props) {
   const requested = station && isStationId(station) ? station : undefined;
   try {
     const episodes = await getEpisodes();
-    return <EpisodesPage episodes={episodes} stationId={requested ?? episodes[0]?.station ?? "neuralforge"} />;
+    const stationId = requested ?? episodes[0]?.station ?? "neuralforge";
+    return <EpisodesPage episodes={episodes} stationId={stationId} rssUrl={podcastFeedUrl(stationId)} />;
   } catch {
-    return <EpisodesPage episodes={[]} stationId={requested ?? "neuralforge"} unavailable />;
+    const stationId = requested ?? "neuralforge";
+    return <EpisodesPage episodes={[]} stationId={stationId} rssUrl={podcastFeedUrl(stationId)} unavailable />;
   }
 }

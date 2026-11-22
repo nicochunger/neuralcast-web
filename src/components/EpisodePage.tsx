@@ -4,24 +4,27 @@ import { useState, type CSSProperties } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { EpisodeControls } from "@/components/EpisodeControls";
 import { EpisodeGuide } from "@/components/EpisodeGuide";
+import { PodcastRssActions } from "@/components/PodcastRssActions";
 import { useEpisodePlayer } from "@/context/EpisodePlayerContext";
+import { formatEpisodeTitle } from "@/lib/episodes";
 import { useI18n } from "@/lib/i18n";
 import { STATIONS } from "@/lib/stations";
 import type { PublishedEpisode } from "@/types/episode";
 import type { HostCompanion } from "@/types/hostCompanion";
 import styles from "./Episodes.module.css";
 
-export function EpisodePage({ episode }: { episode: PublishedEpisode }) {
+export function EpisodePage({ episode, rssUrl }: { episode: PublishedEpisode; rssUrl?: string }) {
   const { t, locale } = useI18n();
   const player = useEpisodePlayer();
   const [showTranscript, setShowTranscript] = useState(false);
   const station = STATIONS.find((item) => item.id === episode.station)!;
   const selected = player.episode?.id === episode.id && player.episode.station === episode.station && player.episode.revision === episode.revision;
   const position = selected ? player.position : 0;
+  const displayTitle = formatEpisodeTitle(episode);
   const card: HostCompanion = {
     id: episode.id, channel: episode.channel, archetype: "episode", expected_start: 0,
     expected_end: episode.duration, expires_at: 0, transcript: episode.transcript ?? "",
-    content: { title: episode.title, summary: episode.description, key_points: [], items: [] },
+    content: { title: displayTitle, summary: episode.description, key_points: [], items: [] },
     episode: { media_id: episode.id, duration: episode.duration, chapters: episode.chapters ?? [] }
   };
   const seek = (seconds: number) => {
@@ -37,10 +40,10 @@ export function EpisodePage({ episode }: { episode: PublishedEpisode }) {
           "--station-accent": station.accentColor
         } as CSSProperties}>
           <div className={styles.playerCardContent}>
-            <div className={styles.playerTopline}><strong>{station.name}</strong><span>{t("nav.podcasts")}</span></div>
+            <div className={styles.playerTopline}><strong>{station.name}</strong><div className={styles.playerToplineActions}><span>{t("nav.podcasts")}</span><PodcastRssActions rssUrl={rssUrl} stationName={station.name} /></div></div>
             <div className={styles.playerIdentity}>
               <img src={station.podcastArtworkImage} alt="" width={112} height={112} />
-              <div><h1 id="episode-title">{episode.title}</h1><p>{new Intl.DisplayNames([locale], { type: "language" }).of(episode.language.split("-")[0])} · <time dateTime={episode.published_at}>{new Date(episode.published_at).toLocaleDateString(locale, { timeZone: "UTC" })}</time></p></div>
+              <div><h1 id="episode-title">{displayTitle}</h1><p>{new Intl.DisplayNames([locale], { type: "language" }).of(episode.language.split("-")[0])} · <time dateTime={episode.published_at}>{new Date(episode.published_at).toLocaleDateString(locale, { timeZone: "UTC" })}</time></p></div>
             </div>
             <p className={styles.playerDescription}>{episode.description}</p>
             <EpisodeControls episode={episode} />
