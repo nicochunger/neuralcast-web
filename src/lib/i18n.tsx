@@ -10,10 +10,11 @@ import {
 } from "@/lib/locale";
 import type { ScheduleSegment, StationId } from "@/types/radio";
 
-type TranslationKey =
+export type TranslationKey =
   | "nav.listen"
   | "nav.liveRadio"
   | "nav.podcasts"
+  | "nav.explore"
   | "podcasts.selectSeries"
   | "podcasts.series"
   | "podcasts.episodeNumber"
@@ -224,7 +225,88 @@ type TranslationKey =
   | "about.how.step3.body"
   | "about.closing.eyebrow"
   | "about.closing.title"
-  | "about.closing.body";
+  | "about.closing.body"
+  | "atlas.eyebrow"
+  | "atlas.title"
+  | "atlas.subtitle"
+  | "atlas.stationSwitcherAria"
+  | "atlas.switchToStation"
+  | "atlas.loading"
+  | "atlas.retry"
+  | "atlas.errorTitle"
+  | "atlas.errorUnavailable"
+  | "atlas.errorUnconfigured"
+  | "atlas.listenLive"
+  | "atlas.stats.tracks"
+  | "atlas.stats.artists"
+  | "atlas.stats.playlists"
+  | "atlas.stats.eraSpan"
+  | "atlas.stats.bridges"
+  | "atlas.stats.episodes"
+  | "atlas.map.title"
+  | "atlas.map.subtitle"
+  | "atlas.map.showAllBridges"
+  | "atlas.map.strongestBridges"
+  | "atlas.map.zoomIn"
+  | "atlas.map.zoomOut"
+  | "atlas.map.resetView"
+  | "atlas.map.clearSelection"
+  | "atlas.map.listView"
+  | "atlas.map.mapView"
+  | "atlas.map.bridgeTooltip"
+  | "atlas.map.sharedTracks"
+  | "atlas.map.noMatches"
+  | "atlas.map.keyboardHint"
+  | "atlas.map.ariaLabel"
+  | "atlas.map.matchingCount"
+  | "atlas.role.themed"
+  | "atlas.role.open_only"
+  | "atlas.role.reserved_window"
+  | "atlas.timeline.title"
+  | "atlas.timeline.subtitle"
+  | "atlas.timeline.clearDecades"
+  | "atlas.timeline.activeFilter"
+  | "atlas.timeline.tracksLabel"
+  | "atlas.timeline.allEras"
+  | "atlas.inspector.title"
+  | "atlas.inspector.emptyTitle"
+  | "atlas.inspector.emptyBody"
+  | "atlas.inspector.manifesto"
+  | "atlas.inspector.placementNotes"
+  | "atlas.inspector.decadeSpread"
+  | "atlas.inspector.connectedPlaylists"
+  | "atlas.inspector.featuredEpisodes"
+  | "atlas.inspector.upcomingBlocks"
+  | "atlas.inspector.noUpcomingBlocks"
+  | "atlas.inspector.tracksHeading"
+  | "atlas.inspector.filterTracks"
+  | "atlas.inspector.sortArtist"
+  | "atlas.inspector.sortTitle"
+  | "atlas.inspector.sortYear"
+  | "atlas.inspector.colArtist"
+  | "atlas.inspector.colTitle"
+  | "atlas.inspector.colAlbum"
+  | "atlas.inspector.colYear"
+  | "atlas.inspector.loadingTracks"
+  | "atlas.inspector.errorTracks"
+  | "atlas.inspector.close"
+  | "atlas.inspector.alsoIn"
+  | "atlas.vault.title"
+  | "atlas.vault.subtitle"
+  | "atlas.vault.searchPlaceholder"
+  | "atlas.vault.clearSearch"
+  | "atlas.vault.resultsCount"
+  | "atlas.vault.noResults"
+  | "atlas.vault.playlistsSpanned"
+  | "atlas.vault.eraSpan"
+  | "atlas.vault.tracksOnStation"
+  | "atlas.vault.linkedEpisodes"
+  | "atlas.vault.hostStories"
+  | "atlas.vault.backToResults"
+  | "atlas.vault.tabArtists"
+  | "atlas.vault.tabPlaylists"
+  | "atlas.vault.tabTracks"
+  | "atlas.vault.showingTop";
 
 type TranslationParams = Record<string, string | number>;
 
@@ -232,6 +314,7 @@ const englishMessages: Record<TranslationKey, string> = {
     "nav.listen": "Listen",
     "nav.liveRadio": "Live radio",
     "nav.podcasts": "Podcasts",
+    "nav.explore": "Explore",
     "podcasts.selectSeries": "Choose your podcast",
     "podcasts.series": "Podcast series",
     "podcasts.episodeNumber": "Episode {number}",
@@ -455,6 +538,87 @@ const englishMessages: Record<TranslationKey, string> = {
     "about.closing.title": "This is still a living project, and it is not finished.",
     "about.closing.body":
       "I keep refining the music selection and the AI host as we listen every day. Both stations continue to take shape through new discoveries, ideas, and the small details that make radio worth coming back to.",
+    "atlas.eyebrow": "Sonic Atlas & Station Vault",
+    "atlas.title": "Explore the musical DNA",
+    "atlas.subtitle": "Map how playlists connect, trace decades across the catalog, and search every artist and track on air.",
+    "atlas.stationSwitcherAria": "Choose a station catalog to explore",
+    "atlas.switchToStation": "Explore {station}",
+    "atlas.loading": "Mapping station archive…",
+    "atlas.retry": "Try again",
+    "atlas.errorTitle": "Station atlas unavailable",
+    "atlas.errorUnavailable": "The station archive is temporarily unavailable. Please try again shortly.",
+    "atlas.errorUnconfigured": "The Sonic Atlas service is not configured for this environment yet.",
+    "atlas.listenLive": "Listen live",
+    "atlas.stats.tracks": "Unique tracks",
+    "atlas.stats.artists": "Artists",
+    "atlas.stats.playlists": "Playlists",
+    "atlas.stats.eraSpan": "Era span",
+    "atlas.stats.bridges": "Playlist bridges",
+    "atlas.stats.episodes": "Episodes",
+    "atlas.map.title": "Playlist constellation",
+    "atlas.map.subtitle": "Each node is a curated playlist; connecting lines mark shared recordings.",
+    "atlas.map.showAllBridges": "All bridges",
+    "atlas.map.strongestBridges": "Strongest bridges",
+    "atlas.map.zoomIn": "Zoom in",
+    "atlas.map.zoomOut": "Zoom out",
+    "atlas.map.resetView": "Reset view",
+    "atlas.map.clearSelection": "Clear selection",
+    "atlas.map.listView": "List view",
+    "atlas.map.mapView": "Map view",
+    "atlas.map.bridgeTooltip": "{source} ↔ {target}",
+    "atlas.map.sharedTracks": "{count} shared tracks",
+    "atlas.map.noMatches": "No playlists match the selected decades.",
+    "atlas.map.keyboardHint": "Use Tab to move between playlists and Enter to inspect liner notes.",
+    "atlas.map.ariaLabel": "{station} playlist constellation map",
+    "atlas.map.matchingCount": "{count} of {total} playlists",
+    "atlas.role.themed": "Themed block",
+    "atlas.role.open_only": "Open rotation",
+    "atlas.role.reserved_window": "Reserved window",
+    "atlas.timeline.title": "Decade timeline",
+    "atlas.timeline.subtitle": "Select one or more decades to highlight matching playlists and filter the vault.",
+    "atlas.timeline.clearDecades": "Clear era filter",
+    "atlas.timeline.activeFilter": "Filtering: {decades}",
+    "atlas.timeline.tracksLabel": "{count} tracks",
+    "atlas.timeline.allEras": "All eras",
+    "atlas.inspector.title": "Liner notes",
+    "atlas.inspector.emptyTitle": "Select a playlist",
+    "atlas.inspector.emptyBody": "Pick any node on the constellation or row in the list to read its manifesto, bridges, schedule, and full tracklist.",
+    "atlas.inspector.manifesto": "Editorial notes",
+    "atlas.inspector.placementNotes": "Scheduling & placement",
+    "atlas.inspector.decadeSpread": "Decade spread",
+    "atlas.inspector.connectedPlaylists": "Connected playlists",
+    "atlas.inspector.featuredEpisodes": "Featured podcast episodes",
+    "atlas.inspector.upcomingBlocks": "On today’s schedule",
+    "atlas.inspector.noUpcomingBlocks": "Not scheduled in a dedicated block today.",
+    "atlas.inspector.tracksHeading": "Tracklist",
+    "atlas.inspector.filterTracks": "Filter tracks, artists, or albums…",
+    "atlas.inspector.sortArtist": "Artist",
+    "atlas.inspector.sortTitle": "Title",
+    "atlas.inspector.sortYear": "Year",
+    "atlas.inspector.colArtist": "Artist",
+    "atlas.inspector.colTitle": "Title",
+    "atlas.inspector.colAlbum": "Album",
+    "atlas.inspector.colYear": "Year",
+    "atlas.inspector.loadingTracks": "Loading playlist tracklist…",
+    "atlas.inspector.errorTracks": "Unable to load this playlist’s tracklist right now.",
+    "atlas.inspector.close": "Close liner notes",
+    "atlas.inspector.alsoIn": "Also in",
+    "atlas.vault.title": "Station vault",
+    "atlas.vault.subtitle": "Instant search across every artist, song, album, and playlist in rotation.",
+    "atlas.vault.searchPlaceholder": "Search artists, tracks, albums, or playlists…",
+    "atlas.vault.clearSearch": "Clear search",
+    "atlas.vault.resultsCount": "{count} results",
+    "atlas.vault.noResults": "No entries matched your search.",
+    "atlas.vault.playlistsSpanned": "Playlists",
+    "atlas.vault.eraSpan": "Era span",
+    "atlas.vault.tracksOnStation": "Tracks on this station",
+    "atlas.vault.linkedEpisodes": "Featured in podcasts",
+    "atlas.vault.hostStories": "Recent host notes",
+    "atlas.vault.backToResults": "Back to vault",
+    "atlas.vault.tabArtists": "Artists",
+    "atlas.vault.tabPlaylists": "Playlists",
+    "atlas.vault.tabTracks": "Tracks",
+    "atlas.vault.showingTop": "Showing {shown} of {total}",
 };
 
 const messages: Record<Locale, Record<TranslationKey, string>> = {
@@ -463,6 +627,7 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "nav.listen": "Escuchar",
     "nav.liveRadio": "Radio en vivo",
     "nav.podcasts": "Podcasts",
+    "nav.explore": "Explorar",
     "podcasts.selectSeries": "Elegí tu podcast",
     "podcasts.series": "Serie de podcast",
     "podcasts.episodeNumber": "Episodio {number}",
@@ -686,12 +851,94 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "about.closing.title": "Esto sigue siendo un proyecto vivo y todavía no está terminado.",
     "about.closing.body":
       "Sigo ajustando la selección musical y el locutor de IA a partir de lo que escuchamos todos los días. Las dos emisoras siguen tomando forma con nuevos descubrimientos, ideas y esos pequeños detalles que dan ganas de volver a escuchar.",
+    "atlas.eyebrow": "Atlas Sonoro y Archivo",
+    "atlas.title": "Explorá el ADN musical",
+    "atlas.subtitle": "Recorré cómo se conectan las playlists, seguí cada década del catálogo y buscá cualquier artista o canción al aire.",
+    "atlas.stationSwitcherAria": "Elegí qué catálogo de emisora explorar",
+    "atlas.switchToStation": "Explorar {station}",
+    "atlas.loading": "Mapeando el archivo de la emisora…",
+    "atlas.retry": "Volver a intentar",
+    "atlas.errorTitle": "Atlas de la emisora no disponible",
+    "atlas.errorUnavailable": "El archivo de la emisora no está disponible en este momento. Volvé a intentarlo en unos minutos.",
+    "atlas.errorUnconfigured": "El servicio del Atlas Sonoro todavía no está configurado en este entorno.",
+    "atlas.listenLive": "Escuchar en vivo",
+    "atlas.stats.tracks": "Canciones únicas",
+    "atlas.stats.artists": "Artistas",
+    "atlas.stats.playlists": "Playlists",
+    "atlas.stats.eraSpan": "Recorrido",
+    "atlas.stats.bridges": "Puentes entre listas",
+    "atlas.stats.episodes": "Episodios",
+    "atlas.map.title": "Constelación de playlists",
+    "atlas.map.subtitle": "Cada nodo es una playlist curada; las líneas conectan las que comparten grabaciones.",
+    "atlas.map.showAllBridges": "Todos los puentes",
+    "atlas.map.strongestBridges": "Puentes más fuertes",
+    "atlas.map.zoomIn": "Acercar",
+    "atlas.map.zoomOut": "Alejar",
+    "atlas.map.resetView": "Restablecer vista",
+    "atlas.map.clearSelection": "Quitar selección",
+    "atlas.map.listView": "Vista lista",
+    "atlas.map.mapView": "Vista mapa",
+    "atlas.map.bridgeTooltip": "{source} ↔ {target}",
+    "atlas.map.sharedTracks": "{count} canciones compartidas",
+    "atlas.map.noMatches": "Ninguna playlist coincide con las décadas seleccionadas.",
+    "atlas.map.keyboardHint": "Usá Tab para moverte entre playlists y Enter para abrir sus notas.",
+    "atlas.map.ariaLabel": "Mapa de constelación de playlists de {station}",
+    "atlas.map.matchingCount": "{count} de {total} playlists",
+    "atlas.role.themed": "Bloque temático",
+    "atlas.role.open_only": "Rotación abierta",
+    "atlas.role.reserved_window": "Franja reservada",
+    "atlas.timeline.title": "Línea de décadas",
+    "atlas.timeline.subtitle": "Elegí una o más décadas para resaltar las playlists y filtrar el archivo.",
+    "atlas.timeline.clearDecades": "Limpiar filtro de épocas",
+    "atlas.timeline.activeFilter": "Filtrando: {decades}",
+    "atlas.timeline.tracksLabel": "{count} canciones",
+    "atlas.timeline.allEras": "Todas las épocas",
+    "atlas.inspector.title": "Notas de edición",
+    "atlas.inspector.emptyTitle": "Elegí una playlist",
+    "atlas.inspector.emptyBody": "Tocá cualquier nodo de la constelación o fila de la lista para ver su manifiesto, conexiones, programación y listado completo.",
+    "atlas.inspector.manifesto": "Criterio editorial",
+    "atlas.inspector.placementNotes": "Programación y lugar",
+    "atlas.inspector.decadeSpread": "Distribución por décadas",
+    "atlas.inspector.connectedPlaylists": "Playlists conectadas",
+    "atlas.inspector.featuredEpisodes": "Episodios de podcast relacionados",
+    "atlas.inspector.upcomingBlocks": "En la programación de hoy",
+    "atlas.inspector.noUpcomingBlocks": "Hoy no tiene un bloque dedicado en la programación.",
+    "atlas.inspector.tracksHeading": "Lista de canciones",
+    "atlas.inspector.filterTracks": "Filtrar canciones, artistas o discos…",
+    "atlas.inspector.sortArtist": "Artista",
+    "atlas.inspector.sortTitle": "Título",
+    "atlas.inspector.sortYear": "Año",
+    "atlas.inspector.colArtist": "Artista",
+    "atlas.inspector.colTitle": "Título",
+    "atlas.inspector.colAlbum": "Álbum",
+    "atlas.inspector.colYear": "Año",
+    "atlas.inspector.loadingTracks": "Cargando canciones de la playlist…",
+    "atlas.inspector.errorTracks": "No pudimos cargar las canciones de esta playlist en este momento.",
+    "atlas.inspector.close": "Cerrar notas de edición",
+    "atlas.inspector.alsoIn": "También en",
+    "atlas.vault.title": "Archivo de la emisora",
+    "atlas.vault.subtitle": "Búsqueda instantánea entre cada artista, canción, disco y playlist en rotación.",
+    "atlas.vault.searchPlaceholder": "Buscar artistas, canciones, discos o playlists…",
+    "atlas.vault.clearSearch": "Limpiar búsqueda",
+    "atlas.vault.resultsCount": "{count} resultados",
+    "atlas.vault.noResults": "No encontramos resultados para tu búsqueda.",
+    "atlas.vault.playlistsSpanned": "Playlists",
+    "atlas.vault.eraSpan": "Recorrido",
+    "atlas.vault.tracksOnStation": "Canciones en esta emisora",
+    "atlas.vault.linkedEpisodes": "Presente en podcasts",
+    "atlas.vault.hostStories": "Notas recientes del host",
+    "atlas.vault.backToResults": "Volver al archivo",
+    "atlas.vault.tabArtists": "Artistas",
+    "atlas.vault.tabPlaylists": "Playlists",
+    "atlas.vault.tabTracks": "Canciones",
+    "atlas.vault.showingTop": "Mostrando {shown} de {total}",
   },
   fr: {
     ...englishMessages,
     "nav.listen": "Écouter",
     "nav.liveRadio": "Radio en direct",
     "nav.podcasts": "Podcasts",
+    "nav.explore": "Explorer",
     "podcasts.selectSeries": "Choisissez votre podcast",
     "podcasts.series": "Série de podcasts",
     "podcasts.episodeNumber": "Épisode {number}",
@@ -902,7 +1149,88 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "about.how.step3.body": "L’animateur IA fait partie intégrante de NeuralCast et de NeuralForge. Entre les morceaux, il présente la musique, raconte des histoires autour des artistes et des albums, et donne un aperçu de la suite. Il apporte de la personnalité à l’écoute et des repères sur la musique, dans un style adapté à chaque station.",
     "about.closing.eyebrow": "Et ensuite",
     "about.closing.title": "Ce projet continue d’évoluer et il n’est pas terminé.",
-    "about.closing.body": "Je continue d’affiner la sélection musicale et l’animateur IA au fil de nos écoutes quotidiennes. Les deux stations évoluent avec les découvertes, les idées et ces petits détails qui donnent envie de retrouver une radio."
+    "about.closing.body": "Je continue d’affiner la sélection musicale et l’animateur IA au fil de nos écoutes quotidiennes. Les deux stations évoluent avec les découvertes, les idées et ces petits détails qui donnent envie de retrouver une radio.",
+    "atlas.eyebrow": "Atlas Sonore & Archives",
+    "atlas.title": "Explorer l’ADN musical",
+    "atlas.subtitle": "Découvrez comment les playlists se relient, parcourez les décennies du catalogue et recherchez chaque artiste et morceau à l’antenne.",
+    "atlas.stationSwitcherAria": "Choisir le catalogue d’une station à explorer",
+    "atlas.switchToStation": "Explorer {station}",
+    "atlas.loading": "Cartographie des archives de la station…",
+    "atlas.retry": "Réessayer",
+    "atlas.errorTitle": "Atlas de la station indisponible",
+    "atlas.errorUnavailable": "Les archives de la station sont temporairement indisponibles. Réessayez dans quelques instants.",
+    "atlas.errorUnconfigured": "Le service Atlas Sonore n’est pas encore configuré dans cet environnement.",
+    "atlas.listenLive": "Écouter en direct",
+    "atlas.stats.tracks": "Morceaux uniques",
+    "atlas.stats.artists": "Artistes",
+    "atlas.stats.playlists": "Playlists",
+    "atlas.stats.eraSpan": "Période",
+    "atlas.stats.bridges": "Passerelles",
+    "atlas.stats.episodes": "Épisodes",
+    "atlas.map.title": "Constellation des playlists",
+    "atlas.map.subtitle": "Chaque point représente une playlist ; les lignes relient celles qui partagent des morceaux.",
+    "atlas.map.showAllBridges": "Toutes les passerelles",
+    "atlas.map.strongestBridges": "Passerelles majeures",
+    "atlas.map.zoomIn": "Zoomer",
+    "atlas.map.zoomOut": "Dézoomer",
+    "atlas.map.resetView": "Réinitialiser la vue",
+    "atlas.map.clearSelection": "Effacer la sélection",
+    "atlas.map.listView": "Vue liste",
+    "atlas.map.mapView": "Vue carte",
+    "atlas.map.bridgeTooltip": "{source} ↔ {target}",
+    "atlas.map.sharedTracks": "{count} morceaux communs",
+    "atlas.map.noMatches": "Aucune playlist ne correspond aux décennies sélectionnées.",
+    "atlas.map.keyboardHint": "Utilisez Tab pour parcourir les playlists et Entrée pour ouvrir les notes de pochette.",
+    "atlas.map.ariaLabel": "Carte de constellation des playlists de {station}",
+    "atlas.map.matchingCount": "{count} sur {total} playlists",
+    "atlas.role.themed": "Bloc thématique",
+    "atlas.role.open_only": "Rotation ouverte",
+    "atlas.role.reserved_window": "Créneau réservé",
+    "atlas.timeline.title": "Frise des décennies",
+    "atlas.timeline.subtitle": "Sélectionnez une ou plusieurs décennies pour mettre en évidence les playlists et filtrer les archives.",
+    "atlas.timeline.clearDecades": "Effacer le filtre d’époque",
+    "atlas.timeline.activeFilter": "Filtre : {decades}",
+    "atlas.timeline.tracksLabel": "{count} morceaux",
+    "atlas.timeline.allEras": "Toutes les époques",
+    "atlas.inspector.title": "Notes de pochette",
+    "atlas.inspector.emptyTitle": "Sélectionnez une playlist",
+    "atlas.inspector.emptyBody": "Choisissez un point sur la constellation ou une ligne dans la liste pour lire son manifeste, ses passerelles, sa diffusion et sa tracklist complète.",
+    "atlas.inspector.manifesto": "Ligne éditoriale",
+    "atlas.inspector.placementNotes": "Programmation & placement",
+    "atlas.inspector.decadeSpread": "Répartition par décennie",
+    "atlas.inspector.connectedPlaylists": "Playlists reliées",
+    "atlas.inspector.featuredEpisodes": "Épisodes de podcast liés",
+    "atlas.inspector.upcomingBlocks": "Au programme aujourd’hui",
+    "atlas.inspector.noUpcomingBlocks": "Aucun bloc dédié n’est programmé aujourd’hui.",
+    "atlas.inspector.tracksHeading": "Tracklist",
+    "atlas.inspector.filterTracks": "Filtrer par morceau, artiste ou album…",
+    "atlas.inspector.sortArtist": "Artiste",
+    "atlas.inspector.sortTitle": "Titre",
+    "atlas.inspector.sortYear": "Année",
+    "atlas.inspector.colArtist": "Artiste",
+    "atlas.inspector.colTitle": "Titre",
+    "atlas.inspector.colAlbum": "Album",
+    "atlas.inspector.colYear": "Année",
+    "atlas.inspector.loadingTracks": "Chargement de la tracklist…",
+    "atlas.inspector.errorTracks": "Impossible de charger la tracklist de cette playlist pour le moment.",
+    "atlas.inspector.close": "Fermer les notes de pochette",
+    "atlas.inspector.alsoIn": "Aussi dans",
+    "atlas.vault.title": "Archives de la station",
+    "atlas.vault.subtitle": "Recherche instantanée parmi tous les artistes, morceaux, albums et playlists en rotation.",
+    "atlas.vault.searchPlaceholder": "Rechercher des artistes, morceaux, albums ou playlists…",
+    "atlas.vault.clearSearch": "Effacer la recherche",
+    "atlas.vault.resultsCount": "{count} résultats",
+    "atlas.vault.noResults": "Aucun résultat ne correspond à votre recherche.",
+    "atlas.vault.playlistsSpanned": "Playlists",
+    "atlas.vault.eraSpan": "Période",
+    "atlas.vault.tracksOnStation": "Morceaux sur cette station",
+    "atlas.vault.linkedEpisodes": "Présent dans les podcasts",
+    "atlas.vault.hostStories": "Notes récentes de l’animateur",
+    "atlas.vault.backToResults": "Retour aux archives",
+    "atlas.vault.tabArtists": "Artistes",
+    "atlas.vault.tabPlaylists": "Playlists",
+    "atlas.vault.tabTracks": "Morceaux",
+    "atlas.vault.showingTop": "Affichage de {shown} sur {total}"
   }
 };
 

@@ -8,12 +8,25 @@ import { useI18n } from "@/lib/i18n";
 import type { StationId } from "@/types/radio";
 import type { Locale } from "@/lib/locale";
 
-export function SiteHeader({ extraActions, englishOnly = false, podcastStation }: { extraActions?: ReactNode; englishOnly?: boolean; podcastStation?: StationId }) {
+export function SiteHeader({
+  extraActions,
+  englishOnly = false,
+  podcastStation,
+  exploreStation
+}: {
+  extraActions?: ReactNode;
+  englishOnly?: boolean;
+  podcastStation?: StationId;
+  exploreStation?: StationId;
+}) {
   const pathname = usePathname();
   const { locale, setLocale, t } = useI18n();
   const inPodcasts = pathname.startsWith("/episodes");
-  const selectedPodcast = podcastStation ?? pathname.match(/^\/episodes\/(neuralcast|neuralforge)\//)?.[1];
-  const podcastHref = selectedPodcast ? `/episodes?station=${selectedPodcast}` : "/episodes";
+  const inExplore = pathname.startsWith("/explore");
+  const pathStation = pathname.match(/^\/episodes\/(neuralcast|neuralforge)\//)?.[1] as StationId | undefined;
+  const selectedStation = exploreStation ?? podcastStation ?? pathStation;
+  const podcastHref = selectedStation ? `/episodes?station=${selectedStation}` : "/episodes";
+  const exploreHref = selectedStation ? `/explore?station=${selectedStation}` : "/explore";
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const languageMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -114,6 +127,13 @@ export function SiteHeader({ extraActions, englishOnly = false, podcastStation }
         <Link href={podcastHref} className="productNavigationTab" aria-current={inPodcasts ? "page" : undefined}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M4 14v-3a8 8 0 0 1 16 0v3M4 13H3v6h4v-6H4Zm16 0h1v6h-4v-6h3Z" /></svg>
           {englishOnly ? "Podcasts" : t("nav.podcasts")}
+        </Link>
+        <Link href={exploreHref} className="productNavigationTab" aria-current={inExplore ? "page" : undefined}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <polygon points="15.8,8.2 13.4,13.4 8.2,15.8 10.6,10.6" />
+          </svg>
+          {englishOnly ? "Explore" : t("nav.explore")}
         </Link>
       </nav>
     </>

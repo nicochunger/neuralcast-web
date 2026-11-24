@@ -13,7 +13,8 @@
     "check:episode-playback": "node scripts/check-episode-playback.cjs",
     "check:discovery": "node scripts/check-discovery.cjs",
     "check:episode-admin": "node scripts/check-episode-admin.cjs",
-    "check:episode-admin-browser": "node scripts/check-episode-admin-browser.cjs"
+    "check:episode-admin-browser": "node scripts/check-episode-admin-browser.cjs",
+    "check:sonic-atlas-browser": "node scripts/check-sonic-atlas-browser.cjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
