@@ -1,25 +1,25 @@
 .card {
-  --guide-ink: #f4f0e8;
-  --guide-muted: #c0c7ca;
+  --guide-ink: var(--ink);
+  --guide-muted: var(--muted);
   --guide-accent: #d7bb86;
-  --guide-line: rgba(255,255,255,.12);
-  --guide-current: rgba(215,187,134,.09);
+  --guide-line: var(--line);
+  --guide-current: rgba(215, 187, 134, 0.09);
   max-width: none;
   width: 100%;
   margin: 0;
   padding: clamp(1.2rem, 3vw, 2rem);
   border: 0;
   border-radius: 0;
-  background: linear-gradient(135deg, rgba(41, 46, 49, .97), rgba(22, 27, 31, .97));
-  color: #f4f0e8;
+  background: var(--surface);
+  color: var(--ink);
   box-shadow: none;
   overflow-wrap: anywhere;
   box-sizing: border-box;
 }
-.topline { display: flex; justify-content: space-between; gap: 1rem; color: #d7bb86; font-size: .78rem; letter-spacing: .04em; }
-.topline > span { text-transform: uppercase; font-weight: 700; }
-.topline time { color: #c0c7ca; flex-shrink: 0; }
-.card h2 { margin: .8rem 0; font-size: clamp(1.2rem, 3vw, 1.55rem); line-height: 1.3; }
+.topline { display: flex; justify-content: space-between; gap: 1rem; color: #d7bb86; font-size: .8125rem; }
+.topline > span { font-weight: 600; }
+.topline time { color: var(--muted); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.card h2 { margin: .6rem 0 .8rem; font-family: var(--font-display), Georgia, serif; font-size: clamp(1.35rem, 3vw, 1.75rem); font-weight: 500; letter-spacing: -0.025em; line-height: 1.2; }
 .subject { color: #c0c7ca; font-size: .85rem; }
 .summary, .points { line-height: 1.65; }
 .points { padding-left: 1.2rem; }

@@ -39,7 +39,7 @@ export function EpisodesPage({ episodes, stationId, rssUrl, unavailable = false 
     </nav>
     </header>
     <div className={styles.seriesHeading}>
-      <div><p className={styles.eyebrow}>{t("podcasts.series")}</p><h2>{station.name}</h2></div>
+      <div><h2>{station.name}</h2></div>
       <div className={styles.seriesMeta}>
         <span>{numbered.length} {t("episodes.title").toLocaleLowerCase(locale)}</span>
         <PodcastRssActions rssUrl={rssUrl} stationName={station.name} />

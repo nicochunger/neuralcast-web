@@ -60,82 +60,80 @@ export function SiteHeader({
 
   return (
     <>
-    <header className="appHeader">
-      <Link className="brandLockup" href="/" aria-label={(englishOnly ? "Back to radio" : t("nav.backToRadio"))}>
-        <img src="/neuralcast-logo-160.webp" alt="" className="brandIcon" width="160" height="160" />
-        <div>
-          <h1>NeuralCast</h1>
-          <p>{(englishOnly ? "AI-hosted radio and podcasts from Estavayer, Switzerland." : t("app.tagline"))}</p>
-        </div>
-      </Link>
-      <div className="headerActions">
-        <nav className="primaryNavigation" aria-label={(englishOnly ? "Primary navigation" : t("nav.label"))}>
-          <Link className="headerContextLink" href={pathname === "/about" ? "/" : "/about"}>
-            {pathname === "/about" ? (englishOnly ? "Back to radio" : t("nav.backToRadio")) : (englishOnly ? "About" : t("nav.about"))}
+      <header className="appHeader">
+        <div className="appHeaderBar">
+          <Link className="brandLockup" href="/" aria-label={englishOnly ? "Back to radio" : t("nav.backToRadio")}>
+            <img src="/neuralcast-logo-160.webp" alt="" className="brandIcon" width="40" height="40" />
+            <span className="brandWordmark">NeuralCast</span>
           </Link>
-        </nav>
-        <div className="headerUtilityRow">
-          {!englishOnly ? <div className="languageMenu" ref={languageMenuRef}>
-            <button
-              className="languageMenuTrigger"
-              type="button"
-              aria-haspopup="menu"
-              aria-expanded={languageMenuOpen}
-              aria-label={t("common.language")}
-              onClick={() => setLanguageMenuOpen((open) => !open)}
-            >
-              <FlagIcon country={activeLanguage.country} />
-              <span>{activeLanguage.shortLabel}</span>
-              <span className={`languageMenuChevron ${languageMenuOpen ? "languageMenuChevronOpen" : ""}`} aria-hidden="true">
-                ▾
-              </span>
-            </button>
-            {languageMenuOpen ? (
-              <div className="languageMenuList" role="menu" aria-label={t("common.language")}>
-                {languageOptions.map((option) => (
+
+          <nav className="primaryNavigation" aria-label={englishOnly ? "Primary navigation" : t("nav.label")}>
+            <Link href="/" className="primaryNavLink" aria-current={pathname === "/" ? "page" : undefined}>
+              {englishOnly ? "Live radio" : t("nav.liveRadio")}
+            </Link>
+            <Link href={podcastHref} className="primaryNavLink" aria-current={inPodcasts ? "page" : undefined}>
+              {englishOnly ? "Podcasts" : t("nav.podcasts")}
+            </Link>
+            <Link href={exploreHref} className="primaryNavLink" aria-current={inExplore ? "page" : undefined}>
+              {englishOnly ? "Explore" : t("nav.explore")}
+            </Link>
+            <Link href="/about" className="primaryNavLink" aria-current={pathname === "/about" ? "page" : undefined}>
+              {englishOnly ? "About" : t("nav.about")}
+            </Link>
+          </nav>
+
+          <div className="headerActions">
+            <div className="headerUtilityRow">
+              {!englishOnly ? (
+                <div className="languageMenu" ref={languageMenuRef}>
                   <button
-                    key={option.locale}
-                    className={`languageMenuItem ${option.locale === locale ? "languageMenuItemActive" : ""}`}
+                    className="languageMenuTrigger"
                     type="button"
-                    role="menuitemradio"
-                    aria-checked={option.locale === locale}
-                    onClick={() => {
-                      setLocale(option.locale);
-                      setLanguageMenuOpen(false);
-                    }}
+                    aria-haspopup="menu"
+                    aria-expanded={languageMenuOpen}
+                    aria-label={t("common.language")}
+                    onClick={() => setLanguageMenuOpen((open) => !open)}
                   >
-                    <FlagIcon country={option.country} />
-                    <span>{option.label}</span>
+                    <FlagIcon country={activeLanguage.country} />
+                    <span>{activeLanguage.shortLabel}</span>
+                    <span className={`languageMenuChevron ${languageMenuOpen ? "languageMenuChevronOpen" : ""}`} aria-hidden="true">
+                      ▾
+                    </span>
                   </button>
-                ))}
-              </div>
-            ) : null}
+                  {languageMenuOpen ? (
+                    <div className="languageMenuList" role="menu" aria-label={t("common.language")}>
+                      {languageOptions.map((option) => (
+                        <button
+                          key={option.locale}
+                          className={`languageMenuItem ${option.locale === locale ? "languageMenuItemActive" : ""}`}
+                          type="button"
+                          role="menuitemradio"
+                          aria-checked={option.locale === locale}
+                          onClick={() => {
+                            setLocale(option.locale);
+                            setLanguageMenuOpen(false);
+                          }}
+                        >
+                          <FlagIcon country={option.country} />
+                          <span>{option.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+              {extraActions}
+            </div>
           </div>
-          : null}
-          {extraActions}
         </div>
-      </div>
-    </header>
-    {pathname === "/" ? <div className="listeningIntroduction">
-      <h2>{t("stations.introTitle")}</h2><p>{t("stations.introDescription")}</p>
-    </div> : null}
-      <nav className="productNavigation" aria-label={englishOnly ? "Listen" : t("nav.listen")}>
-        <Link href="/" className="productNavigationTab" aria-current={pathname === "/" ? "page" : undefined}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M5 9v6m4-10v14m4-17v20m4-17v14m4-10v6" /></svg>
-          {englishOnly ? "Live radio" : t("nav.liveRadio")}
-        </Link>
-        <Link href={podcastHref} className="productNavigationTab" aria-current={inPodcasts ? "page" : undefined}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M4 14v-3a8 8 0 0 1 16 0v3M4 13H3v6h4v-6H4Zm16 0h1v6h-4v-6h3Z" /></svg>
-          {englishOnly ? "Podcasts" : t("nav.podcasts")}
-        </Link>
-        <Link href={exploreHref} className="productNavigationTab" aria-current={inExplore ? "page" : undefined}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" />
-            <polygon points="15.8,8.2 13.4,13.4 8.2,15.8 10.6,10.6" />
-          </svg>
-          {englishOnly ? "Explore" : t("nav.explore")}
-        </Link>
-      </nav>
+      </header>
+
+      {pathname === "/" ? (
+        <div className="listeningIntroduction">
+          <h1>{t("stations.introTitle")}</h1>
+          <p>{t("stations.introDescription")}</p>
+        </div>
+      ) : null}
     </>
   );
 }

@@ -13,24 +13,19 @@ export function AboutPage() {
 
       <section className="aboutHero">
         <div className="aboutHeroContent">
-          <p className="sectionEyebrow">{t("about.eyebrow")}</p>
-          <h2>{t("about.title")}</h2>
+          <h1>{t("about.title")}</h1>
           <p className="aboutLead">{t("about.lead")}</p>
           <div className="aboutHeroActions">
             <Link href="/" className="aboutPrimaryLink">
               {t("about.cta.listen")}
             </Link>
-            <a href="#how-it-works" className="aboutSecondaryLink">
-              {t("about.cta.how")}
-            </a>
           </div>
         </div>
       </section>
 
       <section className="aboutBand">
         <div className="aboutSectionHeading">
-          <p className="sectionEyebrow">{t("about.philosophy.eyebrow")}</p>
-          <h3>{t("about.philosophy.title")}</h3>
+          <h2>{t("about.philosophy.title")}</h2>
         </div>
         <div className="aboutStoryText">
           <p>{t("about.philosophy.card1.body")}</p>
@@ -41,8 +36,7 @@ export function AboutPage() {
 
       <section className="aboutBand aboutNarrativeBand">
         <div className="aboutNarrativeBlock">
-          <p className="sectionEyebrow">{t("about.why.eyebrow")}</p>
-          <h3>{t("about.why.title")}</h3>
+          <h2>{t("about.why.title")}</h2>
           <p>{t("about.why.body1")}</p>
           <p>{t("about.why.body2")}</p>
         </div>
@@ -50,16 +44,15 @@ export function AboutPage() {
 
       <section className="aboutBand" id="how-it-works">
         <div className="aboutSectionHeading">
-          <p className="sectionEyebrow">{t("about.how.eyebrow")}</p>
-          <h3>{t("about.how.title")}</h3>
+          <h2>{t("about.how.title")}</h2>
         </div>
         <div className="aboutCompactGrid">
           <article className="aboutStep">
-            <strong>{t("about.how.step1.title")}</strong>
+            <h3>{t("about.how.step1.title")}</h3>
             <p>{t("about.how.step1.body")}</p>
           </article>
           <article className="aboutStep">
-            <strong>{t("about.how.step2.title")}</strong>
+            <h3>{t("about.how.step2.title")}</h3>
             <p>{t("about.how.step2.body")}</p>
           </article>
         </div>
@@ -70,8 +63,7 @@ export function AboutPage() {
 
       <section className="aboutBand aboutClosingBand">
         <div className="aboutSectionHeading">
-          <p className="sectionEyebrow">{t("about.closing.eyebrow")}</p>
-          <h3>{t("about.closing.title")}</h3>
+          <h2>{t("about.closing.title")}</h2>
           <p className="aboutClosingText">{t("about.closing.body")}</p>
         </div>
       </section>

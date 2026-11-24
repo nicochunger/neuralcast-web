@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { LanguageProvider } from "@/lib/i18n";
 import { DEFAULT_LOCALE } from "@/lib/locale";
@@ -10,11 +11,25 @@ import { EpisodePlayerProvider } from "@/context/EpisodePlayerContext";
 import { EpisodeMiniPlayer } from "@/components/EpisodeMiniPlayer";
 import "./globals.css";
 
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-display",
+  display: "swap"
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-sans",
+  display: "swap"
+});
+
 const themeBootScript = `
 try {
   var themeColor = document.querySelector('meta[name="theme-color"]');
   if (themeColor) {
-    themeColor.setAttribute("content", "#101317");
+    themeColor.setAttribute("content", "#0e0f11");
   }
 } catch (_) {}
 `;
@@ -44,7 +59,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#101317"
+  themeColor: "#0e0f11"
 };
 
 export default function RootLayout({
@@ -53,7 +68,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang={DEFAULT_LOCALE} data-theme="dark">
+    <html lang={DEFAULT_LOCALE} data-theme="dark" className={`${fraunces.variable} ${plusJakarta.variable}`}>
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <audio

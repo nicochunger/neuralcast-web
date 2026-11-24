@@ -281,7 +281,6 @@ export function SonicAtlasPage({
         <section className={styles.hero} aria-labelledby="atlas-page-heading">
           <div className={styles.heroTop}>
             <div className={styles.heroIntro}>
-              <p className={styles.eyebrow}>{t("atlas.eyebrow")}</p>
               <h1 id="atlas-page-heading">{t("atlas.title")}</h1>
               <p>{t("atlas.subtitle")}</p>
             </div>
