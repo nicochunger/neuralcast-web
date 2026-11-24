@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
+import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { LanguageProvider } from "@/lib/i18n";
 import { DEFAULT_LOCALE } from "@/lib/locale";
@@ -10,10 +10,11 @@ import { PERSISTENT_AUDIO_ELEMENT_CLASS, PERSISTENT_AUDIO_ELEMENT_ID } from "@/l
 import { EpisodePlayerProvider } from "@/context/EpisodePlayerContext";
 import { EpisodeMiniPlayer } from "@/components/EpisodeMiniPlayer";
 import "./globals.css";
+import "./studio.css";
 
-const fraunces = Fraunces({
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["500", "600", "700", "800"],
   variable: "--font-display",
   display: "swap"
 });
@@ -29,7 +30,7 @@ const themeBootScript = `
 try {
   var themeColor = document.querySelector('meta[name="theme-color"]');
   if (themeColor) {
-    themeColor.setAttribute("content", "#0e0f11");
+    themeColor.setAttribute("content", "#f3f1ec");
   }
 } catch (_) {}
 `;
@@ -59,7 +60,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0e0f11"
+  themeColor: "#f3f1ec"
 };
 
 export default function RootLayout({
@@ -68,7 +69,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang={DEFAULT_LOCALE} data-theme="dark" className={`${fraunces.variable} ${plusJakarta.variable}`}>
+    <html lang={DEFAULT_LOCALE} data-theme="light" className={`${bricolage.variable} ${plusJakarta.variable}`}>
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <audio

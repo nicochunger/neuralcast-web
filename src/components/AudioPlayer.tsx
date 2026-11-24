@@ -11,7 +11,7 @@ import { useHostCompanions } from "@/hooks/useHostCompanions";
 import type { HostCompanion } from "@/types/hostCompanion";
 import { MiniPlayer } from "@/components/MiniPlayer";
 import { SiteHeader } from "@/components/SiteHeader";
-import { StationCard } from "@/components/StationCard";
+import { StudioConsole } from "@/components/StudioConsole";
 import { submitSongRequestAction } from "@/lib/actions";
 import { RecentlyPlayedModal } from "@/components/RecentlyPlayedModal";
 import { FavoritesModal } from "@/components/FavoritesModal";
@@ -98,6 +98,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
   }), [getHostChannelId, nowPlaying]);
   const companionCards = useHostCompanions(companionChannels, currentTime);
 
+  const [selectedStationId, setSelectedStationId] = useState<StationId>(activeStationId);
   const [showAdminControls, setShowAdminControls] = useState(isAdmin);
   const [isAdminUser, setIsAdminUser] = useState(isAdmin);
   const [activeOverlay, setActiveOverlay] = useState<ActiveOverlay>(null);
@@ -562,9 +563,20 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
     });
   };
 
+  const selectedStation = useMemo(
+    () => STATIONS.find((station) => station.id === selectedStationId) ?? STATIONS[0],
+    [selectedStationId]
+  );
+  const selectedFavorite = useMemo(
+    () => createFavoriteTrack(selectedStation.id, nowPlaying[selectedStation.id]),
+    [nowPlaying, selectedStation.id]
+  );
+
   return (
     <main className="appShell">
       <SiteHeader
+        podcastStation={selectedStation.id}
+        exploreStation={selectedStation.id}
         extraActions={
           <>
             <Link
@@ -601,61 +613,65 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
         }
       />
 
-      <section className="stationGrid" aria-label={t("stations.ariaLabel")}>
-        {STATIONS.map((station) => {
-          const currentFavorite = createFavoriteTrack(station.id, nowPlaying[station.id]);
-
-          return (
-            <StationCard
-              key={station.id}
-              station={station}
-              isActive={station.id === activeStationId}
-              playbackState={playbackState}
-              currentTime={currentTime}
-              nowPlaying={nowPlaying[station.id]}
-              schedule={schedules[station.id]}
-              isHistorySelected={activeOverlay?.type === "history" && station.id === activeOverlay.stationId}
-              isScheduleSelected={activeOverlay?.type === "schedule" && station.id === activeOverlay.stationId}
-              isRequestSelected={activeOverlay?.type === "requests" && station.id === activeOverlay.stationId}
-              hasHostRecap={Boolean(companionCards[station.id])}
-              isRecapSelected={activeOverlay?.type === "recap" && activeOverlay.stationId === station.id}
-              onSelectRecap={() => {
-                const card = companionCards[station.id];
-                if (!card) return;
-                overlayTriggerRef.current = document.activeElement as HTMLElement | null;
-                setActiveOverlay({ type: "recap", stationId: station.id, card });
-              }}
-              onPlay={playStation}
-              hostSelection={getHostSelection(station)}
-              onHostSelectionChange={(selectedStation, selection) =>
-                setHostSelection(selectedStation.id, selection)
-              }
-              onStop={stopPlayback}
-              onSelectHistory={(selectedStation) => {
-                overlayTriggerRef.current = document.activeElement as HTMLElement | null;
-                setActiveOverlay({ type: "history", stationId: selectedStation.id });
-                void refreshNowPlaying([selectedStation.id]);
-              }}
-              onSelectSchedule={(selectedStation) => {
-                overlayTriggerRef.current = document.activeElement as HTMLElement | null;
-                setActiveOverlay({ type: "schedule", stationId: selectedStation.id });
-                void refreshSchedules([selectedStation.id]);
-              }}
-              onRequestSong={openSongRequests}
-              isFavorite={Boolean(currentFavorite && favorites.some((favorite) => favorite.id === currentFavorite.id))}
-              onToggleFavorite={() => toggleFavorite(station, nowPlaying[station.id])}
-              onOpenArtwork={(artwork) => {
-                overlayTriggerRef.current = document.activeElement as HTMLElement | null;
-                setActiveOverlay({ type: "artwork", stationId: station.id, ...artwork });
-              }}
-              showAdminSkip={showAdminControls}
-              isSkippingTrack={skippingStationId === station.id}
-              hasSkippedTrack={skippedStationId === station.id}
-              onSkipTrack={skipTrack}
-            />
-          );
-        })}
-      </section>
+      <StudioConsole
+        stations={STATIONS}
+        selectedStationId={selectedStation.id}
+        activeStationId={activeStationId}
+        playbackState={playbackState}
+        currentTime={currentTime}
+        volume={volume}
+        nowPlayingByStation={nowPlaying}
+        schedulesByStation={schedules}
+        hasHostRecapByStation={{
+          neuralcast: Boolean(companionCards.neuralcast),
+          neuralforge: Boolean(companionCards.neuralforge)
+        }}
+        isFavorite={Boolean(selectedFavorite && favorites.some((favorite) => favorite.id === selectedFavorite.id))}
+        isHistorySelected={activeOverlay?.type === "history" && selectedStation.id === activeOverlay.stationId}
+        isScheduleSelected={activeOverlay?.type === "schedule" && selectedStation.id === activeOverlay.stationId}
+        isRequestSelected={activeOverlay?.type === "requests" && selectedStation.id === activeOverlay.stationId}
+        isRecapSelected={activeOverlay?.type === "recap" && selectedStation.id === activeOverlay.stationId}
+        hostSelection={getHostSelection(selectedStation)}
+        showAdminSkip={showAdminControls}
+        isSkippingTrack={skippingStationId === selectedStation.id}
+        hasSkippedTrack={skippedStationId === selectedStation.id}
+        onSelectStation={(stationId) => {
+          setSelectedStationId(stationId);
+          void refreshNowPlaying([stationId]);
+          void refreshSchedules([stationId]);
+        }}
+        onPlay={(station) => {
+          setSelectedStationId(station.id);
+          playStation(station);
+        }}
+        onStop={stopPlayback}
+        onVolumeChange={setVolume}
+        onToggleMute={toggleMute}
+        onHostSelectionChange={(station, selection) => setHostSelection(station.id, selection)}
+        onToggleFavorite={() => toggleFavorite(selectedStation, nowPlaying[selectedStation.id])}
+        onSelectHistory={(station) => {
+          overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+          setActiveOverlay({ type: "history", stationId: station.id });
+          void refreshNowPlaying([station.id]);
+        }}
+        onSelectSchedule={(station) => {
+          overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+          setActiveOverlay({ type: "schedule", stationId: station.id });
+          void refreshSchedules([station.id]);
+        }}
+        onRequestSong={openSongRequests}
+        onSelectRecap={(station) => {
+          const card = companionCards[station.id];
+          if (!card) return;
+          overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+          setActiveOverlay({ type: "recap", stationId: station.id, card });
+        }}
+        onOpenArtwork={(station, artwork) => {
+          overlayTriggerRef.current = document.activeElement as HTMLElement | null;
+          setActiveOverlay({ type: "artwork", stationId: station.id, ...artwork });
+        }}
+        onSkipTrack={skipTrack}
+      />
 
       {playbackError ? (
         <div className="playerError" role="alert">

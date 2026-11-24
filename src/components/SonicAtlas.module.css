@@ -1,20 +1,20 @@
 /* Sonic Atlas & Station Vault — Editorial Observatory Styles */
 
 .page {
-  --atlas-accent: #1f8a78;
-  --atlas-accent-bright: #34b8a1;
-  --atlas-accent-soft: rgba(31, 138, 120, 0.16);
-  --atlas-accent-border: rgba(31, 138, 120, 0.45);
-  --atlas-accent-glow: rgba(31, 138, 120, 0.28);
-  --atlas-gold: #d7bb86;
-  --atlas-gold-soft: rgba(215, 187, 134, 0.14);
-  --atlas-sky-top: #111822;
-  --atlas-sky-bottom: #0b0f15;
+  --atlas-accent: #0f7a68;
+  --atlas-accent-bright: #0f7a68;
+  --atlas-accent-soft: rgba(15, 122, 104, 0.12);
+  --atlas-accent-border: rgba(15, 122, 104, 0.42);
+  --atlas-accent-glow: rgba(15, 122, 104, 0.22);
+  --atlas-gold: #8c6a2b;
+  --atlas-gold-soft: rgba(140, 106, 43, 0.12);
+  --atlas-sky-top: #14171c;
+  --atlas-sky-bottom: #0d1014;
   --atlas-panel: var(--surface);
   --atlas-panel-raised: var(--surface-raised);
 
   width: 100%;
-  max-width: 1120px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 0 140px;
   color: var(--ink);
@@ -24,19 +24,19 @@
 }
 
 .stationNeuralcast {
-  --atlas-accent: #1f8a78;
-  --atlas-accent-bright: #39bfa8;
-  --atlas-accent-soft: rgba(31, 138, 120, 0.16);
-  --atlas-accent-border: rgba(31, 138, 120, 0.5);
-  --atlas-accent-glow: rgba(31, 138, 120, 0.3);
+  --atlas-accent: #0f7a68;
+  --atlas-accent-bright: #0f7a68;
+  --atlas-accent-soft: rgba(15, 122, 104, 0.12);
+  --atlas-accent-border: rgba(15, 122, 104, 0.44);
+  --atlas-accent-glow: rgba(15, 122, 104, 0.24);
 }
 
 .stationNeuralforge {
-  --atlas-accent: #b55748;
-  --atlas-accent-bright: #df7b6a;
-  --atlas-accent-soft: rgba(181, 87, 72, 0.17);
-  --atlas-accent-border: rgba(181, 87, 72, 0.54);
-  --atlas-accent-glow: rgba(181, 87, 72, 0.32);
+  --atlas-accent: #be402b;
+  --atlas-accent-bright: #be402b;
+  --atlas-accent-soft: rgba(190, 64, 43, 0.12);
+  --atlas-accent-border: rgba(190, 64, 43, 0.44);
+  --atlas-accent-glow: rgba(190, 64, 43, 0.24);
 }
 
 /* ─── Hero & Station Switcher ────────────────────────────────────────── */
@@ -76,11 +76,11 @@
 
 .heroIntro h1 {
   margin: 0 0 10px;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(2rem, 4vw, 2.85rem);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  line-height: 1.04;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(2.1rem, 4.2vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
   color: var(--ink);
 }
 
