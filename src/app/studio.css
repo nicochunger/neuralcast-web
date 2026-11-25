@@ -923,8 +923,7 @@
 
 .studioProgramRow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 2px 12px;
+  gap: 5px;
   padding: 12px 14px;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -936,8 +935,14 @@
   background: color-mix(in srgb, var(--station-accent), var(--surface-raised) 88%);
 }
 
+.studioProgramHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .studioProgramRole {
-  grid-column: 1 / -1;
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--muted);
@@ -952,7 +957,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.9375rem;
+  font-size: 0.96875rem;
   font-weight: 650;
   color: var(--ink);
 }
@@ -962,6 +967,8 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .studioRailEmpty {

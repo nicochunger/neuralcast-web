@@ -627,7 +627,6 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
           neuralforge: Boolean(companionCards.neuralforge)
         }}
         isFavorite={Boolean(selectedFavorite && favorites.some((favorite) => favorite.id === selectedFavorite.id))}
-        isHistorySelected={activeOverlay?.type === "history" && selectedStation.id === activeOverlay.stationId}
         isScheduleSelected={activeOverlay?.type === "schedule" && selectedStation.id === activeOverlay.stationId}
         isRequestSelected={activeOverlay?.type === "requests" && selectedStation.id === activeOverlay.stationId}
         isRecapSelected={activeOverlay?.type === "recap" && selectedStation.id === activeOverlay.stationId}

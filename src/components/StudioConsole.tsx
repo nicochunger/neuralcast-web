@@ -11,6 +11,7 @@ import type { ArtworkLightboxData } from "@/components/ArtworkLightbox";
 import type {
   PlaybackState,
   PlayedTrack,
+  ScheduleSegment,
   Station,
   StationId,
   StationNowPlayingState,
@@ -28,7 +29,6 @@ interface StudioConsoleProps {
   schedulesByStation: Record<StationId, StationScheduleState>;
   hasHostRecapByStation: Record<StationId, boolean>;
   isFavorite: boolean;
-  isHistorySelected: boolean;
   isScheduleSelected: boolean;
   isRequestSelected: boolean;
   isRecapSelected: boolean;
@@ -62,7 +62,6 @@ export function StudioConsole({
   schedulesByStation,
   hasHostRecapByStation,
   isFavorite,
-  isHistorySelected,
   isScheduleSelected,
   isRequestSelected,
   isRecapSelected,
@@ -325,15 +324,6 @@ export function StudioConsole({
               <span>{t("station.schedule")}</span>
             </button>
             <button
-              className={`studioActionLink ${isHistorySelected ? "studioActionLinkActive" : ""}`}
-              type="button"
-              onClick={() => onSelectHistory(station)}
-              aria-expanded={isHistorySelected}
-            >
-              <StudioIcon icon="history" />
-              <span>{t("station.recentlyPlayed")}</span>
-            </button>
-            <button
               className={`studioActionLink ${hasHostRecap ? "studioActionLinkHighlight" : ""} ${isRecapSelected ? "studioActionLinkActive" : ""}`}
               type="button"
               onClick={() => {
@@ -385,23 +375,27 @@ export function StudioConsole({
             </div>
             <div className="studioProgramList">
               <div className="studioProgramRow studioProgramRowLive">
-                <span className="studioProgramRole">{t("schedule.summary.liveNow")}</span>
+                <div className="studioProgramHeader">
+                  <span className="studioProgramRole">{t("schedule.summary.liveNow")}</span>
+                  {formatSegmentWindow(schedule.liveSegment, timeFormatter) ? (
+                    <span className="studioProgramTime">
+                      {formatSegmentWindow(schedule.liveSegment, timeFormatter)}
+                    </span>
+                  ) : null}
+                </div>
                 <strong className="studioProgramTitle">{liveBlockText}</strong>
-                {schedule.liveSegment ? (
-                  <span className="studioProgramTime">
-                    {schedule.liveSegment.startTime}–{schedule.liveSegment.endTime}
-                  </span>
-                ) : null}
               </div>
               {upNextBlockText ? (
                 <div className="studioProgramRow">
-                  <span className="studioProgramRole">{t("schedule.summary.upNext")}</span>
+                  <div className="studioProgramHeader">
+                    <span className="studioProgramRole">{t("schedule.summary.upNext")}</span>
+                    {formatSegmentWindow(schedule.upNextSegment, timeFormatter) ? (
+                      <span className="studioProgramTime">
+                        {formatSegmentWindow(schedule.upNextSegment, timeFormatter)}
+                      </span>
+                    ) : null}
+                  </div>
                   <strong className="studioProgramTitle">{upNextBlockText}</strong>
-                  {schedule.upNextSegment ? (
-                    <span className="studioProgramTime">
-                      {schedule.upNextSegment.startTime}–{schedule.upNextSegment.endTime}
-                    </span>
-                  ) : null}
                 </div>
               ) : null}
             </div>
@@ -588,4 +582,17 @@ function getTrackDetails(
 
 function getArtworkInitial(track: TrackDetails): string {
   return (track.title || track.artist || "?").trim().charAt(0).toUpperCase() || "?";
+}
+
+function formatSegmentWindow(
+  segment: ScheduleSegment | undefined,
+  formatter: Intl.DateTimeFormat
+): string | undefined {
+  if (!segment) return undefined;
+  const start = new Date(segment.startTime);
+  const end = new Date(segment.endTime);
+  if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime())) {
+    return undefined;
+  }
+  return `${formatter.format(start)}–${formatter.format(end)}`;
 }
