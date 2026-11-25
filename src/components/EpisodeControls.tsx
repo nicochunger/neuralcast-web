@@ -38,6 +38,17 @@ export function EpisodeControls({ episode, compact = false }: { episode: Publish
     <div className="trackProgress">
       <div className={styles.seekControl}>
         <div className="trackProgressBar" aria-hidden="true" style={{ "--track-progress": `${Math.min(100, Math.max(0, position / episode.duration * 100))}%` } as CSSProperties} />
+        {!compact && episode.chapters && episode.chapters.length > 1 && episode.duration > 0 ? (
+          <div className={styles.chapterMarkers} aria-hidden="true">
+            {episode.chapters.slice(1).map((chapter) => (
+              <span
+                key={chapter.id}
+                className={chapter.kind === "music" ? styles.chapterTickMusic : styles.chapterTick}
+                style={{ left: `${Math.min(100, Math.max(0, (chapter.start / episode.duration) * 100))}%` }}
+              />
+            ))}
+          </div>
+        ) : null}
         <input className={styles.scrubber} type="range" min={0} max={episode.duration} step={0.1} value={position} aria-label={t("episodes.seek")} aria-valuetext={`${elapsed} / ${duration}`} onChange={(event) => {
           const value = Number(event.target.value);
           if (selected && player.active) player.seek(value);

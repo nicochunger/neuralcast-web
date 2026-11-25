@@ -26,7 +26,7 @@ export function EpisodeGuide({ card, currentTime = 0, fallbackArtwork, position,
           if (!["http:", "https:"].includes(url.protocol) || url.username) return [];
           return [{ url, claim: source.claim }];
         });
-        return <li key={chapter.id} className={`${styles.chapter} ${active ? styles.currentChapter : ""}`} aria-current={active ? "step" : undefined}>
+        return <li key={chapter.id} className={`${styles.chapter} ${chapter.kind === "music" ? styles.chapterMusic : styles.chapterHost} ${active ? styles.currentChapter : ""}`} aria-current={active ? "step" : undefined}>
           <div className={styles.chapterTime}>{onSeek ? <button className={styles.chapterSeek} type="button" onClick={() => onSeek(chapter.start)} aria-label={`${t("episodes.jumpTo")} ${chapter.title}`}>{formatTrackTime(chapter.start)} ↗</button> : <span>{formatTrackTime(chapter.start)}</span>}{active ? <strong>{t(position !== undefined ? "episodes.currentChapter" : "companion.playingChapter")}</strong> : null}</div>
           {chapter.kind === "music" ? <div className={styles.chapterTrack}>
             <ChapterArtwork src={chapter.art_url} fallback={fallbackArtwork} />
