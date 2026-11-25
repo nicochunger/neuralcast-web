@@ -30,7 +30,7 @@ const themeBootScript = `
 try {
   var themeColor = document.querySelector('meta[name="theme-color"]');
   if (themeColor) {
-    themeColor.setAttribute("content", "#f3f1ec");
+    themeColor.setAttribute("content", "#0d0e11");
   }
 } catch (_) {}
 `;
@@ -60,7 +60,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#f3f1ec"
+  themeColor: "#0d0e11"
 };
 
 export default function RootLayout({
@@ -69,7 +69,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang={DEFAULT_LOCALE} data-theme="light" className={`${bricolage.variable} ${plusJakarta.variable}`}>
+    <html lang={DEFAULT_LOCALE} data-theme="dark" className={`${bricolage.variable} ${plusJakarta.variable}`}>
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <audio

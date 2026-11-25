@@ -1,15 +1,15 @@
 /* Sonic Atlas & Station Vault — Editorial Observatory Styles */
 
 .page {
-  --atlas-accent: #0f7a68;
-  --atlas-accent-bright: #0f7a68;
-  --atlas-accent-soft: rgba(15, 122, 104, 0.12);
-  --atlas-accent-border: rgba(15, 122, 104, 0.42);
-  --atlas-accent-glow: rgba(15, 122, 104, 0.22);
-  --atlas-gold: #8c6a2b;
-  --atlas-gold-soft: rgba(140, 106, 43, 0.12);
-  --atlas-sky-top: #14171c;
-  --atlas-sky-bottom: #0d1014;
+  --atlas-accent: #2ba892;
+  --atlas-accent-bright: #49c9b2;
+  --atlas-accent-soft: rgba(43, 168, 146, 0.16);
+  --atlas-accent-border: rgba(43, 168, 146, 0.45);
+  --atlas-accent-glow: rgba(43, 168, 146, 0.28);
+  --atlas-gold: #d7bb86;
+  --atlas-gold-soft: rgba(215, 187, 134, 0.14);
+  --atlas-sky-top: #11151c;
+  --atlas-sky-bottom: #0a0c10;
   --atlas-panel: var(--surface);
   --atlas-panel-raised: var(--surface-raised);
 
@@ -24,19 +24,19 @@
 }
 
 .stationNeuralcast {
-  --atlas-accent: #0f7a68;
-  --atlas-accent-bright: #0f7a68;
-  --atlas-accent-soft: rgba(15, 122, 104, 0.12);
-  --atlas-accent-border: rgba(15, 122, 104, 0.44);
-  --atlas-accent-glow: rgba(15, 122, 104, 0.24);
+  --atlas-accent: #2ba892;
+  --atlas-accent-bright: #49c9b2;
+  --atlas-accent-soft: rgba(43, 168, 146, 0.16);
+  --atlas-accent-border: rgba(43, 168, 146, 0.48);
+  --atlas-accent-glow: rgba(43, 168, 146, 0.28);
 }
 
 .stationNeuralforge {
-  --atlas-accent: #be402b;
-  --atlas-accent-bright: #be402b;
-  --atlas-accent-soft: rgba(190, 64, 43, 0.12);
-  --atlas-accent-border: rgba(190, 64, 43, 0.44);
-  --atlas-accent-glow: rgba(190, 64, 43, 0.24);
+  --atlas-accent: #e0654e;
+  --atlas-accent-bright: #f08571;
+  --atlas-accent-soft: rgba(224, 101, 78, 0.17);
+  --atlas-accent-border: rgba(224, 101, 78, 0.5);
+  --atlas-accent-glow: rgba(224, 101, 78, 0.3);
 }
 
 /* ─── Hero & Station Switcher ────────────────────────────────────────── */
@@ -183,14 +183,8 @@
 }
 
 .statCard::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--atlas-accent), transparent 85%);
-  opacity: 0.7;
+  display: none;
+  content: none;
 }
 
 .statValue {

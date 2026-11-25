@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Podcasts Directory & Episode Listening Room — Daylight Broadcast Studio
+   Podcasts Directory & Episode Listening Room — Permanent Dark Studio
    ========================================================================== */
 
 .page {
@@ -11,15 +11,15 @@
 }
 
 .themeCast {
-  --station-accent: #0f7a68;
-  --station-tint: #e7f3f0;
-  --station-tint-strong: #d4eae5;
+  --station-accent: #2ba892;
+  --station-tint: rgba(43, 168, 146, 0.12);
+  --station-tint-strong: rgba(43, 168, 146, 0.22);
 }
 
 .themeForge {
-  --station-accent: #be402b;
-  --station-tint: #f8eae6;
-  --station-tint-strong: #f0d7d0;
+  --station-accent: #e0654e;
+  --station-tint: rgba(224, 101, 78, 0.13);
+  --station-tint-strong: rgba(224, 101, 78, 0.24);
 }
 
 /* ── Directory Header & Dual-Series Switcher ────────────────────────────── */
@@ -56,34 +56,33 @@
 .seriesSelector {
   display: inline-flex;
   gap: 6px;
-  padding: 6px;
+  padding: 5px;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--canvas);
+  border-radius: 14px;
+  background: var(--surface);
   flex-shrink: 0;
 }
 
 .seriesOption {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 46px;
-  padding: 6px 16px 6px 10px;
+  min-height: 44px;
+  padding: 6px 14px 6px 8px;
   border: 1px solid transparent;
-  border-radius: 11px;
+  border-radius: 10px;
   color: var(--muted);
   text-decoration: none;
-  transition: color 160ms cubic-bezier(0.22, 1, 0.36, 1), background-color 160ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: color 160ms cubic-bezier(0.22, 1, 0.36, 1), background-color 160ms cubic-bezier(0.22, 1, 0.36, 1), border-color 160ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.seriesCast { --opt-accent: #0f7a68; }
-.seriesForge { --opt-accent: #be402b; }
+.seriesCast { --opt-accent: #2ba892; }
+.seriesForge { --opt-accent: #e0654e; }
 
 .seriesOption img {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
   border: 1px solid var(--line);
   object-fit: cover;
   flex-shrink: 0;
@@ -98,25 +97,13 @@
 
 .seriesOption:hover {
   color: var(--ink);
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--surface-raised);
 }
 
 .seriesOption[aria-current="page"] {
   color: var(--ink);
-  background: #ffffff;
-  border-color: var(--line);
-  box-shadow: 0 6px 16px rgba(20, 21, 23, 0.08);
-}
-
-.seriesOption[aria-current="page"]::before {
-  content: "";
-  position: absolute;
-  top: 10px;
-  bottom: 10px;
-  left: 0;
-  width: 3px;
-  border-radius: 0 3px 3px 0;
-  background: var(--opt-accent);
+  background: var(--surface-raised);
+  border-color: color-mix(in srgb, var(--opt-accent), var(--line-strong) 45%);
 }
 
 .seriesOption:focus-visible,
@@ -184,7 +171,7 @@
   padding: 0 13px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: #ffffff;
+  background: var(--surface);
   color: var(--ink);
   font: inherit;
   font-size: 0.8125rem;
@@ -207,7 +194,7 @@
 
 .rssCopyButton:hover,
 .rssFeedLink:hover {
-  background: var(--surface-soft);
+  background: var(--surface-raised);
   border-color: var(--line-strong);
   color: var(--ink);
 }
@@ -241,9 +228,8 @@
   grid-template-columns: 280px minmax(0, 1fr);
   overflow: hidden;
   border: 1px solid var(--line);
-  border-top: 4px solid var(--station-accent);
   border-radius: 22px;
-  background: #ffffff;
+  background: var(--surface);
   color: var(--ink);
   text-decoration: none;
   box-shadow: var(--shadow-soft);
@@ -270,8 +256,8 @@
   height: 220px;
   aspect-ratio: 1;
   border-radius: 16px;
-  border: 1px solid var(--line);
-  box-shadow: 0 18px 36px rgba(20, 21, 23, 0.16);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.45);
   object-fit: cover;
 }
 
@@ -296,7 +282,7 @@
 }
 
 .episodeNumber {
-  color: var(--station-accent);
+  color: color-mix(in srgb, var(--station-accent), #ffffff 22%);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -349,14 +335,15 @@
   padding: 10px 20px;
   border-radius: 999px;
   background: var(--ink);
-  color: #ffffff;
+  color: #0d0e11;
   font-size: 0.875rem;
   font-weight: 700;
-  transition: background-color 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: background-color 160ms cubic-bezier(0.22, 1, 0.36, 1), color 160ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .featuredCard:hover .featuredCta {
   background: var(--station-accent);
+  color: #ffffff;
 }
 
 /* Archive Cards */
@@ -369,7 +356,7 @@
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: #ffffff;
+  background: var(--surface);
   color: var(--ink);
   text-decoration: none;
   box-shadow: var(--shadow-soft);
@@ -424,7 +411,7 @@
 .archiveCta {
   margin-top: auto;
   padding-top: 6px;
-  color: var(--station-accent);
+  color: color-mix(in srgb, var(--station-accent), #ffffff 22%);
   font-size: 0.875rem;
   font-weight: 650;
 }
@@ -433,13 +420,13 @@
   border: 1px dashed var(--line-strong);
   border-radius: 20px;
   padding: 36px;
-  background: #ffffff;
+  background: var(--surface);
   line-height: 1.7;
 }
 
 .unavailableMessage {
   padding: 20px;
-  border-left: 4px solid var(--red);
+  border: 1px solid rgba(224, 101, 78, 0.4);
   border-radius: 12px;
   background: var(--error-bg);
   color: var(--ink);
@@ -477,9 +464,8 @@
 .playerCard {
   overflow: hidden;
   border: 1px solid var(--line);
-  border-top: 4px solid var(--station-accent);
   border-radius: 22px;
-  background: #ffffff;
+  background: var(--surface);
   box-shadow: var(--shadow-soft);
 }
 
@@ -504,9 +490,9 @@
   height: 220px;
   border-radius: 16px;
   overflow: hidden;
-  border: 1px solid var(--line);
-  background: var(--station-tint-strong);
-  box-shadow: 0 20px 40px rgba(20, 21, 23, 0.16);
+  border: 1px solid var(--line-strong);
+  background: var(--surface-raised);
+  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.5);
 }
 
 .playerArtworkFrame img {
@@ -527,7 +513,7 @@
 .liveChapterCaption span {
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--station-accent);
+  color: color-mix(in srgb, var(--station-accent), #ffffff 24%);
 }
 
 .liveChapterCaption strong {
@@ -559,7 +545,7 @@
 }
 
 .playerMetaLine strong {
-  color: var(--station-accent);
+  color: color-mix(in srgb, var(--station-accent), #ffffff 24%);
   font-weight: 700;
 }
 
@@ -593,7 +579,7 @@
 .transcriptToggle {
   border: 1px solid var(--line-strong);
   border-radius: 999px;
-  background: #ffffff;
+  background: var(--surface-raised);
   color: var(--ink);
   padding: 10px 18px;
   cursor: pointer;
@@ -631,7 +617,7 @@
   color: #ffffff;
   font-size: 0.96875rem;
   font-weight: 700;
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--station-accent, var(--lime)), transparent 70%);
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--station-accent, var(--lime)), transparent 65%);
 }
 
 .controls .primary:hover {
@@ -645,7 +631,7 @@
   height: 44px;
   padding: 0;
   border-color: var(--line);
-  background: var(--paper);
+  background: var(--surface-raised);
   color: var(--ink);
 }
 
@@ -662,7 +648,7 @@
 }
 
 .controls button:disabled {
-  opacity: 0.4;
+  opacity: 0.38;
   cursor: default;
 }
 
@@ -715,7 +701,7 @@
   background: linear-gradient(
     to right,
     var(--station-accent, var(--lime)) var(--track-progress),
-    rgba(20, 21, 23, 0.12) var(--track-progress)
+    rgba(243, 241, 235, 0.14) var(--track-progress)
   );
 }
 
@@ -737,14 +723,13 @@
   width: 2px;
   border-radius: 2px;
   transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(13, 14, 17, 0.72);
 }
 
 .chapterTickMusic {
   top: -1px;
   bottom: -1px;
-  background: var(--ink);
-  opacity: 0.45;
+  background: rgba(243, 241, 235, 0.55);
 }
 
 .scrubber {
@@ -777,20 +762,20 @@
   width: 16px;
   height: 16px;
   margin-top: -5px;
-  border: 2px solid #ffffff;
+  border: 2px solid var(--surface);
   border-radius: 50%;
   background: var(--station-accent, var(--lime));
-  box-shadow: 0 2px 6px rgba(20, 21, 23, 0.28);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
 }
 
 .scrubber::-moz-range-thumb {
   box-sizing: border-box;
   width: 16px;
   height: 16px;
-  border: 2px solid #ffffff;
+  border: 2px solid var(--surface);
   border-radius: 50%;
   background: var(--station-accent, var(--lime));
-  box-shadow: 0 2px 6px rgba(20, 21, 23, 0.28);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
 }
 
 .scrubber:focus-visible {
@@ -824,7 +809,7 @@
   padding: 6px 14px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: var(--paper);
+  background: var(--surface-raised);
 }
 
 .volume svg {
@@ -860,7 +845,7 @@
   gap: 12px;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line);
 }
 
 .sectionHeader h2 {
@@ -886,7 +871,7 @@
   padding: 22px 24px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: #ffffff;
+  background: var(--surface);
   box-shadow: var(--shadow-soft);
 }
 
@@ -911,7 +896,7 @@
   min-height: 38px;
   padding: 0 14px;
   font-size: 0.8125rem;
-  background: var(--paper);
+  background: var(--surface-raised);
   border-color: var(--line);
 }
 
@@ -941,26 +926,26 @@
   margin-top: 1.15em;
 }
 
-/* ── Floating Episode Mini-Player (High-Contrast Dark Ink) ──────────────── */
+/* ── Floating Episode Mini-Player ───────────────────────────────────────── */
 .miniPlayer {
   position: fixed;
   bottom: max(16px, env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   width: min(650px, calc(100% - 24px));
-  background: #141517;
-  color: #f3f1ec;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(20, 22, 26, 0.96);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
   border-radius: 18px;
   padding: 14px 16px;
   z-index: 100;
-  box-shadow: 0 24px 56px rgba(20, 21, 23, 0.36);
-  --station-accent: #f3f1ec;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  --station-accent: #f3f1eb;
 }
 
 .miniPlayer > a {
   display: block;
-  color: #f3f1ec;
+  color: var(--ink);
   padding: 0 4px 10px;
   font-family: var(--font-display), sans-serif;
   font-size: 1rem;
@@ -974,29 +959,29 @@
 }
 
 .miniPlayer .controls .primary {
-  background: #f3f1ec;
-  border-color: #f3f1ec;
-  color: #141517;
+  background: #f3f1eb;
+  border-color: #f3f1eb;
+  color: #0d0e11;
   min-height: 44px;
   box-shadow: none;
 }
 
 .miniPlayer .controls .skip {
-  border-color: rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.08);
-  color: #f3f1ec;
+  border-color: var(--line);
+  background: var(--surface-raised);
+  color: var(--ink);
 }
 
 .miniPlayer .seekControl :global(.trackProgressBar) {
   background: linear-gradient(
     to right,
-    #f3f1ec var(--track-progress),
-    rgba(255, 255, 255, 0.2) var(--track-progress)
+    #f3f1eb var(--track-progress),
+    rgba(243, 241, 235, 0.18) var(--track-progress)
   );
 }
 
 .miniPlayer :global(.trackProgressTimes) {
-  color: #a8a69e;
+  color: var(--muted);
 }
 
 /* ── Responsive Layouts ─────────────────────────────────────────────────── */
@@ -1153,7 +1138,7 @@
     height: 44px;
     padding: 0;
     border-color: var(--line);
-    background: var(--paper);
+    background: var(--surface-raised);
     color: var(--muted);
   }
 
@@ -1170,7 +1155,7 @@
     width: 196px;
     box-sizing: border-box;
     padding: 14px 16px;
-    background: #ffffff;
+    background: var(--surface-raised);
     border: 1px solid var(--line-strong);
     border-radius: 14px;
     box-shadow: var(--shadow);

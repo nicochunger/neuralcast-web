@@ -142,7 +142,12 @@ export function StudioConsole({
               role="tab"
               aria-selected={candidateSelected}
               className={`tunerPreset tunerPreset-${candidate.id} ${candidateSelected ? "tunerPresetSelected" : ""} ${candidateLive ? "tunerPresetLive" : ""}`}
-              style={{ "--preset-accent": candidate.accentColor } as CSSProperties}
+              style={
+                {
+                  "--preset-accent": candidate.accentColor,
+                  "--preset-bg": `url(${candidate.backgroundImage})`
+                } as CSSProperties
+              }
               onClick={() => onSelectStation(candidate.id)}
             >
               <span className="tunerPresetThumb" aria-hidden="true">
@@ -175,7 +180,10 @@ export function StudioConsole({
       {/* Main Asymmetric Broadcast Console */}
       <div className="studioConsoleGrid">
         {/* Left: Primary Active Station Deck */}
-        <article className={`studioDeck ${isOnAir || isBusy ? "studioDeckOnAir" : ""}`}>
+        <article
+          className={`studioDeck studioDeck-${station.id} ${isOnAir || isBusy ? "studioDeckOnAir" : ""}`}
+          style={{ "--station-bg": `url(${station.backgroundImage})` } as CSSProperties}
+        >
           <div className="studioDeckHeader">
             <div className="studioDeckIdentity">
               <h2>{station.name}</h2>
