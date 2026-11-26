@@ -46,6 +46,8 @@ export type TranslationKey =
   | "episodes.playbackError"
   | "episodes.back"
   | "episodes.language"
+  | "episodes.segmentHost"
+  | "episodes.segmentMusic"
   | "app.tagline"
   | "stations.introTitle"
   | "stations.introDescription"
@@ -346,6 +348,8 @@ const englishMessages: Record<TranslationKey, string> = {
     "episodes.playbackError": "Playback could not start. Press play to try again.",
     "episodes.back": "All episodes",
     "episodes.language": "Host language",
+    "episodes.segmentHost": "Host",
+    "episodes.segmentMusic": "Music",
     "app.tagline": "AI-hosted radio and podcasts from Estavayer, Switzerland.",
     "common.install": "Install",
     "common.language": "Language",
@@ -659,6 +663,8 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "episodes.playbackError": "No se pudo reproducir. Presioná reproducir para volver a intentarlo.",
     "episodes.back": "Todos los episodios",
     "episodes.language": "Idioma del host",
+    "episodes.segmentHost": "Locución",
+    "episodes.segmentMusic": "Música",
     "app.tagline": "Radio y podcasts con hosts de IA desde Estavayer, Suiza.",
     "common.install": "Instalar",
     "common.language": "Idioma",
@@ -970,6 +976,8 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "episodes.playbackError": "La lecture a échoué. Appuyez sur lecture pour réessayer.",
     "episodes.back": "Tous les épisodes",
     "episodes.language": "Langue de l’animateur",
+    "episodes.segmentHost": "Animation",
+    "episodes.segmentMusic": "Musique",
     "app.tagline": "Radio et podcasts avec des animateurs IA depuis Estavayer, en Suisse.",
     "common.install": "Installer",
     "common.language": "Langue",

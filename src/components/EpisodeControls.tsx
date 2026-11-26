@@ -10,6 +10,7 @@ import styles from "./Episodes.module.css";
 export function EpisodeControls({ episode, compact = false }: { episode: PublishedEpisode; compact?: boolean }) {
   const player = useEpisodePlayer();
   const { t } = useI18n();
+  const [hoveredTime, setHoveredTime] = useState<number | null>(null);
   const selected = player.episode?.station === episode.station && player.episode.id === episode.id && player.episode.revision === episode.revision;
   const position = selected ? player.position : 0;
   const playing = selected && player.active && ["playing", "buffering"].includes(player.state);
@@ -17,6 +18,27 @@ export function EpisodeControls({ episode, compact = false }: { episode: Publish
   const skip = (seconds: number) => player.seek(Math.min(episode.duration, Math.max(0, position + seconds)));
   const elapsed = formatTrackTime(position);
   const duration = formatTrackTime(episode.duration);
+  const chapters = !compact && episode.chapters?.length && episode.duration > 0
+    ? episode.chapters
+        .map((chapter) => {
+          const start = Math.min(episode.duration, Math.max(0, chapter.start));
+          const end = Math.min(episode.duration, Math.max(start, chapter.end));
+          return { ...chapter, start, end };
+        })
+        .filter((chapter) => chapter.end > chapter.start)
+    : [];
+  const hasChapters = chapters.length > 0;
+  const findChapterAt = (time: number) =>
+    chapters.find((chapter) => time >= chapter.start && time <= chapter.end) ?? chapters[chapters.length - 1] ?? null;
+  const hoveredChapter = hasChapters && hoveredTime !== null ? findChapterAt(hoveredTime) : null;
+  const activeChapter = hasChapters && selected && player.active ? findChapterAt(position) : null;
+  const previewChapter = hoveredChapter ?? activeChapter;
+  const previewLabel = previewChapter
+    ? previewChapter.kind === "music" && previewChapter.artist
+      ? `${previewChapter.artist} — ${previewChapter.title}`
+      : previewChapter.title
+    : null;
+  const previewStamp = hoveredTime !== null ? formatTrackTime(hoveredTime) : previewChapter ? formatTrackTime(previewChapter.start) : null;
 
   return <div className={styles.controls}>
     <div className={styles.controlButtons}>
@@ -36,17 +58,48 @@ export function EpisodeControls({ episode, compact = false }: { episode: Publish
       {!compact ? <EpisodeVolumeControls /> : null}
     </div>
     <div className="trackProgress">
-      <div className={styles.seekControl}>
-        <div className="trackProgressBar" aria-hidden="true" style={{ "--track-progress": `${Math.min(100, Math.max(0, position / episode.duration * 100))}%` } as CSSProperties} />
-        {!compact && episode.chapters && episode.chapters.length > 1 && episode.duration > 0 ? (
-          <div className={styles.chapterMarkers} aria-hidden="true">
-            {episode.chapters.slice(1).map((chapter) => (
-              <span
-                key={chapter.id}
-                className={chapter.kind === "music" ? styles.chapterTickMusic : styles.chapterTick}
-                style={{ left: `${Math.min(100, Math.max(0, (chapter.start / episode.duration) * 100))}%` }}
-              />
-            ))}
+      <div
+        className={styles.seekControl}
+        onPointerMove={hasChapters ? (event) => {
+          const rect = event.currentTarget.getBoundingClientRect();
+          const usableWidth = Math.max(1, rect.width - 14);
+          const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left - 7) / usableWidth));
+          setHoveredTime(ratio * episode.duration);
+        } : undefined}
+        onPointerLeave={hasChapters ? () => setHoveredTime(null) : undefined}
+      >
+        <div
+          className={`trackProgressBar${hasChapters ? ` ${styles.trackBarBehind}` : ""}`}
+          aria-hidden="true"
+          style={{ "--track-progress": `${Math.min(100, Math.max(0, position / episode.duration * 100))}%` } as CSSProperties}
+        />
+        {hasChapters ? (
+          <div className={styles.chapterTrack} aria-hidden="true">
+            {chapters.map((chapter) => {
+              const span = chapter.end - chapter.start;
+              const segProgress = span > 0 ? Math.min(100, Math.max(0, ((position - chapter.start) / span) * 100)) : 0;
+              const isMusic = chapter.kind === "music";
+              const isHovered = hoveredChapter?.id === chapter.id;
+              const isCurrent = activeChapter?.id === chapter.id;
+              return (
+                <span
+                  key={chapter.id}
+                  className={[
+                    styles.chapterSegment,
+                    isMusic ? styles.chapterSegMusic : styles.chapterSegHost,
+                    isHovered ? styles.chapterSegHovered : "",
+                    isCurrent ? styles.chapterSegCurrent : "",
+                  ].filter(Boolean).join(" ")}
+                  style={{
+                    left: `${(chapter.start / episode.duration) * 100}%`,
+                    width: `${(span / episode.duration) * 100}%`,
+                    "--seg-progress": `${segProgress}%`,
+                  } as CSSProperties}
+                >
+                  <span className={styles.chapterSegBar} />
+                </span>
+              );
+            })}
           </div>
         ) : null}
         <input className={styles.scrubber} type="range" min={0} max={episode.duration} step={0.1} value={position} aria-label={t("episodes.seek")} aria-valuetext={`${elapsed} / ${duration}`} onChange={(event) => {
@@ -57,6 +110,27 @@ export function EpisodeControls({ episode, compact = false }: { episode: Publish
       </div>
       <div className="trackProgressTimes" aria-hidden="true"><span>{elapsed}</span><span>{duration}</span></div>
     </div>
+    {hasChapters ? (
+      <div className={styles.timelineFooter}>
+        <div className={styles.timelineLegend}>
+          <span className={styles.legendItem}>
+            <span className={styles.legendSwatchHost} aria-hidden="true" />
+            <span>{t("episodes.segmentHost")}</span>
+          </span>
+          <span className={styles.legendItem}>
+            <span className={styles.legendSwatchMusic} aria-hidden="true" />
+            <span>{t("episodes.segmentMusic")}</span>
+          </span>
+        </div>
+        {previewLabel && previewStamp ? (
+          <div className={styles.timelinePreview} title={previewLabel}>
+            <span className={styles.timelinePreviewTime}>{previewStamp}</span>
+            <span aria-hidden="true">·</span>
+            <span className={styles.timelinePreviewTitle}>{previewLabel}</span>
+          </div>
+        ) : null}
+      </div>
+    ) : null}
     {selected && player.error ? <p role="alert">{player.error}</p> : null}
   </div>;
 }
