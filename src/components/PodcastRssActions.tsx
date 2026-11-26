@@ -60,16 +60,6 @@ export function PodcastRssActions({ rssUrl, stationName }: { rssUrl?: string; st
         <RssIcon />
         <span>{copied ? t("podcasts.rssCopied") : t("podcasts.copyRss")}</span>
       </button>
-      <a
-        href={rssUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={styles.rssFeedLink}
-        aria-label={t("podcasts.openRss", { station: stationName })}
-        title={rssUrl}
-      >
-        RSS ↗
-      </a>
     </div>
   );
 }

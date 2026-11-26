@@ -21,7 +21,6 @@ export type TranslationKey =
   | "podcasts.copyRss"
   | "podcasts.rssCopied"
   | "podcasts.copyRssAria"
-  | "podcasts.openRss"
   | "episodes.currentChapter"
   | "episodes.liveInvite"
   | "episodes.retry"
@@ -323,7 +322,6 @@ const englishMessages: Record<TranslationKey, string> = {
     "podcasts.copyRss": "Copy RSS",
     "podcasts.rssCopied": "RSS copied",
     "podcasts.copyRssAria": "Copy {station} RSS feed URL",
-    "podcasts.openRss": "Open {station} RSS feed",
     "episodes.currentChapter": "Current chapter",
     "episodes.liveInvite": "Keep exploring with our live radio and its AI host.",
     "episodes.retry": "Try again",
@@ -638,7 +636,6 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "podcasts.copyRss": "Copiar RSS",
     "podcasts.rssCopied": "RSS copiado",
     "podcasts.copyRssAria": "Copiar URL del feed RSS de {station}",
-    "podcasts.openRss": "Abrir feed RSS de {station}",
     "episodes.currentChapter": "Capítulo actual",
     "episodes.liveInvite": "Seguí explorando con nuestra radio en vivo y su host de IA.",
     "episodes.retry": "Volver a intentar",
@@ -951,7 +948,6 @@ const messages: Record<Locale, Record<TranslationKey, string>> = {
     "podcasts.copyRss": "Copier le RSS",
     "podcasts.rssCopied": "RSS copié",
     "podcasts.copyRssAria": "Copier l’URL du flux RSS de {station}",
-    "podcasts.openRss": "Ouvrir le flux RSS de {station}",
     "episodes.currentChapter": "Chapitre actuel",
     "episodes.liveInvite": "Poursuivez la découverte avec notre radio en direct et son animateur IA.",
     "episodes.retry": "Réessayer",
