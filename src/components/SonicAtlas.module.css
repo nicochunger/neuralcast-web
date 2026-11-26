@@ -20,7 +20,7 @@
   color: var(--ink);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 24px;
+  gap: 20px;
 }
 
 .stationNeuralcast {
@@ -97,7 +97,7 @@
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 14px;
   background: var(--surface);
   flex-shrink: 0;
   max-width: 100%;
@@ -107,10 +107,10 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-height: 42px;
+  min-height: 44px;
   padding: 6px 14px;
   border: 1px solid transparent;
-  border-radius: 9px;
+  border-radius: 10px;
   background: transparent;
   color: var(--muted);
   text-decoration: none;
@@ -122,7 +122,7 @@
 
 .stationTab:hover {
   color: var(--ink);
-  background: rgba(244, 241, 234, 0.04);
+  background: rgba(243, 241, 235, 0.04);
 }
 
 .stationTab:focus-visible {
@@ -140,7 +140,7 @@
 .stationTabThumb {
   width: 28px;
   height: 28px;
-  border-radius: 7px;
+  border-radius: 6px;
   object-fit: cover;
   border: 1px solid var(--line);
   flex-shrink: 0;
@@ -154,13 +154,13 @@
 }
 
 .stationDotNeuralcast {
-  background: #1f8a78;
-  box-shadow: 0 0 10px rgba(31, 138, 120, 0.7);
+  background: #2ba892;
+  box-shadow: 0 0 10px rgba(43, 168, 146, 0.65);
 }
 
 .stationDotNeuralforge {
-  background: #b55748;
-  box-shadow: 0 0 10px rgba(181, 87, 72, 0.7);
+  background: #e0654e;
+  box-shadow: 0 0 10px rgba(224, 101, 78, 0.65);
 }
 
 /* ─── Hero Stat Strip ────────────────────────────────────────────────── */
@@ -311,8 +311,8 @@
 
 .constellationSection {
   min-width: 0;
-  border: 1px solid var(--line-strong);
-  border-radius: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl, 20px);
   background: var(--surface);
   box-shadow: var(--shadow);
   overflow: hidden;
@@ -337,8 +337,9 @@
 
 .sectionTitle {
   margin: 0;
-  font-size: 1.18rem;
-  font-weight: 780;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--ink);
 }
@@ -513,7 +514,7 @@
 }
 
 .nodeLabel {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 10.6px;
   font-weight: 680;
   fill: #e8eef6;
@@ -537,7 +538,7 @@
 }
 
 .nodeCountBadge {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 9.5px;
   font-weight: 750;
   fill: #ffffff;
@@ -782,12 +783,12 @@
 .roleBadge {
   display: inline-flex;
   align-items: center;
-  padding: 3px 8px;
+  padding: 3px 9px;
   border-radius: 999px;
-  font-size: 0.69rem;
-  font-weight: 760;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -815,10 +816,10 @@
 .timelineSection {
   min-width: 0;
   border: 1px solid var(--line);
-  border-radius: 18px;
-  background: var(--panel-bg);
+  border-radius: var(--radius-xl, 20px);
+  background: var(--surface);
   box-shadow: var(--shadow-soft);
-  padding: 18px 20px 20px;
+  padding: 20px 22px 22px;
   display: grid;
   gap: 16px;
 }
@@ -991,12 +992,12 @@
 
 .inspectorPanel {
   border: 1px solid var(--atlas-accent-border);
-  border-radius: 18px;
-  background: var(--panel-bg);
+  border-radius: var(--radius-xl, 20px);
+  background: var(--surface);
   box-shadow: var(--shadow);
   display: grid;
   gap: 18px;
-  padding: 20px;
+  padding: 20px 22px;
   max-height: 780px;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -1020,8 +1021,9 @@
 
 .inspectorTitleGroup h2 {
   margin: 0;
-  font-size: 1.32rem;
-  font-weight: 800;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1.2;
 }
@@ -1077,17 +1079,19 @@
 
 .inspectorBlockHeading {
   margin: 0;
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--muted);
 }
 
 .manifestoText {
   margin: 0;
-  padding-left: 12px;
-  border-left: 2px solid var(--atlas-accent);
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md, 12px);
+  background: var(--surface-raised);
   color: var(--ink);
   font-size: 0.89rem;
   line-height: 1.65;
@@ -1213,11 +1217,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  font-size: 0.73rem;
+  font-size: 0.78rem;
   color: var(--atlas-gold);
-  font-weight: 760;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .episodeLinkTitle {
@@ -1266,7 +1270,7 @@
   padding: 8px 12px;
   border: 1px solid var(--line-strong);
   border-radius: 10px;
-  background: var(--surface-soft);
+  background: var(--surface-raised);
   color: var(--ink);
   font-size: 0.88rem;
 }
@@ -1428,8 +1432,8 @@
 .vaultSection {
   min-width: 0;
   border: 1px solid var(--line);
-  border-radius: 18px;
-  background: var(--panel-bg);
+  border-radius: var(--radius-xl, 20px);
+  background: var(--surface);
   box-shadow: var(--shadow-soft);
   padding: clamp(18px, 2.5vw, 24px);
   display: grid;
@@ -1473,8 +1477,8 @@
   min-height: 44px;
   padding: 10px 40px 10px 40px;
   border: 1px solid var(--line-strong);
-  border-radius: 12px;
-  background: var(--surface-soft);
+  border-radius: var(--radius-md, 12px);
+  background: var(--surface-raised);
   color: var(--ink);
   font-size: 0.94rem;
 }
@@ -1676,10 +1680,10 @@
   padding: 10px 12px;
   background: var(--surface-soft);
   color: var(--muted);
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
   border-bottom: 1px solid var(--line);
 }
 
@@ -1698,7 +1702,7 @@
 .dossierCard {
   min-width: 0;
   border: 1px solid var(--atlas-accent-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 16px);
   background:
     radial-gradient(circle at 95% 0%, var(--atlas-accent-soft), transparent 40%),
     var(--surface);
@@ -1719,8 +1723,9 @@
 
 .dossierHeader h3 {
   margin: 0 0 8px;
+  font-family: var(--font-display), sans-serif;
   font-size: clamp(1.35rem, 2.5vw, 1.85rem);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.03em;
 }
 
@@ -1775,11 +1780,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   color: var(--atlas-gold);
-  font-weight: 760;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-weight: 650;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .storyMeta time {
@@ -1836,7 +1841,7 @@
   }
 
   .hero {
-    padding: 18px 16px;
+    padding: 4px 0 20px;
     gap: 16px;
   }
 

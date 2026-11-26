@@ -3,7 +3,7 @@
   --guide-muted: var(--muted);
   --guide-accent: var(--lime);
   --guide-line: var(--line);
-  --guide-current: rgba(15, 122, 104, 0.07);
+  --guide-current: rgba(43, 168, 146, 0.14);
   max-width: none;
   width: 100%;
   margin: 0;
@@ -25,7 +25,7 @@
 .points { padding-left: 1.2rem; }
 .points li + li { margin-top: .4rem; }
 .items { list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: .75rem; }
-.items li { display: grid; gap: .35rem; padding: .9rem 1rem; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-soft); }
+.items li { display: grid; gap: .35rem; padding: .9rem 1rem; border-radius: var(--radius-md, 12px); border: 1px solid var(--line); background: var(--surface-raised); }
 .items time { color: var(--lime); font-weight: 600; font-size: .9rem; }
 .items li > span { color: var(--muted); font-size: .85rem; }
 .items a { color: var(--lime); width: fit-content; font-size: .85rem; text-underline-offset: 3px; }
@@ -42,17 +42,17 @@
 @media (max-width: 540px) { .backdrop.backdrop { padding: .5rem; } .modal.modal { max-height: calc(100dvh - 1rem); } }
 
 .episodeGuide { color: var(--guide-ink, var(--ink)); overflow-wrap: anywhere; }
-.episodeProgress { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .6rem; margin: 0 0 18px; padding: 14px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); font-size: .8125rem; color: var(--guide-muted, var(--muted)); }
+.episodeProgress { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .6rem; margin: 0 0 18px; padding: 16px 20px; border: 1px solid var(--line); border-radius: var(--radius-lg, 16px); background: var(--surface); font-size: .8125rem; color: var(--guide-muted, var(--muted)); }
 .episodeProgress strong { color: var(--guide-ink, var(--ink)); font-variant-numeric: tabular-nums; font-weight: 700; }
 .episodeProgress progress { width: 100%; height: 5px; border-radius: 999px; accent-color: var(--station-accent, var(--lime)); }
 .chapters { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
-.chapter { padding: 18px 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-soft); transition: border-color 160ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 160ms cubic-bezier(0.22, 1, 0.36, 1), background-color 160ms cubic-bezier(0.22, 1, 0.36, 1); }
+.chapter { padding: 20px 22px; border: 1px solid var(--line); border-radius: var(--radius-lg, 16px); background: var(--surface); box-shadow: var(--shadow-soft); transition: border-color 160ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 160ms cubic-bezier(0.22, 1, 0.36, 1), background-color 160ms cubic-bezier(0.22, 1, 0.36, 1); }
 .chapterMusic { background: color-mix(in srgb, var(--station-accent, var(--lime)), var(--surface) 92%); border-color: color-mix(in srgb, var(--station-accent, var(--lime)), var(--line) 74%); }
 .currentChapter { border-color: color-mix(in srgb, var(--station-accent, var(--lime)), var(--line-strong) 35%); background: color-mix(in srgb, var(--station-accent, var(--lime)), var(--surface-raised) 86%); box-shadow: 0 14px 32px rgba(0, 0, 0, 0.36); }
 .chapterTime { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem; margin-bottom: 10px; color: var(--guide-muted, var(--muted)); font-size: .8125rem; }
 .chapterTime strong { color: color-mix(in srgb, var(--station-accent, var(--lime)), #ffffff 28%); font-size: .8125rem; font-weight: 700; }
 .chapterTrack { display: flex; align-items: center; gap: 14px; }
-.chapterTrack img { width: 64px; height: 64px; border-radius: 10px; border: 1px solid var(--line-strong); object-fit: cover; flex-shrink: 0; }
+.chapterTrack img { width: 64px; height: 64px; border-radius: var(--radius-sm, 8px); border: 1px solid var(--line-strong); object-fit: cover; flex-shrink: 0; }
 .chapterTrack > div { display: grid; gap: 3px; min-width: 0; }
 .chapter h3 { font-family: var(--font-display), sans-serif; font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; line-height: 1.25; color: var(--ink); }
 .chapterTrack strong { font-size: .9375rem; font-weight: 600; color: var(--ink); }
@@ -62,7 +62,7 @@
 .chapterDetails .points { color: var(--guide-muted, var(--muted)); }
 .chapterSources { color: var(--guide-muted, var(--muted)); font-size: .8125rem; line-height: 26px; margin-top: 6px; }
 .chapterSources > span { white-space: nowrap; }
-.chapterSources a { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; min-height: 24px; padding: 0 6px; border-radius: 6px; background: var(--surface-raised); border: 1px solid var(--line); color: var(--ink); font-size: .78rem; font-weight: 650; text-decoration: none; }
+.chapterSources a { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; min-height: 24px; padding: 0 6px; border-radius: 6px; background: var(--surface-raised); border: 1px solid var(--line); color: var(--ink); font-size: .8125rem; font-weight: 650; text-decoration: none; }
 .chapterSources a:hover { border-color: var(--station-accent, var(--lime)); color: color-mix(in srgb, var(--station-accent, var(--lime)), #ffffff 25%); }
 .chapterSeek { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-raised); color: var(--ink); cursor: pointer; font: inherit; font-size: .8125rem; font-weight: 650; font-variant-numeric: tabular-nums; text-align: left; text-decoration: none; transition: border-color 160ms cubic-bezier(0.22, 1, 0.36, 1), background-color 160ms cubic-bezier(0.22, 1, 0.36, 1), color 160ms cubic-bezier(0.22, 1, 0.36, 1); }
 .chapterSeek:hover { border-color: var(--station-accent, var(--lime)); color: color-mix(in srgb, var(--station-accent, var(--lime)), #ffffff 25%); background: var(--surface-soft); }

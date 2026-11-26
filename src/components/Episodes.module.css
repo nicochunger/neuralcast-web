@@ -55,8 +55,8 @@
 
 .seriesSelector {
   display: inline-flex;
-  gap: 6px;
-  padding: 5px;
+  gap: 4px;
+  padding: 4px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--surface);
@@ -82,7 +82,7 @@
 .seriesOption img {
   width: 32px;
   height: 32px;
-  border-radius: 7px;
+  border-radius: 6px;
   border: 1px solid var(--line);
   object-fit: cover;
   flex-shrink: 0;
@@ -228,7 +228,7 @@
   grid-template-columns: 280px minmax(0, 1fr);
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 22px;
+  border-radius: var(--radius-xl, 20px);
   background: var(--surface);
   color: var(--ink);
   text-decoration: none;
@@ -252,10 +252,10 @@
 
 .featuredArtwork img {
   display: block;
-  width: 220px;
-  height: 220px;
+  width: 224px;
+  height: 224px;
   aspect-ratio: 1;
-  border-radius: 16px;
+  border-radius: var(--radius-md, 12px);
   border: 1px solid var(--line-strong);
   box-shadow: 0 20px 42px rgba(0, 0, 0, 0.45);
   object-fit: cover;
@@ -355,7 +355,7 @@
   width: 100%;
   padding: 22px;
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: var(--radius-xl, 20px);
   background: var(--surface);
   color: var(--ink);
   text-decoration: none;
@@ -374,7 +374,7 @@
   width: 84px;
   height: 84px;
   aspect-ratio: 1;
-  border-radius: 12px;
+  border-radius: var(--radius-sm, 8px);
   border: 1px solid var(--line);
   object-fit: cover;
 }
@@ -418,7 +418,7 @@
 
 .empty {
   border: 1px dashed var(--line-strong);
-  border-radius: 20px;
+  border-radius: var(--radius-xl, 20px);
   padding: 36px;
   background: var(--surface);
   line-height: 1.7;
@@ -464,7 +464,7 @@
 .playerCard {
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 22px;
+  border-radius: var(--radius-xl, 20px);
   background: var(--surface);
   box-shadow: var(--shadow-soft);
 }
@@ -486,9 +486,9 @@
 }
 
 .playerArtworkFrame {
-  width: 220px;
-  height: 220px;
-  border-radius: 16px;
+  width: 224px;
+  height: 224px;
+  border-radius: var(--radius-md, 12px);
   overflow: hidden;
   border: 1px solid var(--line-strong);
   background: var(--surface-raised);
@@ -506,12 +506,12 @@
   display: grid;
   gap: 2px;
   width: 100%;
-  max-width: 220px;
+  max-width: 224px;
   text-align: center;
 }
 
 .liveChapterCaption span {
-  font-size: 0.78rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: color-mix(in srgb, var(--station-accent), #ffffff 24%);
 }
@@ -829,9 +829,9 @@
 .listeningRoomGrid {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.72fr);
-  gap: 24px;
+  gap: 20px;
   align-items: start;
-  margin-top: 28px;
+  margin-top: 24px;
 }
 
 .guideColumn {
@@ -870,7 +870,7 @@
   min-width: 0;
   padding: 22px 24px;
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: var(--radius-xl, 20px);
   background: var(--surface);
   box-shadow: var(--shadow-soft);
 }
@@ -933,10 +933,11 @@
   left: 50%;
   transform: translateX(-50%);
   width: min(650px, calc(100% - 24px));
-  background: rgba(20, 22, 26, 0.96);
+  background: rgba(20, 22, 26, 0.94);
+  backdrop-filter: blur(18px) saturate(1.15);
   color: var(--ink);
   border: 1px solid var(--line-strong);
-  border-radius: 18px;
+  border-radius: var(--radius-lg, 16px);
   padding: 14px 16px;
   z-index: 100;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
@@ -1027,7 +1028,7 @@
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 860px) {
   .episodeGrid {
     grid-template-columns: minmax(0, 1fr);
   }

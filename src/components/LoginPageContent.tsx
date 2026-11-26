@@ -13,8 +13,7 @@ export function LoginPageContent({ callbackUrl, isConfigured }: LoginPageContent
 
   return (
     <section className="authCard">
-      <p className="sectionEyebrow">{t("auth.eyebrow")}</p>
-      <h2>{t("auth.title")}</h2>
+      <h1>{t("auth.title")}</h1>
       <p className="authLead">{t("auth.lead")}</p>
       {isConfigured ? (
         <LoginForm callbackUrl={callbackUrl} />
