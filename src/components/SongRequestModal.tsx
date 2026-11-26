@@ -3,6 +3,7 @@
 import { useMemo, useState, type CSSProperties } from "react";
 import { useI18n } from "@/lib/i18n";
 import { AnimatedSuccessIcon } from "@/components/AnimatedSuccessIcon";
+import { CloseIcon } from "@/components/CloseIcon";
 import type { RequestableSong, SongRequestState, Station } from "@/types/radio";
 
 interface SongRequestModalProps {
@@ -56,7 +57,7 @@ export function SongRequestModal({ station, requestState, onRequestSong, onDismi
             <p>{t("request.description")}</p>
           </div>
           <button className="requestModalClose" type="button" onClick={onDismiss} aria-label={t("request.close")}>
-            ×
+            <CloseIcon />
           </button>
         </div>
 

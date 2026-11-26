@@ -16,6 +16,7 @@ import { submitSongRequestAction } from "@/lib/actions";
 import { RecentlyPlayedModal } from "@/components/RecentlyPlayedModal";
 import { FavoritesModal } from "@/components/FavoritesModal";
 import { ArtworkLightbox, type ArtworkLightboxData } from "@/components/ArtworkLightbox";
+import { CloseIcon } from "@/components/CloseIcon";
 import { HeartIcon } from "@/components/HeartIcon";
 import {
   FAVORITES_STORAGE_KEY,
@@ -728,7 +729,7 @@ export function AudioPlayer({ isAdmin }: AudioPlayerProps) {
               aria-label={t("schedule.close")}
               data-modal-autofocus
             >
-              ×
+              <CloseIcon />
             </button>
             <SchedulePreview station={scheduleStation} schedule={schedules[scheduleStation.id]} />
           </div>

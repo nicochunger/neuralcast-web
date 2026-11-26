@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, type CSSProperties } from "react";
+import { CloseIcon } from "@/components/CloseIcon";
 import { HeartIcon } from "@/components/HeartIcon";
 import { getFavoriteTitle } from "@/lib/favorites";
 import { useI18n } from "@/lib/i18n";
@@ -47,7 +48,7 @@ export function FavoritesModal({ favorites, syncError, onRemove, onDismiss }: Fa
             aria-label={t("favorites.close")}
             data-modal-autofocus
           >
-            ×
+            <CloseIcon />
           </button>
         </div>
 

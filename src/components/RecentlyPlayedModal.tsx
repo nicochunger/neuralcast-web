@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, type CSSProperties } from "react";
+import { CloseIcon } from "@/components/CloseIcon";
 import { useI18n } from "@/lib/i18n";
 import type { PlayedTrack, Station, StationNowPlayingState } from "@/types/radio";
 
@@ -61,7 +62,7 @@ export function RecentlyPlayedModal({ station, nowPlaying, onDismiss }: Recently
             aria-label={t("history.close")}
             data-modal-autofocus
           >
-            ×
+            <CloseIcon />
           </button>
         </div>
 

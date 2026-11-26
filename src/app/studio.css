@@ -1212,12 +1212,19 @@
 
 .requestModalClose,
 .scheduleModalClose,
+.scheduleBlockDetailsClose,
 .artworkLightboxClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 38px;
   height: 38px;
+  padding: 0;
   border: 1px solid var(--line-strong);
+  border-radius: 999px;
   background: var(--surface-soft);
   color: var(--ink);
+  line-height: 0;
   backdrop-filter: none;
 }
 
@@ -1229,6 +1236,7 @@
 
 .requestModalClose:hover,
 .scheduleModalClose:hover,
+.scheduleBlockDetailsClose:hover,
 .artworkLightboxClose:hover {
   background: rgba(255, 255, 255, 0.14);
 }

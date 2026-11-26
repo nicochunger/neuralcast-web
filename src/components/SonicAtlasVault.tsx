@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { CloseIcon } from "@/components/CloseIcon";
 import { formatEpisodeNumber } from "@/lib/episodes";
 import { useI18n } from "@/lib/i18n";
 import { formatTrackTime } from "@/lib/trackProgress";
@@ -361,7 +362,7 @@ export function SonicAtlasVault({
                   onClick={() => setQuery("")}
                   aria-label={t("atlas.vault.clearSearch")}
                 >
-                  ×
+                  <CloseIcon size={14} />
                 </button>
               ) : null}
             </div>

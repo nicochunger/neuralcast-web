@@ -1048,16 +1048,17 @@
 }
 
 .closeButton {
-  display: grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 34px;
   height: 34px;
+  padding: 0;
   border: 1px solid var(--line);
   border-radius: 9px;
   background: var(--surface-soft);
   color: var(--ink);
-  font-size: 1.15rem;
-  line-height: 1;
+  line-height: 0;
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -1500,13 +1501,15 @@
   transform: translateY(-50%);
   width: 28px;
   height: 28px;
+  padding: 0;
   border-radius: 7px;
   background: var(--surface-raised);
   color: var(--muted);
   cursor: pointer;
-  display: grid;
-  place-items: center;
-  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
 }
 
 .vaultClearButton:hover {

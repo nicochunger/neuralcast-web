@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { CloseIcon } from "@/components/CloseIcon";
 import { formatEpisodeNumber } from "@/lib/episodes";
 import { getSegmentTitle, useI18n } from "@/lib/i18n";
 import { formatTrackTime } from "@/lib/trackProgress";
@@ -234,7 +235,7 @@ export function SonicAtlasInspector({
           aria-label={t("atlas.inspector.close")}
           title={t("atlas.inspector.close")}
         >
-          ×
+          <CloseIcon />
         </button>
       </div>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { CloseIcon } from "@/components/CloseIcon";
 import { useI18n } from "@/lib/i18n";
 
 export interface ArtworkLightboxData {
@@ -42,7 +43,7 @@ export function ArtworkLightbox({ imageUrl, title, artist, album, onDismiss }: A
           aria-label={t("artwork.close")}
           data-modal-autofocus
         >
-          ×
+          <CloseIcon />
         </button>
         <img
           className="artworkLightboxImage"

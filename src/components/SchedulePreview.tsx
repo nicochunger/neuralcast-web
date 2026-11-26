@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { CloseIcon } from "@/components/CloseIcon";
 import { getSegmentDetail, getSegmentTitle, useI18n } from "@/lib/i18n";
 import { addDaysToDateString, getZonedDateString, zonedDateTimeToUtcMillis } from "@/lib/dateTime";
 import type { Locale } from "@/lib/locale";
@@ -207,7 +208,7 @@ function ScheduleBlockDetails({
         aria-label={getSegmentTitle(segment, locale)}
         onClick={(event) => event.stopPropagation()}
       >
-        <button type="button" className="scheduleBlockDetailsClose" onClick={onClose} aria-label="Close schedule details">×</button>
+        <button type="button" className="scheduleBlockDetailsClose" onClick={onClose} aria-label="Close schedule details"><CloseIcon /></button>
         <time>{formatRange(segment, timeZone, locale)}</time>
         <h3>{getSegmentTitle(segment, locale)}</h3>
         <p>{getSegmentDetail(segment, locale)}</p>

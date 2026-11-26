@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import { useI18n } from "@/lib/i18n";
+import { CloseIcon } from "@/components/CloseIcon";
 import { HostCompanionCard } from "@/components/HostCompanionCard";
 import type { HostCompanion } from "@/types/hostCompanion";
 import type { Station } from "@/types/radio";
@@ -20,7 +21,7 @@ export function HostCompanionModal({ station, card, currentTime, onDismiss }: {
       } as CSSProperties}>
         <div className="requestModalHero">
           <div><span className="requestModalKicker">{station.name}</span><h2 id="host-recap-title">{t("companion.button")}</h2></div>
-          <button className="requestModalClose" type="button" onClick={onDismiss} aria-label={t("companion.close")} data-modal-autofocus>×</button>
+          <button className="requestModalClose" type="button" onClick={onDismiss} aria-label={t("companion.close")} data-modal-autofocus><CloseIcon /></button>
         </div>
         <HostCompanionCard card={card} currentTime={currentTime} fallbackArtwork={station.artworkImage} />
       </section>
