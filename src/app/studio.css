@@ -51,13 +51,14 @@
 
 .appHeaderBar {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
   align-items: center;
   gap: 24px;
   min-height: 44px;
 }
 
 .brandLockup {
+  justify-self: start;
   display: inline-flex;
   align-items: center;
   gap: 11px;
@@ -95,12 +96,15 @@
 .primaryNavLink {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  height: 38px;
   min-height: 38px;
-  padding: 0 14px;
+  padding: 0 14px 3px;
   border-radius: 999px;
   color: var(--muted);
   font-size: 0.9375rem;
   font-weight: 600;
+  line-height: 1;
   text-decoration: none;
   transition: color 160ms cubic-bezier(0.22, 1, 0.36, 1), background-color 160ms cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -123,6 +127,7 @@
 
 .headerActions,
 .headerUtilityRow {
+  justify-self: end;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -139,6 +144,7 @@
   color: var(--ink);
   font-size: 0.875rem;
   font-weight: 600;
+  line-height: 1;
   box-shadow: none;
   transition: border-color 160ms cubic-bezier(0.22, 1, 0.36, 1), background-color 160ms cubic-bezier(0.22, 1, 0.36, 1), color 160ms cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -151,6 +157,10 @@
 
 .headerFavoritesButton {
   padding: 0 14px;
+}
+
+.headerFavoritesIcon svg {
+  transform: none;
 }
 
 .headerFavoritesButton:hover {
@@ -674,6 +684,7 @@
   color: #0d0e11;
   font-size: 1rem;
   font-weight: 700;
+  line-height: 1;
   cursor: pointer;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.42);
   transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1), background-color 180ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -840,6 +851,7 @@
   color: rgba(243, 241, 235, 0.8);
   font-size: 0.875rem;
   font-weight: 600;
+  line-height: 1;
   cursor: pointer;
   transition: color 160ms cubic-bezier(0.22, 1, 0.36, 1), background-color 160ms cubic-bezier(0.22, 1, 0.36, 1), border-color 160ms cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -1124,6 +1136,7 @@
   color: #0d0e11;
   font-size: 0.875rem;
   font-weight: 700;
+  line-height: 1;
 }
 
 .miniButton:hover {
@@ -1591,8 +1604,9 @@
   }
 
   .primaryNavLink {
+    height: 36px;
     min-height: 36px;
-    padding: 0 12px;
+    padding: 0 12px 2px;
     font-size: 0.9rem;
     white-space: nowrap;
   }
