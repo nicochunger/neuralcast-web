@@ -150,11 +150,7 @@ export function StudioConsole({
               onClick={() => onSelectStation(candidate.id)}
             >
               <span className="tunerPresetThumb" aria-hidden="true">
-                {candidatePlaying.art ? (
-                  <img src={candidatePlaying.art} alt="" loading="lazy" />
-                ) : (
-                  <img src={candidate.artworkImage} alt="" loading="lazy" />
-                )}
+                <img src={candidate.artworkImage} alt="" loading="lazy" />
               </span>
               <span className="tunerPresetBody">
                 <span className="tunerPresetTop">
