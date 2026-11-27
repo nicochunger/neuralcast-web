@@ -358,13 +358,6 @@
   color: var(--ink);
 }
 
-.tunerPresetChannel {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: var(--muted);
-}
-
 .tunerPresetTrack {
   overflow: hidden;
   text-overflow: ellipsis;

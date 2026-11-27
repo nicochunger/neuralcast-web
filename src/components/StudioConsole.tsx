@@ -123,7 +123,7 @@ export function StudioConsole({
     >
       {/* Dual-Channel Radio Tuner Bar */}
       <div className="tunerStrip" role="tablist" aria-label={t("stations.ariaLabel")}>
-        {stations.map((candidate, index) => {
+        {stations.map((candidate) => {
           const candidatePlaying = nowPlayingByStation[candidate.id];
           const candidateTrack = getTrackDetails(candidatePlaying, t);
           const candidateSelected = candidate.id === station.id;
@@ -159,7 +159,6 @@ export function StudioConsole({
               <span className="tunerPresetBody">
                 <span className="tunerPresetTop">
                   <strong className="tunerPresetName">{candidate.name}</strong>
-                  <span className="tunerPresetChannel">{`CH 0${index + 1}`}</span>
                 </span>
                 <span className="tunerPresetTrack">
                   {candidateTrack.artist ? `${candidateTrack.title} · ${candidateTrack.artist}` : candidateTrack.title}
