@@ -441,13 +441,13 @@
 .studioDeck-neuralforge::before {
   background-position: left 68%;
   transform: scaleX(-1) scale(1.02);
-  filter: saturate(1.06) contrast(1.04);
+  filter: saturate(0.96) contrast(1.02) brightness(0.86);
 }
 
 .studioDeck-neuralforge::after {
   background:
-    linear-gradient(180deg, rgba(11, 12, 15, 0.56) 0%, rgba(11, 12, 15, 0.18) 38%, rgba(11, 12, 15, 0.28) 74%, rgba(11, 12, 15, 0.78) 100%),
-    linear-gradient(92deg, rgba(11, 12, 15, 0.84) 0%, rgba(11, 12, 15, 0.62) 38%, rgba(11, 12, 15, 0.34) 62%, rgba(11, 12, 15, 0.14) 100%);
+    linear-gradient(180deg, rgba(11, 12, 15, 0.58) 0%, rgba(11, 12, 15, 0.26) 38%, rgba(11, 12, 15, 0.34) 74%, rgba(11, 12, 15, 0.82) 100%),
+    linear-gradient(92deg, rgba(11, 12, 15, 0.86) 0%, rgba(11, 12, 15, 0.66) 38%, rgba(11, 12, 15, 0.42) 62%, rgba(11, 12, 15, 0.24) 100%);
 }
 
 .studioDeckOnAir {
@@ -584,7 +584,8 @@
   flex-wrap: wrap;
   gap: 8px;
   font-size: 0.875rem;
-  color: rgba(243, 241, 235, 0.74);
+  color: rgba(243, 241, 235, 0.78);
+  text-shadow: 0 1px 10px rgba(8, 9, 12, 0.85), 0 1px 2px rgba(8, 9, 12, 0.9);
 }
 
 .studioProgramDivider {
@@ -609,6 +610,7 @@
   letter-spacing: -0.025em;
   line-height: 1.15;
   color: #ffffff;
+  text-shadow: 0 1px 10px rgba(8, 9, 12, 0.85), 0 1px 2px rgba(8, 9, 12, 0.9);
 }
 
 .studioTrackArtist {
@@ -619,6 +621,7 @@
   font-size: 1.0625rem;
   font-weight: 600;
   color: rgba(243, 241, 235, 0.92);
+  text-shadow: 0 1px 10px rgba(8, 9, 12, 0.85), 0 1px 2px rgba(8, 9, 12, 0.9);
 }
 
 .studioTrackAlbum {
@@ -627,7 +630,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.9rem;
-  color: rgba(243, 241, 235, 0.7);
+  color: rgba(243, 241, 235, 0.74);
+  text-shadow: 0 1px 10px rgba(8, 9, 12, 0.85), 0 1px 2px rgba(8, 9, 12, 0.9);
 }
 
 .studioTrackError {
@@ -642,18 +646,20 @@
 }
 
 .studioTrackColumn .trackProgressBar {
-  height: 5px;
+  height: 6px;
   border: 0;
+  box-shadow: 0 0 0 1.5px rgba(10, 11, 14, 0.72), 0 2px 10px rgba(10, 11, 14, 0.78);
   background: linear-gradient(
     to right,
-    color-mix(in srgb, var(--station-accent), #ffffff 18%) var(--track-progress),
-    rgba(255, 255, 255, 0.2) var(--track-progress)
+    color-mix(in srgb, var(--station-accent), #ffffff 22%) var(--track-progress),
+    rgba(255, 255, 255, 0.24) var(--track-progress)
   );
 }
 
 .studioTrackColumn .trackProgressTimes {
-  color: rgba(243, 241, 235, 0.74);
+  color: rgba(243, 241, 235, 0.86);
   font-size: 0.8125rem;
+  text-shadow: 0 1px 10px rgba(8, 9, 12, 0.85), 0 1px 2px rgba(8, 9, 12, 0.9);
 }
 
 /* Primary Hardware Transport Controls */
