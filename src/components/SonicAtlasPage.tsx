@@ -174,7 +174,7 @@ export function SonicAtlasPage({
 
     (async () => {
       try {
-        const res = await fetch(`/api/schedule/${activeStation}`, { cache: "no-store" });
+        const res = await fetch(`/api/schedule/${activeStation}`);
         if (!res.ok || cancelled) return;
         const data = (await res.json()) as StationScheduleDay;
         if (cancelled) return;

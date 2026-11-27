@@ -14,7 +14,12 @@ export async function GET(request: Request, context: RouteContext) {
   const station = getStation(stationId);
 
   if (!station) {
-    return NextResponse.json({ error: "Unknown station." }, { status: 404 });
+    return NextResponse.json({ error: "Unknown station." }, {
+      status: 404,
+      headers: {
+        "Cache-Control": "no-store"
+      }
+    });
   }
 
   const { searchParams } = new URL(request.url);
@@ -27,11 +32,16 @@ export async function GET(request: Request, context: RouteContext) {
       : undefined;
     return NextResponse.json(enrichScheduleWithPresentation(schedule, presentation), {
       headers: {
-        "Cache-Control": "no-store"
+        "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=600"
       }
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to load schedule.";
-    return NextResponse.json({ error: message }, { status: 502 });
+    return NextResponse.json({ error: message }, {
+      status: 502,
+      headers: {
+        "Cache-Control": "no-store"
+      }
+    });
   }
 }

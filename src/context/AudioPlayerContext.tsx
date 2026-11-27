@@ -358,9 +358,15 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
           if (metadataRequestsInFlightRef.current.has(key)) return;
           metadataRequestsInFlightRef.current.add(key);
           requestKey = key;
-          setNowPlaying((current) => markNowPlayingLoading(current, [stationId]));
+          setNowPlaying((current) => {
+            const existing = current[stationId];
+            if (existing?.fetchedAt && existing.hostChannelId === channel.id) {
+              return current;
+            }
+            return markNowPlayingLoading(current, [stationId]);
+          });
           const query = `?channel=${encodeURIComponent(channel.id)}`;
-          const response = await fetch(`/api/nowplaying/${stationId}${query}`, { cache: "no-store" });
+          const response = await fetch(`/api/nowplaying/${stationId}${query}`);
 
           if (!response.ok) {
             throw new Error(t("common.unavailable"));
@@ -425,7 +431,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     await Promise.all(
       stationIds.map(async (stationId) => {
         try {
-          const response = await fetch(`/api/schedule/${stationId}`, { cache: "no-store" });
+          const response = await fetch(`/api/schedule/${stationId}`);
 
           if (!response.ok) {
             throw new Error(t("schedule.error"));
@@ -674,7 +680,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       if (shouldSyncNowPlaying && !document.hidden) {
         void refreshNowPlaying();
       }
-    }, 5000);
+    }, 15000);
     const scheduleInterval = window.setInterval(() => {
       if (shouldSyncSchedules && !document.hidden) {
         void refreshSchedules();
