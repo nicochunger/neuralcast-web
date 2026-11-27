@@ -423,7 +423,7 @@
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(180deg, rgba(13, 14, 17, 0.34) 0%, rgba(13, 14, 17, 0.38) 50%, rgba(13, 14, 17, 0.42) 100%),
+    linear-gradient(180deg, rgba(13, 14, 17, 0.62) 0%, rgba(13, 14, 17, 0.48) 46%, rgba(13, 14, 17, 0.42) 100%),
     linear-gradient(95deg, rgba(13, 14, 17, 0.84) 0%, rgba(13, 14, 17, 0.56) 55%, rgba(13, 14, 17, 0.34) 100%);
   content: "";
 }
@@ -434,7 +434,7 @@
 
 .studioDeck-neuralcast::after {
   background:
-    linear-gradient(180deg, rgba(11, 14, 18, 0.4) 0%, rgba(11, 14, 18, 0.44) 50%, rgba(11, 14, 18, 0.46) 100%),
+    linear-gradient(180deg, rgba(11, 14, 18, 0.72) 0%, rgba(11, 14, 18, 0.58) 48%, rgba(11, 14, 18, 0.46) 100%),
     linear-gradient(95deg, rgba(11, 14, 18, 0.88) 0%, rgba(11, 14, 18, 0.66) 56%, rgba(11, 14, 18, 0.44) 100%);
 }
 
@@ -446,7 +446,7 @@
 
 .studioDeck-neuralforge::after {
   background:
-    linear-gradient(180deg, rgba(11, 12, 15, 0.32) 0%, rgba(11, 12, 15, 0.24) 44%, rgba(11, 12, 15, 0.36) 100%),
+    linear-gradient(180deg, rgba(11, 12, 15, 0.58) 0%, rgba(11, 12, 15, 0.26) 38%, rgba(11, 12, 15, 0.34) 74%, rgba(11, 12, 15, 0.36) 100%),
     linear-gradient(92deg, rgba(11, 12, 15, 0.86) 0%, rgba(11, 12, 15, 0.66) 38%, rgba(11, 12, 15, 0.42) 62%, rgba(11, 12, 15, 0.24) 100%);
 }
 
@@ -461,8 +461,6 @@
   gap: 20px;
   padding: 26px 30px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(11, 12, 15, 0.52);
-  backdrop-filter: blur(8px);
 }
 
 .studioDeckIdentity {
