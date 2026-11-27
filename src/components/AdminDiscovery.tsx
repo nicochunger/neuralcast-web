@@ -45,18 +45,34 @@ export function AdminDiscovery() {
 
   useEffect(() => {
     let stopped = false;
-    let timer: ReturnType<typeof setTimeout>;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     let controller: AbortController | undefined;
     let failures = 0;
+    let activeJob = false;
+
+    function scheduleNext() {
+      clearTimeout(timer);
+      if (stopped || document.hidden) return;
+      const baseDelay = activeJob ? 5000 : 30000;
+      const delay = Math.min(baseDelay * 2 ** failures, 60000);
+      timer = setTimeout(() => {
+        if (!stopped && !document.hidden) void refresh();
+      }, delay);
+    }
+
     async function refresh() {
-      controller = new AbortController();
-      const timeout = setTimeout(() => controller?.abort(), 20000);
+      clearTimeout(timer);
+      controller?.abort();
+      const requestController = new AbortController();
+      controller = requestController;
+      const timeout = setTimeout(() => requestController.abort(), 20000);
       try {
-        const response = await fetch(`${base}/state`, { cache: "no-store", signal: controller.signal });
+        const response = await fetch(`${base}/state`, { cache: "no-store", signal: requestController.signal });
         const payload = await response.json();
         if (!response.ok) throw new Error(errorMessage(payload));
-        if (stopped) return;
+        if (stopped || requestController.signal.aborted) return;
         const result = payload as View;
+        activeJob = result.job?.status === "running" || result.job?.status === "accepted";
         const key = result.batch ? `${result.batch.id}:${result.batch.revision}` : "empty";
         if (dirtyRef.current && revisionRef.current !== key) {
           setError("This review changed in another session. Copy any unsaved reasoning, then reload this review.");
@@ -67,14 +83,38 @@ export function AdminDiscovery() {
         }
         failures = 0; setView(result); setJob(result.job ?? null); setError(null);
       } catch (cause) {
-        if (!stopped) { failures++; setError(cause instanceof Error ? cause.message : "Connection interrupted."); }
+        if (!stopped && !requestController.signal.aborted) {
+          failures++;
+          setError(cause instanceof Error ? cause.message : "Connection interrupted.");
+        }
       } finally {
         clearTimeout(timeout);
-        if (!stopped) { setLoading(false); timer = setTimeout(refresh, Math.min(5000 * 2 ** failures, 30000)); }
+        if (!stopped && controller === requestController) {
+          setLoading(false);
+          scheduleNext();
+        }
       }
     }
-    void refresh();
-    return () => { stopped = true; clearTimeout(timer); controller?.abort(); };
+
+    const handleVisibility = () => {
+      if (!document.hidden && !stopped) {
+        clearTimeout(timer);
+        void refresh();
+      } else {
+        clearTimeout(timer);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    if (!document.hidden) {
+      void refresh();
+    }
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+      controller?.abort();
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, [base, reload]);
 
   useEffect(() => {

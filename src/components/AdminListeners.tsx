@@ -22,27 +22,66 @@ export function AdminListeners() {
   const [page, setPage] = useState(0);
   useEffect(() => {
     let stopped = false;
-    let timer: ReturnType<typeof setTimeout>;
-    let controller: AbortController;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let controller: AbortController | undefined;
     setReport(null); setPage(0); setError(null);
+
+    function scheduleNext() {
+      clearTimeout(timer);
+      if (stopped || document.hidden) return;
+      timer = setTimeout(() => {
+        if (!stopped && !document.hidden) void refresh();
+      }, range === "live" ? 15000 : 60000);
+    }
+
     async function refresh() {
+      clearTimeout(timer);
+      controller?.abort();
       setLoading(true);
-      controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 20000);
+      const requestController = new AbortController();
+      controller = requestController;
+      const timeout = setTimeout(() => requestController.abort(), 20000);
       try {
-        const response = await fetch(`/api/admin/listeners?channel=${encodeURIComponent(channel)}&range=${range}`, { cache: "no-store", signal: controller.signal });
+        const response = await fetch(`/api/admin/listeners?channel=${encodeURIComponent(channel)}&range=${range}`, { cache: "no-store", signal: requestController.signal });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "Unable to load listeners.");
-        if (!stopped) { setReport(data); setPage(value => Math.min(value, Math.max(0, Math.ceil(data.listeners.length / 25) - 1))); setError(null); }
+        if (!stopped && !requestController.signal.aborted) {
+          setReport(data);
+          setPage(value => Math.min(value, Math.max(0, Math.ceil(data.listeners.length / 25) - 1)));
+          setError(null);
+        }
       } catch (error) {
-        if (!stopped) setError(error instanceof Error ? error.message : "Unable to load listeners.");
+        if (!stopped && !requestController.signal.aborted) {
+          setError(error instanceof Error ? error.message : "Unable to load listeners.");
+        }
       } finally {
         clearTimeout(timeout);
-        if (!stopped) { setLoading(false); timer = setTimeout(refresh, range === "live" ? 15000 : 60000); }
+        if (!stopped && controller === requestController) {
+          setLoading(false);
+          scheduleNext();
+        }
       }
     }
-    void refresh();
-    return () => { stopped = true; clearTimeout(timer); controller?.abort(); };
+
+    const handleVisibility = () => {
+      if (!document.hidden && !stopped) {
+        clearTimeout(timer);
+        void refresh();
+      } else {
+        clearTimeout(timer);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    if (!document.hidden) {
+      void refresh();
+    }
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+      controller?.abort();
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, [channel, range, revision]);
   const listeners = report?.listeners || [];
   const countries = new Map<string, number>();

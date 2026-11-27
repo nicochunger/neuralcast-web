@@ -7,6 +7,11 @@ export async function GET(_request: Request, context: { params: Promise<{ channe
       !/^[a-z0-9_-]{1,80}$/.test(mediaId) || !/^[a-z0-9_-]{1,80}$/.test(chapterId)) return new Response(null, { status: 404 });
   try {
     const bytes = await getEpisodeArtwork(channelId, mediaId, chapterId);
-    return new Response(bytes, { headers: { "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=3600" } });
+    return new Response(bytes, {
+      headers: {
+        "Content-Type": "image/jpeg",
+        "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800"
+      }
+    });
   } catch { return new Response(null, { status: 404 }); }
 }

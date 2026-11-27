@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { HostCompanion, PlaybackObservation } from "@/types/hostCompanion";
 import type { StationId } from "@/types/radio";
 
@@ -9,6 +9,9 @@ export interface CompanionChannel { stationId: StationId; channelId: string; obs
 /** Keep availability independent of modal visibility and audio playback. */
 export function useHostCompanions(channels: readonly CompanionChannel[], currentTime: number) {
   const [cards, setCards] = useState<Partial<Record<StationId, HostCompanion | null>>>({});
+  const channelsRef = useRef(channels);
+  channelsRef.current = channels;
+  const channelsKey = JSON.stringify(channels);
   const now = currentTime / 1000;
 
   useEffect(() => {
@@ -34,11 +37,27 @@ export function useHostCompanions(channels: readonly CompanionChannel[], current
         if (!controller.signal.aborted) setCards((current) => ({ ...current, [stationId]: null }));
       } finally { pending.delete(stationId); }
     }
-    const refreshAll = () => channels.forEach((channel) => void refresh(channel));
-    refreshAll();
-    const polling = window.setInterval(refreshAll, 15_000);
-    return () => { controller.abort(); window.clearInterval(polling); };
-  }, [channels]);
+    const refreshAll = () => channelsRef.current.forEach((channel) => void refresh(channel));
+    if (!document.hidden) {
+      refreshAll();
+    }
+    const polling = window.setInterval(() => {
+      if (!document.hidden) {
+        refreshAll();
+      }
+    }, 30_000);
+    const handleVisibility = () => {
+      if (!document.hidden) {
+        refreshAll();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      controller.abort();
+      window.clearInterval(polling);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [channelsKey]);
 
   const visible: Partial<Record<StationId, HostCompanion>> = {};
   for (const { stationId, channelId } of channels) {

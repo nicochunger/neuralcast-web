@@ -198,22 +198,37 @@ export function AdminEpisodes() {
 
   useEffect(() => {
     let stopped = false;
-    let timer: ReturnType<typeof setTimeout>;
-    let controller: AbortController;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let controller: AbortController | undefined;
     let failures = 0;
+    let activeJob = false;
+
+    function scheduleNext() {
+      clearTimeout(timer);
+      if (stopped || document.hidden) return;
+      const baseDelay = activeJob ? 5000 : 30000;
+      const delay = Math.min(baseDelay * 2 ** failures, 60000);
+      timer = setTimeout(() => {
+        if (!stopped && !document.hidden) void refresh();
+      }, delay);
+    }
 
     async function refresh() {
-      controller = new AbortController();
+      clearTimeout(timer);
+      controller?.abort();
+      const requestController = new AbortController();
+      controller = requestController;
       try {
         const r = await fetch(`${base}/state${selected ? `?episode_id=${selected}` : ""}`, {
           cache: "no-store",
-          signal: controller.signal,
+          signal: requestController.signal,
         });
         const v = await r.json();
         if (!r.ok) throw new Error(v.detail || v.error || "Unable to load episodes.");
-        if (stopped) return;
+        if (stopped || requestController.signal.aborted) return;
 
         const data = v as View;
+        activeJob = data.job?.status === "running" || data.job?.status === "accepted";
         const key = data.episode ? `${data.episode.id}:${data.episode.revision}` : "";
 
         if (dirtyRef.current && revisionRef.current !== key) {
@@ -278,20 +293,33 @@ export function AdminEpisodes() {
           );
         }
       } catch (cause) {
-        if (!stopped) {
+        if (!stopped && !requestController.signal.aborted) {
           setError(cause instanceof Error ? cause.message : "Connection interrupted.");
           failures++;
         }
       } finally {
-        if (!stopped) timer = setTimeout(refresh, Math.min(5000 * 2 ** failures, 30000));
+        if (!stopped && controller === requestController) scheduleNext();
       }
     }
 
-    void refresh();
+    const handleVisibility = () => {
+      if (!document.hidden && !stopped) {
+        clearTimeout(timer);
+        void refresh();
+      } else {
+        clearTimeout(timer);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    if (!document.hidden) {
+      void refresh();
+    }
     return () => {
       stopped = true;
       clearTimeout(timer);
       controller?.abort();
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [base, selected, tick]);
 

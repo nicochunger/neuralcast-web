@@ -13,7 +13,12 @@ export async function GET(request: Request, context: RouteContext) {
   const station = getStation(stationId);
 
   if (!station) {
-    return NextResponse.json({ error: "Unknown station." }, { status: 404 });
+    return NextResponse.json({ error: "Unknown station." }, {
+      status: 404,
+      headers: {
+        "Cache-Control": "no-store"
+      }
+    });
   }
 
   try {
@@ -21,16 +26,26 @@ export async function GET(request: Request, context: RouteContext) {
     const hostChannel =
       requestedChannelId ? getHostChannel(station, requestedChannelId) : getDefaultHostChannel(station);
     if (!hostChannel) {
-      return NextResponse.json({ error: "Unknown host channel." }, { status: 404 });
+      return NextResponse.json({ error: "Unknown host channel." }, {
+        status: 404,
+        headers: {
+          "Cache-Control": "no-store"
+        }
+      });
     }
     const status = await fetchNowPlaying(station, hostChannel);
     return NextResponse.json(status, {
       headers: {
-        "Cache-Control": "no-store"
+        "Cache-Control": "public, max-age=0, s-maxage=8, stale-while-revalidate=15"
       }
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to load metadata.";
-    return NextResponse.json({ error: message }, { status: 502 });
+    return NextResponse.json({ error: message }, {
+      status: 502,
+      headers: {
+        "Cache-Control": "no-store"
+      }
+    });
   }
 }
