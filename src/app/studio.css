@@ -439,14 +439,15 @@
 }
 
 .studioDeck-neuralforge::before {
-  background-position: 15% center;
-  filter: saturate(1.04) contrast(1.04);
+  background-position: left 68%;
+  transform: scaleX(-1) scale(1.02);
+  filter: saturate(1.06) contrast(1.04);
 }
 
 .studioDeck-neuralforge::after {
   background:
-    linear-gradient(180deg, rgba(11, 12, 15, 0.52) 0%, rgba(11, 12, 15, 0.34) 44%, rgba(11, 12, 15, 0.86) 100%),
-    linear-gradient(95deg, rgba(11, 12, 15, 0.78) 0%, rgba(11, 12, 15, 0.42) 52%, rgba(11, 12, 15, 0.24) 100%);
+    linear-gradient(180deg, rgba(11, 12, 15, 0.56) 0%, rgba(11, 12, 15, 0.18) 38%, rgba(11, 12, 15, 0.28) 74%, rgba(11, 12, 15, 0.78) 100%),
+    linear-gradient(92deg, rgba(11, 12, 15, 0.84) 0%, rgba(11, 12, 15, 0.62) 38%, rgba(11, 12, 15, 0.34) 62%, rgba(11, 12, 15, 0.14) 100%);
 }
 
 .studioDeckOnAir {
